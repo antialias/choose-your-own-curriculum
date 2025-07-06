@@ -18,6 +18,20 @@ Users can authenticate via email. Use the navigation bar's **Sign in** link to o
 - **GitHub Actions** build Docker images and push to GCR
 
 ## Development
+This project requires **Node.js 22**. Install it via `nvm`:
+
+```bash
+nvm install 22
+nvm use 22
+```
+
+After installing dependencies, run the following to compile native modules such
+as `better-sqlite3` for Node 22:
+
+```bash
+npm rebuild better-sqlite3
+```
+
 
 ```bash
 pnpm install
