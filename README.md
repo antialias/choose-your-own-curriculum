@@ -2,6 +2,8 @@
 
 A web application for planning and tracking long term learning goals. Users define topic graphs and upload work samples. The app stores metadata and embeddings to recommend what to study next.
 
+Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**.
+
 ## Tech Stack
 
 - **Next.js** with React Server Components and Server Side Rendering
