@@ -11,6 +11,7 @@ A web application for planning and tracking long term learning goals. Users defi
 - **Vitest** for unit and e2e testing
 - **Storybook** for component development
 - **Casbin** for access control
+- **LLM Client** uses OpenAI-compatible API with Zod schema validation ([docs](app/src/llm/README.md))
 - **GitHub Actions** build Docker images and push to GCR
 
 ## Development
