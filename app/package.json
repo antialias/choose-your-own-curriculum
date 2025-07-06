@@ -1,0 +1,49 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "storybook": "storybook dev -p 6006 --ci",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@stylexjs/stylex": "^0.14.1",
+    "casbin": "^5.38.0",
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.1",
+    "@eslint/eslintrc": "^3",
+    "@storybook/addon-a11y": "^9.0.15",
+    "@storybook/addon-docs": "^9.0.15",
+    "@storybook/addon-vitest": "^9.0.15",
+    "@storybook/nextjs-vite": "^9.0.15",
+    "@stylexjs/babel-plugin": "^0.14.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/browser": "3.2.4",
+    "@vitest/coverage-v8": "3.2.4",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "eslint-plugin-storybook": "^9.0.15",
+    "jsdom": "^26.1.0",
+    "playwright": "^1.53.2",
+    "prisma": "^6.11.1",
+    "storybook": "^9.0.15",
+    "typescript": "^5",
+    "vite": "^7.0.2",
+    "vitest": "^3.2.4"
+  }
+}
