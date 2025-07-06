@@ -7,9 +7,10 @@ A web application for planning and tracking long term learning goals. Users defi
 - **Next.js** with React Server Components and Server Side Rendering
 - **StyleX** for styling
 - **TypeScript** throughout
-- **SQLite** database accessed via Prisma ORM
+- **SQLite** database accessed via Drizzle ORM with migrations
 - **Vitest** for unit and e2e testing
 - **Storybook** for component development
+- **NextAuth** for authentication
 - **Casbin** for access control
 - **GitHub Actions** build Docker images and push to GCR
 
