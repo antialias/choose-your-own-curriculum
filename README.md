@@ -27,11 +27,20 @@ nvm install 22
 nvm use 22
 ```
 
-After installing dependencies, run the following to compile native modules such
-as `better-sqlite3` for Node 22:
+
+`pnpm install` automatically rebuilds native modules like `better-sqlite3` for
+the current Node version. If you encounter binding errors, you can manually
+rebuild with:
 
 ```bash
 npm rebuild better-sqlite3
+```
+
+After installing dependencies, initialize the SQLite database and run pending
+migrations:
+
+```bash
+pnpm exec drizzle-kit push
 ```
 
 
