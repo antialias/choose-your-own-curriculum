@@ -12,6 +12,7 @@ A web application for planning and tracking long term learning goals. Users defi
 - **Storybook** for component development
 - **NextAuth** for authentication
 - **Casbin** for access control
+- **LLM Client** uses OpenAI-compatible API with Zod schema validation ([docs](app/src/llm/README.md))
 - **GitHub Actions** build Docker images and push to GCR
 
 ## Development
