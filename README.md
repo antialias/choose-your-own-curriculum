@@ -32,6 +32,19 @@ pnpm test
 pnpm storybook
 ```
 
+### Configuration
+
+Create an `.env` file based on `.env.example` and provide SMTP credentials for email authentication:
+
+```
+NEXTAUTH_SECRET=yourSecret
+EMAIL_SERVER_HOST=smtp.example.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=username
+EMAIL_SERVER_PASSWORD=password
+EMAIL_FROM=Example <noreply@example.com>
+```
+
 ## Contributing
 
 Ensure all tests pass and lint before submitting PRs. See `AGENTS.md` for automation guidelines.
