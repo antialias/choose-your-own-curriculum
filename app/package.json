@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
+    "postinstall": "npm rebuild better-sqlite3",
     "storybook": "storybook dev -p 6006 --ci",
     "build-storybook": "storybook build"
   },
