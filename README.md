@@ -37,6 +37,7 @@ npm rebuild better-sqlite3
 
 ```bash
 pnpm install
+pnpm exec drizzle-kit migrate
 pnpm dev
 ```
 
