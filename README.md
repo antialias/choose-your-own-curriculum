@@ -8,6 +8,7 @@ A web application for planning and tracking long term learning goals. Users defi
 - **StyleX** for styling
 - **TypeScript** throughout
 - **SQLite** database accessed via Prisma ORM
+- **NextAuth** for authentication
 - **Vitest** for unit and e2e testing
 - **Storybook** for component development
 - **Casbin** for access control
@@ -19,6 +20,9 @@ A web application for planning and tracking long term learning goals. Users defi
 pnpm install
 pnpm dev
 ```
+
+Create a `.env` file based on `.env.example` to configure database access and
+SMTP credentials for email authentication.
 
 ### Tests
 
