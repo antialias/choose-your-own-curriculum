@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import { MathSkillSelector } from '@/components/MathSkillSelector';
 
 const styles = stylex.create({
   container: {
@@ -11,7 +12,8 @@ export default function Home() {
   return (
     <div {...stylex.props(styles.container)}>
       <h1>Choose Your Own Curriculum</h1>
-      <p>Welcome! Scaffold under construction.</p>
+      <p>Select advanced math topics to see their prerequisites.</p>
+      <MathSkillSelector />
     </div>
   );
 }
