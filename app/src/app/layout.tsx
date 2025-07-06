@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppNavBar } from "@/components/AppNavBar";
 
 export const metadata: Metadata = {
   title: "Choose Your Own Curriculum",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AppNavBar />
+        {children}
+      </body>
     </html>
   );
 }

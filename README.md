@@ -14,6 +14,9 @@ A web application for planning and tracking long term learning goals. Users defi
 - **Casbin** for access control
 - **GitHub Actions** build Docker images and push to GCR
 
+The app now includes a simple login page at `/login` and a navigation bar with a
+sign in/out button.
+
 ## Development
 
 ```bash
