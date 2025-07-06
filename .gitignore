@@ -1,1 +1,6 @@
-# nothing
+node_modules/
+.env
+**/.next
+**/build
+**/coverage
+app/prisma/dev.db

@@ -35,3 +35,4 @@ pnpm storybook
 ## Contributing
 
 Ensure all tests pass and lint before submitting PRs. See `AGENTS.md` for automation guidelines.
+Remaining tasks and future work are documented in `TASKS.md`.
