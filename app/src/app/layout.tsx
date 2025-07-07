@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "../styles/index.css";
+import "katex/dist/katex.min.css";
 import AuthProvider from "@/components/AuthProvider";
 import { NavBar } from "@/components/NavBar";
 import { getServerSession } from "next-auth";

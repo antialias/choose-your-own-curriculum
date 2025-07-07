@@ -1,4 +1,5 @@
 'use client'
+import { SummaryWithMath } from '@/components/SummaryWithMath';
 import { useEffect, useState } from 'react'
 import { UploadForm } from './UploadForm'
 
@@ -61,7 +62,7 @@ export function UploadedWorkList() {
         {works.map((w) => (
           <li key={w.id} style={{ marginBottom: '1rem' }}>
             <strong>{new Date(w.dateCompleted || w.dateUploaded).toDateString()}</strong>
-            <p>{w.summary}</p>
+            <SummaryWithMath text={w.summary ?? ''} />
           </li>
         ))}
       </ul>
