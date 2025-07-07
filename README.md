@@ -59,6 +59,12 @@ pnpm dev
 pnpm test
 ```
 
+Run end-to-end tests:
+
+```bash
+pnpm test:e2e
+```
+
 ### Storybook
 
 ```bash
