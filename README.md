@@ -4,6 +4,8 @@ A web application for planning and tracking long term learning goals. Users defi
 
 Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**.
 
+An **Uploaded Work** page lets authenticated users store documents. Each upload records the completion date, a summary, embeddings, and the file itself for later review.
+
 The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
 
 ## Tech Stack
