@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "panda && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome check .",
+    "format": "biome format --write .",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "postinstall": "npm rebuild better-sqlite3",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
+    "@hookform/resolvers": "^3.3.1",
     "better-sqlite3": "^12.2.0",
     "casbin": "^5.38.0",
     "drizzle-kit": "^0.31.4",
@@ -29,15 +31,15 @@
     "openai": "^5.8.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.50.0",
     "react-katex": "^3.1.0",
     "react-mermaid2": "^0.1.4",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",
-    "zod-to-json-schema": "^3.24.6",
-    "react-hook-form": "^7.50.0",
-    "@hookform/resolvers": "^3.3.1"
+    "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.0.6",
     "@chromatic-com/storybook": "^4.0.1",
     "@eslint/eslintrc": "^3",
     "@pandacss/dev": "^0.54.0",
