@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { uploadedWork } from '@/db/schema';
 import { UploadForm } from '@/components/UploadForm';
+import { MathText } from '@/components/MathText';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import { eq } from 'drizzle-orm';
@@ -27,8 +28,12 @@ export default async function UploadedWorkPage() {
       <ul>
         {works.map((w) => (
           <li key={w.id} style={{ marginBottom: '1rem' }}>
-            <strong>{new Date(w.dateCompleted || w.dateUploaded).toDateString()}</strong>
-            <p>{w.summary}</p>
+            <strong>
+              {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
+            </strong>
+            <div>
+              <MathText text={w.summary || ''} />
+            </div>
           </li>
         ))}
       </ul>
