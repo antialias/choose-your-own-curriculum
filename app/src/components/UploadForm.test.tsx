@@ -1,10 +1,14 @@
-import { render } from '@testing-library/react'
+import { render, fireEvent, screen } from '@testing-library/react'
 import { UploadForm } from './UploadForm'
 import '@testing-library/jest-dom'
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({}) }))
+
 describe('UploadForm', () => {
-  it('renders', () => {
-    const { getByText } = render(<UploadForm />)
-    expect(getByText('Upload')).toBeInTheDocument()
+  it('shows validation errors', async () => {
+    render(<UploadForm />)
+    fireEvent.submit(screen.getByRole('button'))
+    expect(await screen.findByText('File is required')).toBeInTheDocument()
+    expect(await screen.findByText('Student ID is required')).toBeInTheDocument()
   })
 })
