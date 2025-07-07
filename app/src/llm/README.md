@@ -12,6 +12,7 @@ const client = new LLMClient(process.env.OPENAI_API_KEY!);
 
 const schema = z.object({
   message: z.string(),
+  errorReason: z.string().optional(),
 });
 
 const result = await client.chat('Say hello to {{name}}', {
@@ -26,6 +27,9 @@ if (result.error) {
   console.log(result.response);
 }
 ```
+
+The schema can include optional fields like `errorReason` so the model can
+provide an explanation when it declines to answer.
 
 The client will try up to `maxRetries` times (default `3`) when the model returns output that cannot be parsed with the provided schema. On each retry it explains the validation error to the model via a system message.
 
