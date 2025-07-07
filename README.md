@@ -13,6 +13,7 @@ The home page includes a math skill selector that generates a mermaid DAG of pre
 - **Mermaid diagrams** rendered with `react-mermaid2`
 - **TypeScript** throughout
 - **SQLite** database accessed via Drizzle ORM with migrations
+- **sqlite-vss** extension automatically loaded for vector search
 - **Vitest** for unit and e2e testing
 - **Storybook** for component development
 - **NextAuth** for authentication
@@ -46,6 +47,9 @@ pnpm exec drizzle-kit push
 Running this command will create any tables defined in the schema, including the
 `uploaded_work` table. When the `drizzle` folder exists, migrations run
 automatically at runtime.
+
+The `sqlite-vss` extension is installed via npm and loaded automatically when
+the database initializes, so no extra setup is required.
 
 
 ```bash
