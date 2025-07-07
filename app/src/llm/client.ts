@@ -7,6 +7,9 @@ import { OpenAI } from 'openai';
 import { ZodSchema, ZodError } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
+/** Default model used when none is provided */
+const DEFAULT_MODEL = 'o4-mini';
+
 /**
  * An error returned by the LLM client.
  * - `openai_error` indicates the request to the API failed.
@@ -28,10 +31,8 @@ export interface LLMOptions<T> {
   templateVars?: Record<string, string | number>;
   /** Number of validation retries. Defaults to 3. */
   maxRetries?: number;
-  /** Additional OpenAI parameters. Must include the model name. */
-  params?: Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages' | 'model'> & {
-    model: string;
-  };
+  /** Additional OpenAI parameters. */
+  params?: Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
 }
 
 /**
@@ -101,8 +102,12 @@ export class LLMClient {
         });
       }
       try {
+        const paramsWithModel = {
+          ...(params ?? {}),
+          model: params?.model ?? DEFAULT_MODEL,
+        } as Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
         const result = await this.openai.chat.completions.create({
-          ...(params as OpenAI.Chat.ChatCompletionCreateParams),
+          ...paramsWithModel,
           stream: false,
           messages,
         });

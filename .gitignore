@@ -4,3 +4,4 @@ node_modules/
 **/build
 **/coverage
 app/prisma/dev.db
+app/node-compile-cache
