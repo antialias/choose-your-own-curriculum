@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Mermaid from 'react-mermaid2';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -27,28 +28,6 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
-
-  // Load mermaid from CDN once on mount
-  useEffect(() => {
-    if (document.getElementById('mermaid-script')) return;
-    const script = document.createElement('script');
-    script.id = 'mermaid-script';
-    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
-    script.onload = () => {
-      const m = (window as unknown as { mermaid: { initialize: (opts: unknown) => void } }).mermaid;
-      m.initialize({ startOnLoad: false });
-    };
-    document.body.appendChild(script);
-  }, []);
-
-  useEffect(() => {
-    const m = (window as unknown as { mermaid?: { render: (id: string, code: string, cb: (svg: string) => void) => void } }).mermaid;
-    if (!graph || !m) return;
-    m.render('math-graph', graph, (svg: string) => {
-      const container = document.getElementById('graph-container');
-      if (container) container.innerHTML = svg;
-    });
-  }, [graph]);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -85,7 +64,11 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-      {graph && <div id="graph-container" style={styles.graph} />}
+      {graph && (
+        <div id="graph-container" style={styles.graph}>
+          <Mermaid chart={graph} />
+        </div>
+      )}
     </div>
   );
 }
