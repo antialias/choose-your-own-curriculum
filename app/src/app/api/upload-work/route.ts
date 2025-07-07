@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { uploadedWork } from '@/db/schema';
+import { uploadedWork, students } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
@@ -14,6 +15,17 @@ export async function POST(req: NextRequest) {
   const form = await req.formData();
   const file = form.get('file');
   const studentId = String(form.get('studentId'));
+  const [student] = await db
+    .select()
+    .from(students)
+    .where(eq(students.id, studentId));
+  if (!student) {
+    await db.insert(students).values({
+      id: studentId,
+      name: studentId,
+      userId: userId as string,
+    });
+  }
   const dateCompleted = form.get('dateCompleted')
     ? new Date(String(form.get('dateCompleted'))).getTime()
     : null;
