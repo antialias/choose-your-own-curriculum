@@ -27,16 +27,21 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+  const [mermaidLoaded, setMermaidLoaded] = useState(false);
 
   // Load mermaid from CDN once on mount
   useEffect(() => {
-    if (document.getElementById('mermaid-script')) return;
+    if (document.getElementById('mermaid-script')) {
+      setMermaidLoaded(true);
+      return;
+    }
     const script = document.createElement('script');
     script.id = 'mermaid-script';
     script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
     script.onload = () => {
       const m = (window as unknown as { mermaid: { initialize: (opts: unknown) => void } }).mermaid;
       m.initialize({ startOnLoad: false });
+      setMermaidLoaded(true);
     };
     document.body.appendChild(script);
   }, []);
@@ -48,7 +53,7 @@ export function MathSkillSelector() {
       const container = document.getElementById('graph-container');
       if (container) container.innerHTML = svg;
     });
-  }, [graph]);
+  }, [graph, mermaidLoaded]);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
