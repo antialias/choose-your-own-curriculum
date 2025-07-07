@@ -1,4 +1,4 @@
-import { db, sqlite } from './index';
+import { sqlite } from './index';
 
 export interface WorkEmbedding {
   workId: string;

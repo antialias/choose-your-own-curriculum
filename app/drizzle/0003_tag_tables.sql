@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS tag (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT NOT NULL UNIQUE
+);
+--> statement-breakpoint
+CREATE VIRTUAL TABLE IF NOT EXISTS tag_index USING vec0(
+  tag_id TEXT PRIMARY KEY,
+  vector FLOAT[1536]
+);
+
