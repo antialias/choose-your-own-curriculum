@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Mermaid from 'react-mermaid2';
+import mermaid from 'mermaid';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -28,6 +29,12 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+
+  useEffect(() => {
+    if (graph) {
+      mermaid.contentLoaded();
+    }
+  }, [graph]);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
