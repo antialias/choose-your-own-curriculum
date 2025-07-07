@@ -16,10 +16,12 @@ test('shows sign in link when unauthenticated', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
   render(<NavBar />);
   expect(screen.getByText('Sign in')).toBeInTheDocument();
+  expect(screen.queryByText('Uploaded Work')).not.toBeInTheDocument();
 });
 
 test('shows sign out when authenticated', () => {
   mockedUseSession.mockReturnValue({ data: { user: { name: 'a' }, expires: '1' }, status: 'authenticated' });
   render(<NavBar />);
+  expect(screen.getByText('Uploaded Work')).toBeInTheDocument();
   expect(screen.getByText('Sign out')).toBeInTheDocument();
 });
