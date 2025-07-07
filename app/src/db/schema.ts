@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, primaryKey, blob } from 'drizzle-orm/sqlite-core';
+import crypto from 'node:crypto';
 
 export const users = sqliteTable('user', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
@@ -108,5 +109,10 @@ export const uploadedWork = sqliteTable('uploaded_work', {
   summary: text('summary'),
   embeddings: text('embeddings'),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
+});
+
+export const tags = sqliteTable('tag', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  text: text('text').notNull().unique(),
 });
 
