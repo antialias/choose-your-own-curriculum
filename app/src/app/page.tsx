@@ -12,6 +12,9 @@ export default function Home() {
     <div style={styles.container}>
       <h1>Choose Your Own Curriculum</h1>
       <p>Select advanced math topics to see their prerequisites.</p>
+      <p>
+        <a href="/uploaded-work">Go to Uploaded Work</a>
+      </p>
       <MathSkillSelector />
     </div>
   );
