@@ -68,3 +68,19 @@ export const authenticators = sqliteTable(
     pk: primaryKey(authenticator.userId, authenticator.credentialID),
   })
 );
+
+export const workUploads = sqliteTable('work_upload', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  student: text('student'),
+  uploadedAt: integer('uploaded_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  completedAt: integer('completed_at', { mode: 'timestamp_ms' }),
+  summary: text('summary'),
+  embedding: text('embedding'),
+  file: text('file'),
+  originalName: text('original_name'),
+});
