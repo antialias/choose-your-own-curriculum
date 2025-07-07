@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 vi.mock('react-mermaid2', () => ({ default: () => <div data-testid="mermaid" /> }));
+vi.mock('mermaid', () => ({ contentLoaded: vi.fn() }));
 import { MathSkillSelector } from './MathSkillSelector';
 
 vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ graph: 'g' }) }));
