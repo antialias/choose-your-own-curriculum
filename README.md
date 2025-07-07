@@ -73,7 +73,8 @@ pnpm storybook
 
 ## Contributing
 
-Ensure all tests pass and lint before submitting PRs. See `AGENTS.md` for automation guidelines.
+Ensure all tests pass and lint using Biome before submitting PRs. See `AGENTS.md` for automation guidelines.
+Run `pnpm lint` to check formatting and linting or `pnpm format` to apply fixes.
 Remaining tasks and future work are documented in `TASKS.md`.
 
 ## Uploaded Work
