@@ -44,6 +44,13 @@ migrations:
 pnpm exec drizzle-kit push
 ```
 
+Whenever you change `app/src/db/schema.ts`, generate a new migration before
+pushing:
+
+```bash
+pnpm exec drizzle-kit generate --config ./drizzle.config.mjs
+```
+
 
 ```bash
 pnpm install
