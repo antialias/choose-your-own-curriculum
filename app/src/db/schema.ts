@@ -90,7 +90,8 @@ export const uploadedWork = sqliteTable('uploaded_work', {
     .$defaultFn(() => new Date()),
   dateCompleted: integer('dateCompleted', { mode: 'timestamp_ms' }),
   summary: text('summary'),
-  embeddings: text('embeddings'),
+  // OpenAI vectors stored as 1536-dim Float32 buffers
+  embeddings: blob('embeddings', { mode: 'buffer' }),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
 });
 
