@@ -23,3 +23,9 @@ test('shows sign out when authenticated', () => {
   render(<NavBar />);
   expect(screen.getByText('Sign out')).toBeInTheDocument();
 });
+
+test('shows uploaded work link', () => {
+  mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
+  render(<NavBar />);
+  expect(screen.getByText('Uploaded Work')).toBeInTheDocument();
+});

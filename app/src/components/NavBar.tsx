@@ -35,6 +35,9 @@ export function NavBar() {
       <Link href="/" style={styles.link}>
         Home
       </Link>
+      <Link href="/uploaded-work" style={styles.link}>
+        Uploaded Work
+      </Link>
       <div style={styles.spacer} />
       {session ? (
         <button style={styles.button} onClick={() => signOut()}>
