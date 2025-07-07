@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { uploadedWork, students } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { uploadedWork, teacherStudents } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
@@ -20,16 +20,17 @@ export async function POST(req: NextRequest) {
     dateCompleted: form.get('dateCompleted'),
   });
   const { studentId, dateCompleted } = fields;
-  const [student] = await db
+  const [relation] = await db
     .select()
-    .from(students)
-    .where(eq(students.id, studentId));
-  if (!student) {
-    await db.insert(students).values({
-      id: studentId,
-      name: studentId,
-      userId: userId as string,
-    });
+    .from(teacherStudents)
+    .where(
+      and(
+        eq(teacherStudents.teacherId, userId),
+        eq(teacherStudents.studentId, studentId),
+      ),
+    );
+  if (!relation) {
+    return NextResponse.json({ error: 'invalid student' }, { status: 400 });
   }
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'file required' }, { status: 400 });
