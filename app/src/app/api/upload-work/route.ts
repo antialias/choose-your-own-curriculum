@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import crypto from 'node:crypto';
+import { db, sqlite } from '@/db';
 import { uploadedWork, students } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import { upsertEmbedding } from '@/db/vectors';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -75,25 +77,31 @@ export async function POST(req: NextRequest) {
       console.error('summary error', err);
     }
   }
-  let embeddings = '';
+  let vector: number[] = [];
   try {
     const emb = await openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: summary,
     });
-    embeddings = JSON.stringify(emb);
+    vector = emb.data[0]?.embedding ?? [];
   } catch (err) {
     console.error('embedding error', err);
   }
+
+  const id = crypto.randomUUID();
   await db.insert(uploadedWork).values({
+    id,
     userId: userId as string,
     studentId,
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
-    embeddings,
     originalDocument: buffer,
   } as typeof uploadedWork.$inferInsert);
+  const row = sqlite.prepare('SELECT rowid FROM uploaded_work WHERE id = ?').get(id) as { rowid: number };
+  if (row) {
+    upsertEmbedding(sqlite, row.rowid, vector);
+  }
   return NextResponse.json({ ok: true });
 }
 
