@@ -90,7 +90,8 @@ export const uploadedWork = sqliteTable('uploaded_work', {
     .$defaultFn(() => new Date()),
   dateCompleted: integer('dateCompleted', { mode: 'timestamp_ms' }),
   summary: text('summary'),
-  embeddings: text('embeddings'),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
 });
+
+export const uploadedWorkVss = 'vss_uploaded_work';
 
