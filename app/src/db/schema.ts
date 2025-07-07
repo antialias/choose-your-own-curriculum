@@ -73,9 +73,23 @@ export const students = sqliteTable('student', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   userId: text('userId')
-    .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
 });
+
+export const studentTeachers = sqliteTable(
+  'student_teacher',
+  {
+    studentId: text('studentId')
+      .notNull()
+      .references(() => students.id, { onDelete: 'cascade' }),
+    teacherId: text('teacherId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({
+    pk: primaryKey(t.studentId, t.teacherId),
+  }),
+);
 
 export const uploadedWork = sqliteTable('uploaded_work', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),

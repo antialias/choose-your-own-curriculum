@@ -82,3 +82,6 @@ Authenticated users can upload documents from the **Uploaded Work** page. The se
 New uploads appear immediately in the list with a temporary "Processing..." placeholder while the LLM generates the summary. Any upload errors are shown next to the list.
 
 Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summaries are rendered with KaTeX.
+
+## Student Management
+Users can add student profiles from the **Students** page. If the student email matches an existing user account, the profile links automatically. Uploads are associated with a selected student.
