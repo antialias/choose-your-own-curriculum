@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import { uploadWorkSchema } from '@/validations/uploadWork';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,8 +14,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const form = await req.formData();
-  const file = form.get('file');
-  const studentId = String(form.get('studentId'));
+  const parsed = uploadWorkSchema.safeParse({
+    file: form.get('file'),
+    studentId: form.get('studentId'),
+    dateCompleted: form.get('dateCompleted'),
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.message }, { status: 400 });
+  }
+  const { file, studentId, dateCompleted } = parsed.data;
   const [student] = await db
     .select()
     .from(students)
@@ -26,12 +34,7 @@ export async function POST(req: NextRequest) {
       userId: userId as string,
     });
   }
-  const dateCompleted = form.get('dateCompleted')
-    ? new Date(String(form.get('dateCompleted'))).getTime()
-    : null;
-  if (!(file instanceof File)) {
-    return NextResponse.json({ error: 'file required' }, { status: 400 });
-  }
+  const completedDate = dateCompleted ? new Date(String(dateCompleted)) : null;
   const buffer = Buffer.from(await file.arrayBuffer());
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
     userId: userId as string,
     studentId,
     dateUploaded: new Date(),
-    dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
+    dateCompleted: completedDate,
     summary,
     embeddings: embeddingsJson,
     originalDocument: buffer,
