@@ -55,6 +55,7 @@ export class LLMClient {
    */
   constructor(apiKey: string) {
     this.openai = new OpenAI({ apiKey });
+    console.log('LLMClient initialized');
   }
 
   /**
@@ -88,6 +89,7 @@ export class LLMClient {
     let lastError: LLMError | null = null;
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
+      console.log(`Sending chat prompt (attempt ${attempt + 1})`);
       const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         { role: 'system', content: systemTemplate },
         { role: 'user', content: userPrompt },
@@ -111,11 +113,13 @@ export class LLMClient {
           return { error: null, response: data };
         } catch (e) {
           if (e instanceof SyntaxError) {
+            console.error('Invalid JSON returned from LLM', e);
             lastError = {
               type: 'validation_error',
               message: `Invalid JSON: ${e.message}`,
             };
           } else if (e instanceof ZodError) {
+            console.error('LLM response failed schema validation', e);
             lastError = {
               type: 'validation_error',
               message: e.errors.map(err => err.message).join(', '),
@@ -129,6 +133,7 @@ export class LLMClient {
           typeof err === 'object' && err && 'message' in err
             ? String((err as { message?: unknown }).message)
             : 'Unknown OpenAI error';
+        console.error('OpenAI request failed', err);
         lastError = {
           type: 'openai_error',
           message,
