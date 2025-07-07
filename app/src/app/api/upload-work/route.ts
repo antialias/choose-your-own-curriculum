@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { uploadedWork, teacherStudents } from '@/db/schema';
-import { upsertWorkEmbeddings } from '@/db/embeddings';
+import { uploadedWork, teacherStudents, tags } from '@/db/schema';
+import {
+  upsertWorkEmbeddings,
+  searchTagEmbeddings,
+  getWorkVector,
+} from '@/db/embeddings';
 import crypto from 'node:crypto';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
@@ -104,15 +108,35 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
   if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  const url = new URL(req.url);
+  const n = parseInt(url.searchParams.get('n') ?? '3', 10);
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
-  return NextResponse.json({ works });
+  const result = [] as (typeof works[number] & { tags: string[] })[];
+  for (const w of works) {
+    const vector = getWorkVector(w.id);
+    let tagsArr: string[] = [];
+    if (vector) {
+      const matches = searchTagEmbeddings(vector, n);
+      if (matches.length) {
+        const ids = matches.map((m) => m.id);
+        const tagRows = await db
+          .select({ id: tags.id, text: tags.text })
+          .from(tags)
+          .where(inArray(tags.id, ids));
+        const map = new Map(tagRows.map((t) => [t.id, t.text]));
+        tagsArr = ids.map((id) => map.get(id)).filter((t): t is string => !!t);
+      }
+    }
+    result.push({ ...w, tags: tagsArr });
+  }
+  return NextResponse.json({ works: result });
 }

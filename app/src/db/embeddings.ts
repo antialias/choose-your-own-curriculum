@@ -61,3 +61,10 @@ export function searchTagEmbeddings(vector: number[], k: number) {
     )
     .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
 }
+
+export function getWorkVector(workId: string): number[] | null {
+  const row = sqlite
+    .prepare('SELECT vector FROM uploaded_work_index WHERE work_id = ?')
+    .get(workId) as { vector?: string } | undefined;
+  return row?.vector ? (JSON.parse(row.vector) as number[]) : null;
+}
