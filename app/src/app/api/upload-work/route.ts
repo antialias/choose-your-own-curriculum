@@ -9,6 +9,8 @@ import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
+const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL || 'text-embedding-3-small';
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
@@ -82,7 +84,7 @@ export async function POST(req: NextRequest) {
   let vector: number[] = [];
   try {
     const emb = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
+      model: EMBEDDING_MODEL,
       input: summary,
     });
     vector = emb.data[0]?.embedding || [];
