@@ -34,6 +34,7 @@
     "react-hook-form": "^7.50.0",
     "react-katex": "^3.1.0",
     "react-mermaid2": "^0.1.4",
+    "sqlite-vec": "0.1.7-alpha.2",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",
     "zod-to-json-schema": "^3.24.6"
@@ -64,9 +65,13 @@
     "eslint-plugin-storybook": "^9.0.15",
     "jsdom": "^26.1.0",
     "playwright": "^1.53.2",
+    "sqlite-vss": "0.1.2",
     "storybook": "^9.0.15",
     "typescript": "^5",
     "vite": "^7.0.2",
     "vitest": "^3.2.4"
+  },
+  "optionalDependencies": {
+    "sqlite-vec-linux-x64": "0.1.7-alpha.2"
   }
 }

@@ -14,9 +14,10 @@ vi.mock('@/authOptions', () => ({ authOptions: {} }));
 vi.mock('@/db', () => ({
   db: {
     select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
-    insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
+    insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue({ lastInsertRowid: 1 }) }))
   }
 }));
+vi.mock('@/db/vectors', () => ({ upsertUploadedWorkVector: vi.fn() }));
 
 describe('upload-work API', () => {
   it('rejects unauthenticated users', async () => {
