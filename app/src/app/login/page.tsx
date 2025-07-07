@@ -1,25 +1,23 @@
 'use client'
 
 import { signIn } from 'next-auth/react';
-import * as stylex from '@stylexjs/stylex';
-
-const styles = stylex.create({
+const styles = {
   container: {
     padding: '2rem',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   button: {
     padding: '0.5rem 1rem',
     fontSize: '1rem',
     cursor: 'pointer',
   },
-});
+};
 
 export default function LoginPage() {
   return (
-    <div {...stylex.props(styles.container)}>
+    <div style={styles.container}>
       <h1>Log In</h1>
-      <button {...stylex.props(styles.button)} onClick={() => signIn()}>
+      <button style={styles.button} onClick={() => signIn()}>
         Sign in with Email
       </button>
     </div>

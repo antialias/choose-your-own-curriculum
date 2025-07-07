@@ -1,13 +1,11 @@
-import * as stylex from '@stylexjs/stylex';
+type Props = { name: string };
 
-type Props = {name: string};
-
-const styles = stylex.create({
+const styles = {
   root: {
     color: 'blue',
   },
-});
+};
 
-export function Greeting({name}: Props) {
-  return <span {...stylex.props(styles.root)}>Hello {name}</span>;
+export function Greeting({ name }: Props) {
+  return <span style={styles.root}>Hello {name}</span>;
 }

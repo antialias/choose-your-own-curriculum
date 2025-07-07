@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import stylex from '@stylexjs/babel-plugin';
 
 export default defineConfig({
-  plugins: [react({ babel: { plugins: [stylex] } })],
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@/styled-system': '/styled-system'
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true,
