@@ -110,3 +110,8 @@ export const uploadedWork = sqliteTable('uploaded_work', {
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
 });
 
+export const tags = sqliteTable('tag', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull().unique(),
+});
+

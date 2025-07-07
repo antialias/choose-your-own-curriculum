@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   let vector: number[] = [];
   try {
     const emb = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
+      model: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
       input: summary,
     });
     vector = emb.data[0]?.embedding || [];
