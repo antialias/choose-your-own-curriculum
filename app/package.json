@@ -30,6 +30,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-mermaid2": "^0.1.4",
+    "sqlite-vss": "^0.1.2",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",
     "zod-to-json-schema": "^3.24.6"
