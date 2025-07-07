@@ -64,11 +64,12 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-      {graph && (
-        <div id="graph-container" style={styles.graph}>
-          <Mermaid chart={graph} />
-        </div>
-      )}
+        {graph && (
+          <div id="graph-container" style={styles.graph}>
+            {/* re-mount Mermaid when chart string changes to ensure re-render */}
+            <Mermaid key={graph} chart={graph} />
+          </div>
+        )}
     </div>
   );
 }
