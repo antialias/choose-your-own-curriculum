@@ -3,6 +3,7 @@ import { css } from '@/styled-system/css'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadWorkClientSchema, UploadWorkClient } from '@/forms/uploadWork'
+import { useEffect, useState } from 'react'
 
 interface Props {
   onUploadStart?: () => void
@@ -17,6 +18,13 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<UploadWorkClient>({ resolver: zodResolver(uploadWorkClientSchema) })
+
+  const [students, setStudents] = useState<{ id: string; name: string }[]>([])
+  useEffect(() => {
+    fetch('/api/students')
+      .then((r) => r.json())
+      .then((d) => setStudents(d.students))
+  }, [])
 
   const onSubmit = async (data: UploadWorkClient) => {
     onUploadStart?.()
@@ -44,7 +52,12 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
       <input type="file" data-testid="file" {...register('file')} />
       {errors.file && <span>{errors.file.message}</span>}
       <input type="date" {...register('dateCompleted')} />
-      <input type="text" placeholder="Student ID" {...register('studentId')} />
+      <select {...register('studentId')} defaultValue="">
+        <option value="" disabled>Select student</option>
+        {students.map((s) => (
+          <option key={s.id} value={s.id}>{s.name}</option>
+        ))}
+      </select>
       {errors.studentId && <span>{errors.studentId.message}</span>}
       <button type="submit" disabled={isSubmitting}>Upload</button>
     </form>

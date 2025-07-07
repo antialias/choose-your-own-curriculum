@@ -3,6 +3,7 @@ import { UploadForm } from './UploadForm'
 import '@testing-library/jest-dom'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({}) }))
+global.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve({ students: [] }) })) as unknown as typeof fetch
 
 describe('UploadForm', () => {
   it('shows validation errors', async () => {
