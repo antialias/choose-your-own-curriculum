@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { load as loadVec } from 'sqlite-vec';
 
-const sqlite = new Database(process.env.DATABASE_URL || './sqlite.db');
+export const sqlite = new Database(process.env.DATABASE_URL || './sqlite.db');
 loadVec(sqlite);
 export const db = drizzle(sqlite);
 
