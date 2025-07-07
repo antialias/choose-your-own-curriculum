@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import { UploadedWorkList } from './UploadedWorkList'
+import type { Mock } from 'vitest'
 
 vi.stubGlobal('fetch', vi.fn())
 
-const mockFetch = fetch as unknown as vi.Mock
+const mockFetch = fetch as unknown as Mock
 
 interface Work { id: string; summary: string; dateUploaded: string; dateCompleted: string | null }
 

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { NavBar } from './NavBar';
 import { useSession } from 'next-auth/react';
+import type { Mock } from 'vitest';
 
 vi.mock('next-auth/react', async () => {
   const actual = (await vi.importActual<typeof import('next-auth/react')>('next-auth/react'));
@@ -10,7 +11,7 @@ vi.mock('next-auth/react', async () => {
     signOut: vi.fn(),
   };
 });
-const mockedUseSession = useSession as unknown as vi.Mock;
+const mockedUseSession = useSession as unknown as Mock;
 
 test('shows sign in link when unauthenticated', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
