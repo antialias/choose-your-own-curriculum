@@ -18,4 +18,12 @@ export const authOptions: NextAuthOptions = {
       from: process.env.SMTP_FROM,
     }),
   ],
+  callbacks: {
+    session({ session, user }) {
+      if (session.user) {
+        (session.user as { id?: string }).id = user.id
+      }
+      return session
+    },
+  },
 }
