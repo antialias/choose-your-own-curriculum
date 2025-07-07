@@ -4,7 +4,7 @@ A web application for planning and tracking long term learning goals. Users defi
 
 Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**.
 
-The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
+The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client. Generated diagrams are validated server-side and any LLM-provided error explanations are surfaced to the user.
 
 ## Tech Stack
 

@@ -28,6 +28,7 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+  const [error, setError] = useState('');
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -41,8 +42,12 @@ export function MathSkillSelector() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topics: selected }),
     });
-    if (res.ok) {
-      const data = (await res.json()) as { graph: string };
+    const data = (await res.json()) as { graph?: string; error?: string };
+    if (!res.ok || data.error) {
+      setError(data.error || 'Failed to generate graph');
+      setGraph('');
+    } else if (data.graph) {
+      setError('');
       setGraph(data.graph);
     }
   };
@@ -64,8 +69,9 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-        {graph && (
-          <div id="graph-container" style={styles.graph}>
+      {error && <p role="alert">{error}</p>}
+      {graph && (
+        <div id="graph-container" style={styles.graph}>
             {/* re-mount Mermaid when chart string changes to ensure re-render */}
             <Mermaid key={graph} chart={graph} />
           </div>
