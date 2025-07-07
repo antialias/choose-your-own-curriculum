@@ -10,6 +10,7 @@ The home page includes a math skill selector that generates a mermaid DAG of pre
 
 - **Next.js** with React Server Components and Server Side Rendering
 - **Panda CSS** for styling
+- **Mermaid diagrams** rendered with `react-mermaid2`
 - **TypeScript** throughout
 - **SQLite** database accessed via Drizzle ORM with migrations
 - **Vitest** for unit and e2e testing
