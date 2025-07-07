@@ -18,9 +18,11 @@ describe('UploadedWorkList', () => {
   })
 
   it('loads works on mount', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
     mockGet([{ id: '1', summary: 'sum', dateUploaded: new Date().toISOString(), dateCompleted: null }])
     render(<UploadedWorkList />)
-    expect(mockFetch).toHaveBeenCalledWith('/api/upload-work')
+    expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
+    expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/upload-work')
     expect(await screen.findByText('sum')).toBeInTheDocument()
   })
 

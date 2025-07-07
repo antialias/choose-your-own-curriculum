@@ -72,10 +72,26 @@ export const authenticators = sqliteTable(
 export const students = sqliteTable('student', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+  email: text('email'),
+  accountUserId: text('accountUserId').references(() => users.id, {
+    onDelete: 'set null',
+  }),
 });
+
+export const teacherStudents = sqliteTable(
+  'teacher_student',
+  {
+    teacherId: text('teacherId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    studentId: text('studentId')
+      .notNull()
+      .references(() => students.id, { onDelete: 'cascade' }),
+  },
+  (ts) => ({
+    pk: primaryKey(ts.teacherId, ts.studentId),
+  })
+);
 
 export const uploadedWork = sqliteTable('uploaded_work', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
