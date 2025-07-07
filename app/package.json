@@ -17,7 +17,8 @@
     "postinstall": "npm rebuild better-sqlite3",
     "storybook": "storybook dev -p 6006 --ci",
     "build-storybook": "storybook build",
-    "panda": "panda"
+    "panda": "panda",
+    "fetch-tags-for-embeddings": "tsx scripts/fetch-tags.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
@@ -69,6 +70,7 @@
     "storybook": "^9.0.15",
     "typescript": "^5",
     "vite": "^7.0.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "tsx": "^4.8.1"
   }
 }
