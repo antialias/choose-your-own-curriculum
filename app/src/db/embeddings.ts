@@ -1,4 +1,4 @@
-import { db, sqlite } from './index';
+import { sqlite } from './index';
 
 export interface WorkEmbedding {
   workId: string;
@@ -27,6 +27,37 @@ export function searchWorkEmbeddings(vector: number[], k: number) {
   return sqlite
     .prepare(
       'SELECT work_id as id, distance FROM uploaded_work_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
+    )
+    .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
+}
+
+export interface TagEmbedding {
+  tagId: string;
+  vector: number[];
+}
+
+const deleteTagStmt = sqlite.prepare(
+  'DELETE FROM tag_index WHERE tag_id = ?'
+);
+const insertTagStmt = sqlite.prepare(
+  'INSERT INTO tag_index(tag_id, vector) VALUES (?, json(?))'
+);
+
+const tagTx = sqlite.transaction((batch: TagEmbedding[]) => {
+  for (const row of batch) {
+    deleteTagStmt.run(row.tagId);
+    insertTagStmt.run(row.tagId, JSON.stringify(row.vector));
+  }
+});
+
+export function upsertTagEmbeddings(rows: TagEmbedding[]) {
+  tagTx(rows);
+}
+
+export function searchTagEmbeddings(vector: number[], k: number) {
+  return sqlite
+    .prepare(
+      'SELECT tag_id as id, distance FROM tag_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
     )
     .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
 }
