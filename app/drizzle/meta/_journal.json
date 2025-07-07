@@ -15,6 +15,13 @@
       "when": 1751855494538,
       "tag": "0001_tense_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1751904762551,
+      "tag": "0002_talented_santa_claus",
+      "breakpoints": true
     }
   ]
 }
