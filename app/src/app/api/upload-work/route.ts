@@ -21,27 +21,55 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'file required' }, { status: 400 });
   }
   const buffer = Buffer.from(await file.arrayBuffer());
-  const text = buffer.toString('utf-8');
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
+  const isImage = file.type.startsWith('image/');
+
   let summary = '';
-  try {
-    const chat = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
-    });
-    summary = chat.choices[0].message.content || '';
-  } catch (err) {
-    console.error('summary error', err);
-  }
   let embeddingsJson = '';
-  try {
-    const emb = await openai.embeddings.create({
-      model: 'multimodal-embedding-3-small',
-      input: text,
-    });
-    embeddingsJson = JSON.stringify(emb.data);
-  } catch (err) {
-    console.error('embedding error', err);
+
+  if (isImage) {
+    const base64 = buffer.toString('base64');
+    try {
+      const chat = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Summarize this work' },
+              {
+                type: 'image_url',
+                image_url: { url: `data:${file.type};base64,${base64}` },
+              },
+            ],
+          },
+        ],
+      });
+      summary = chat.choices[0].message.content || '';
+    } catch (err) {
+      console.error('summary error', err);
+    }
+    // Image embeddings are not yet supported in openai-node
+  } else {
+    const text = buffer.toString('utf-8');
+    try {
+      const chat = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
+      });
+      summary = chat.choices[0].message.content || '';
+    } catch (err) {
+      console.error('summary error', err);
+    }
+    try {
+      const emb = await openai.embeddings.create({
+        model: 'multimodal-embedding-3-small',
+        input: text,
+      });
+      embeddingsJson = JSON.stringify(emb.data);
+    } catch (err) {
+      console.error('embedding error', err);
+    }
   }
   await db.insert(uploadedWork).values({
     userId: userId as string,
