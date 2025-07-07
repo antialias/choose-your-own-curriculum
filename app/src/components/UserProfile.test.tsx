@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import { UserProfile } from './UserProfile'
 
+vi.mock('@/styled-system/css', () => ({
+  css: () => ''
+}), { virtual: true })
+
 test('renders name and bio', () => {
   render(<UserProfile name="Alice" bio="Hello" />)
   expect(screen.getByText('Alice')).toBeInTheDocument()

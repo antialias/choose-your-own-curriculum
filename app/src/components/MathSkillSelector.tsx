@@ -27,28 +27,42 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+  const [mermaidLoaded, setMermaidLoaded] = useState(false);
 
   // Load mermaid from CDN once on mount
   useEffect(() => {
-    if (document.getElementById('mermaid-script')) return;
+    const existing = document.getElementById('mermaid-script');
+    if ((window as unknown as { mermaid?: { initialize: (opts: unknown) => void } }).mermaid) {
+      setMermaidLoaded(true);
+      return;
+    }
+    if (existing) {
+      existing.addEventListener('load', () => {
+        const m = (window as unknown as { mermaid: { initialize: (opts: unknown) => void } }).mermaid;
+        m.initialize({ startOnLoad: false });
+        setMermaidLoaded(true);
+      });
+      return;
+    }
     const script = document.createElement('script');
     script.id = 'mermaid-script';
     script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
     script.onload = () => {
       const m = (window as unknown as { mermaid: { initialize: (opts: unknown) => void } }).mermaid;
       m.initialize({ startOnLoad: false });
+      setMermaidLoaded(true);
     };
     document.body.appendChild(script);
   }, []);
 
   useEffect(() => {
     const m = (window as unknown as { mermaid?: { render: (id: string, code: string, cb: (svg: string) => void) => void } }).mermaid;
-    if (!graph || !m) return;
+    if (!graph || !mermaidLoaded || !m) return;
     m.render('math-graph', graph, (svg: string) => {
       const container = document.getElementById('graph-container');
       if (container) container.innerHTML = svg;
     });
-  }, [graph]);
+  }, [graph, mermaidLoaded]);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
