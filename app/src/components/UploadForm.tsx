@@ -4,7 +4,17 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadWorkClientSchema, UploadWorkClient } from '@/forms/uploadWork'
 
-export function UploadForm() {
+export type UploadFormCallbacks = {
+  onUploadStart?: (placeholderId: string, data: { dateCompleted?: Date }) => void
+  onUploadComplete?: (placeholderId: string) => void
+  onUploadError?: (placeholderId: string, error: Error) => void
+}
+
+export function UploadForm({
+  onUploadStart,
+  onUploadComplete,
+  onUploadError,
+}: UploadFormCallbacks = {}) {
   const {
     register,
     handleSubmit,
@@ -13,14 +23,24 @@ export function UploadForm() {
   } = useForm<UploadWorkClient>({ resolver: zodResolver(uploadWorkClientSchema) })
 
   const onSubmit = async (data: UploadWorkClient) => {
+    const placeholderId = crypto.randomUUID()
+    onUploadStart?.(placeholderId, { dateCompleted: data.dateCompleted })
     const formData = new FormData()
     formData.append('file', data.file[0])
     if (data.dateCompleted) {
       formData.append('dateCompleted', data.dateCompleted.toISOString())
     }
     formData.append('studentId', data.studentId)
-    await fetch('/api/upload-work', { method: 'POST', body: formData })
-    reset()
+    try {
+      const res = await fetch('/api/upload-work', { method: 'POST', body: formData })
+      if (!res.ok) {
+        throw new Error('Upload failed')
+      }
+      onUploadComplete?.(placeholderId)
+      reset()
+    } catch (err) {
+      onUploadError?.(placeholderId, err as Error)
+    }
   }
 
   return (
