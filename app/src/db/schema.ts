@@ -1,4 +1,11 @@
-import { sqliteTable, text, integer, primaryKey, blob } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, primaryKey, blob, customType } from 'drizzle-orm/sqlite-core';
+
+const vector = (name: string, dim: number) =>
+  customType<{ data: Buffer; driverData: Buffer }>({
+    dataType() {
+      return `vector(${dim})`;
+    },
+  })(name);
 
 export const users = sqliteTable('user', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
@@ -106,7 +113,7 @@ export const uploadedWork = sqliteTable('uploaded_work', {
     .$defaultFn(() => new Date()),
   dateCompleted: integer('dateCompleted', { mode: 'timestamp_ms' }),
   summary: text('summary'),
-  embeddings: text('embeddings'),
+  embedding: vector('embedding', 1536),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
 });
 
