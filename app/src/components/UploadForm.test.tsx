@@ -6,6 +6,9 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({}) }))
 
 describe('UploadForm', () => {
   it('shows validation errors', async () => {
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ students: [] }) }) as unknown as typeof fetch
     render(<UploadForm />)
     fireEvent.submit(screen.getByRole('button'))
     expect(await screen.findByText('File is required')).toBeInTheDocument()
