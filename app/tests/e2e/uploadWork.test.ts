@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, type Mock } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as uploadWork, GET as getWorks } from '@/app/api/upload-work/route';
 import { getServerSession } from 'next-auth';
@@ -20,7 +20,7 @@ vi.mock('@/db', () => ({
 
 describe('upload-work API', () => {
   it('rejects unauthenticated users', async () => {
-    (getServerSession as unknown as vi.Mock).mockResolvedValue(null);
+    (getServerSession as unknown as Mock).mockResolvedValue(null);
     const form = new FormData();
     form.set('file', new File(['hello'], 'hello.txt'));
     form.set('studentId', '1');
@@ -30,7 +30,7 @@ describe('upload-work API', () => {
   });
 
   it('accepts valid data', async () => {
-    (getServerSession as unknown as vi.Mock).mockResolvedValue({ user: { id: 'u1' } });
+    (getServerSession as unknown as Mock).mockResolvedValue({ user: { id: 'u1' } });
     const form = new FormData();
     form.set('file', new File(['hello'], 'hello.txt'));
     form.set('studentId', '1');
@@ -41,9 +41,8 @@ describe('upload-work API', () => {
   });
 
   it('requires auth for GET', async () => {
-    (getServerSession as unknown as vi.Mock).mockResolvedValue(null);
-    const req = new NextRequest(new Request('http://localhost/api/upload-work'));
-    const res = await getWorks(req);
+    (getServerSession as unknown as Mock).mockResolvedValue(null);
+    const res = await getWorks();
     expect(res.status).toBe(401);
   });
 });
