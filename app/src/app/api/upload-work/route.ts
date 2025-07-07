@@ -37,7 +37,6 @@ export async function POST(req: NextRequest) {
   const isImage = file.type.startsWith('image/');
 
   let summary = '';
-  let embeddingsJson = '';
 
   if (isImage) {
     const base64 = buffer.toString('base64');
@@ -61,7 +60,6 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.error('summary error', err);
     }
-    // Image embeddings are not yet supported in openai-node
   } else {
     const text = buffer.toString('utf-8');
     try {
@@ -73,15 +71,16 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.error('summary error', err);
     }
-    try {
-      const emb = await openai.embeddings.create({
-        model: 'multimodal-embedding-3-small',
-        input: text,
-      });
-      embeddingsJson = JSON.stringify(emb.data);
-    } catch (err) {
-      console.error('embedding error', err);
-    }
+  }
+  let embeddings = '';
+  try {
+    const emb = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: summary,
+    });
+    embeddings = JSON.stringify(emb);
+  } catch (err) {
+    console.error('embedding error', err);
   }
   await db.insert(uploadedWork).values({
     userId: userId as string,
@@ -89,7 +88,7 @@ export async function POST(req: NextRequest) {
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
-    embeddings: embeddingsJson,
+    embeddings,
     originalDocument: buffer,
   } as typeof uploadedWork.$inferInsert);
   return NextResponse.json({ ok: true });
