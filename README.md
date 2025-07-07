@@ -43,6 +43,9 @@ migrations:
 ```bash
 pnpm exec drizzle-kit push
 ```
+Running this command will create any tables defined in the schema, including the
+`uploaded_work` table. When the `drizzle` folder exists, migrations run
+automatically at runtime.
 
 
 ```bash
