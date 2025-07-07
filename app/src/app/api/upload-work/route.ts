@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,11 @@ export async function POST(req: NextRequest) {
   }
   const form = await req.formData();
   const file = form.get('file');
-  const studentId = String(form.get('studentId'));
+  const fields = uploadWorkFieldsSchema.parse({
+    studentId: form.get('studentId'),
+    dateCompleted: form.get('dateCompleted'),
+  });
+  const { studentId, dateCompleted } = fields;
   const [student] = await db
     .select()
     .from(students)
@@ -26,12 +31,10 @@ export async function POST(req: NextRequest) {
       userId: userId as string,
     });
   }
-  const dateCompleted = form.get('dateCompleted')
-    ? new Date(String(form.get('dateCompleted'))).getTime()
-    : null;
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'file required' }, { status: 400 });
   }
+  uploadWorkServerSchema.parse({ ...fields, file });
   const buffer = Buffer.from(await file.arrayBuffer());
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');

@@ -5,7 +5,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@/styled-system': '/styled-system'
+      '@/styled-system': '/styled-system',
+      '@': '/src',
+      '@/': '/src/'
     }
   },
   test: {

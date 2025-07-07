@@ -10,6 +10,13 @@ vi.mock('openai', () => ({
     embeddings: { create: vi.fn().mockResolvedValue({ data: [] }) }
   }))
 }));
+vi.mock('@/authOptions', () => ({ authOptions: {} }));
+vi.mock('@/db', () => ({
+  db: {
+    select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
+    insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
+  }
+}));
 
 describe('upload-work API', () => {
   it('rejects unauthenticated users', async () => {
@@ -20,5 +27,16 @@ describe('upload-work API', () => {
     const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
     const res = await uploadWork(req);
     expect(res.status).toBe(401);
+  });
+
+  it('accepts valid data', async () => {
+    (getServerSession as unknown as vi.Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const form = new FormData();
+    form.set('file', new File(['hello'], 'hello.txt'));
+    form.set('studentId', '1');
+    form.set('dateCompleted', '2024-01-01');
+    const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
+    const res = await uploadWork(req);
+    expect(res.status).toBe(200);
   });
 });
