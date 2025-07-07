@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { uploadedWork, teacherStudents } from '@/db/schema';
+import { upsertWorkEmbeddings } from '@/db/embeddings';
+import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
@@ -76,25 +78,29 @@ export async function POST(req: NextRequest) {
       console.error('summary error', err);
     }
   }
-  let embeddings = '';
+  const workId = crypto.randomUUID();
+  let vector: number[] = [];
   try {
     const emb = await openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: summary,
     });
-    embeddings = JSON.stringify(emb);
+    vector = emb.data[0]?.embedding || [];
   } catch (err) {
     console.error('embedding error', err);
   }
   await db.insert(uploadedWork).values({
+    id: workId,
     userId: userId as string,
     studentId,
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
-    embeddings,
     originalDocument: buffer,
   } as typeof uploadedWork.$inferInsert);
+  if (vector.length) {
+    upsertWorkEmbeddings([{ workId, vector }]);
+  }
   return NextResponse.json({ ok: true });
 }
 
