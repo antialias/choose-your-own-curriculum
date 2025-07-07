@@ -2,9 +2,7 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import * as stylex from '@stylexjs/stylex';
-
-const styles = stylex.create({
+const styles = {
   bar: {
     display: 'flex',
     padding: '1rem',
@@ -28,22 +26,22 @@ const styles = stylex.create({
     font: 'inherit',
     color: 'inherit',
   },
-});
+};
 
 export function NavBar() {
   const { data: session } = useSession();
   return (
-    <nav {...stylex.props(styles.bar)}>
-      <Link href="/" {...stylex.props(styles.link)}>
+    <nav style={styles.bar}>
+      <Link href="/" style={styles.link}>
         Home
       </Link>
-      <div {...stylex.props(styles.spacer)} />
+      <div style={styles.spacer} />
       {session ? (
-        <button {...stylex.props(styles.button)} onClick={() => signOut()}>
+        <button style={styles.button} onClick={() => signOut()}>
           Sign out
         </button>
       ) : (
-        <Link href="/login" {...stylex.props(styles.link)}>
+        <Link href="/login" style={styles.link}>
           Sign in
         </Link>
       )}

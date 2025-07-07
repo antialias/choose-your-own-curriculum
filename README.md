@@ -9,7 +9,7 @@ The home page includes a math skill selector that generates a mermaid DAG of pre
 ## Tech Stack
 
 - **Next.js** with React Server Components and Server Side Rendering
-- **StyleX** for styling
+- **Panda CSS** for styling
 - **TypeScript** throughout
 - **SQLite** database accessed via Drizzle ORM with migrations
 - **Vitest** for unit and e2e testing

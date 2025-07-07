@@ -1,14 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import * as stylex from '@stylexjs/stylex';
-
-const styles = stylex.create({
+const styles = {
   container: { padding: '2rem' },
-  list: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' },
+  list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
   button: { marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' },
-  graph: { marginTop: '2rem', textAlign: 'left' },
-});
+  graph: { marginTop: '2rem', textAlign: 'left' as const },
+};
 
 const skills = [
   'Algebra',
@@ -71,8 +69,8 @@ export function MathSkillSelector() {
   };
 
   return (
-    <div {...stylex.props(styles.container)}>
-      <div {...stylex.props(styles.list)}>
+    <div style={styles.container}>
+      <div style={styles.list}>
         {skills.map((skill) => (
           <label key={skill}>
             <input
@@ -84,10 +82,10 @@ export function MathSkillSelector() {
           </label>
         ))}
       </div>
-      <button {...stylex.props(styles.button)} onClick={generate}>
+      <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-      {graph && <div id="graph-container" {...stylex.props(styles.graph)} />}
+      {graph && <div id="graph-container" style={styles.graph} />}
     </div>
   );
 }
