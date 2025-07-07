@@ -9,8 +9,10 @@ export default defineConfig({
     }
   },
   test: {
+    include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
     globals: true,
     setupFiles: './vitest.setup.ts',
+    exclude: ['tests/e2e/**'],
   },
 });
