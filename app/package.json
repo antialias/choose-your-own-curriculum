@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "biome check .",
     "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "postinstall": "npm rebuild better-sqlite3",
