@@ -5,11 +5,10 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-      '@/': `${resolve(__dirname, 'src')}/`,
-      '@/styled-system': '/styled-system',
-    },
+    alias: [
+      { find: '@/styled-system', replacement: resolve(__dirname, 'styled-system') },
+      { find: '@', replacement: resolve(__dirname, 'src') }
+    ],
   },
   test: {
     include: ['tests/e2e/**/*.test.ts'],

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
+    "@hookform/resolvers": "^5.1.1",
     "better-sqlite3": "^12.2.0",
     "casbin": "^5.38.0",
     "drizzle-kit": "^0.31.4",
@@ -29,6 +30,7 @@
     "openai": "^5.8.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.60.0",
     "react-mermaid2": "^0.1.4",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",

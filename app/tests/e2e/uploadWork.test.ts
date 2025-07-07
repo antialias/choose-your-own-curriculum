@@ -21,4 +21,16 @@ describe('upload-work API', () => {
     const res = await uploadWork(req);
     expect(res.status).toBe(401);
   });
+
+  it('validates request body', async () => {
+    (getServerSession as unknown as vi.Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const form = new FormData();
+    form.set('studentId', '');
+    const req = new NextRequest(new Request('http://localhost/api/upload-work', {
+      method: 'POST',
+      body: form,
+    }));
+    const res = await uploadWork(req);
+    expect(res.status).toBe(400);
+  });
 });
