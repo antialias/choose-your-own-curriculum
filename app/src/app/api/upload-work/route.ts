@@ -98,6 +98,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const works = await db.select().from(uploadedWork);
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  const works = await db
+    .select()
+    .from(uploadedWork)
+    .where(eq(uploadedWork.userId, userId));
   return NextResponse.json({ works });
 }

@@ -4,7 +4,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadWorkClientSchema, UploadWorkClient } from '@/forms/uploadWork'
 
-export function UploadForm() {
+interface Props {
+  onUploadStart?: () => void
+  onSuccess?: () => void
+  onError?: () => void
+}
+
+export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
   const {
     register,
     handleSubmit,
@@ -13,14 +19,21 @@ export function UploadForm() {
   } = useForm<UploadWorkClient>({ resolver: zodResolver(uploadWorkClientSchema) })
 
   const onSubmit = async (data: UploadWorkClient) => {
+    onUploadStart?.()
     const formData = new FormData()
     formData.append('file', data.file[0])
     if (data.dateCompleted) {
       formData.append('dateCompleted', data.dateCompleted.toISOString())
     }
     formData.append('studentId', data.studentId)
-    await fetch('/api/upload-work', { method: 'POST', body: formData })
-    reset()
+    try {
+      const res = await fetch('/api/upload-work', { method: 'POST', body: formData })
+      if (!res.ok) throw new Error('upload failed')
+      onSuccess?.()
+      reset()
+    } catch {
+      onError?.()
+    }
   }
 
   return (
@@ -28,7 +41,7 @@ export function UploadForm() {
       onSubmit={handleSubmit(onSubmit)}
       className={css({ display: 'flex', flexDir: 'column', gap: '2', padding: '4' })}
     >
-      <input type="file" {...register('file')} />
+      <input type="file" data-testid="file" {...register('file')} />
       {errors.file && <span>{errors.file.message}</span>}
       <input type="date" {...register('dateCompleted')} />
       <input type="text" placeholder="Student ID" {...register('studentId')} />

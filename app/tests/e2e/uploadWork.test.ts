@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { POST as uploadWork } from '@/app/api/upload-work/route';
+import { POST as uploadWork, GET as getWorks } from '@/app/api/upload-work/route';
 import { getServerSession } from 'next-auth';
 
 vi.mock('next-auth', () => ({ getServerSession: vi.fn() }));
@@ -38,5 +38,12 @@ describe('upload-work API', () => {
     const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
     const res = await uploadWork(req);
     expect(res.status).toBe(200);
+  });
+
+  it('requires auth for GET', async () => {
+    (getServerSession as unknown as vi.Mock).mockResolvedValue(null);
+    const req = new NextRequest(new Request('http://localhost/api/upload-work'));
+    const res = await getWorks(req);
+    expect(res.status).toBe(401);
   });
 });
