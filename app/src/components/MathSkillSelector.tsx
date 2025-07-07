@@ -66,7 +66,7 @@ export function MathSkillSelector() {
       </button>
       {graph && (
         <div id="graph-container" style={styles.graph}>
-          <Mermaid chart={graph} />
+          <Mermaid chart={graph} key={graph} />
         </div>
       )}
     </div>
