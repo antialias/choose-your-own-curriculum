@@ -8,7 +8,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       '@/': `${resolve(__dirname, 'src')}/`,
-      '@/styled-system': '/styled-system',
+      '@/styled-system': resolve(__dirname, 'styled-system'),
     },
   },
   test: {
