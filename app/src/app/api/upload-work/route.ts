@@ -76,13 +76,13 @@ export async function POST(req: NextRequest) {
       console.error('summary error', err);
     }
   }
-  let embeddings = '';
+  let embedding: Buffer | null = null;
   try {
     const emb = await openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: summary,
     });
-    embeddings = JSON.stringify(emb);
+    embedding = Buffer.from(Float32Array.from(emb.data[0].embedding).buffer);
   } catch (err) {
     console.error('embedding error', err);
   }
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
-    embeddings,
+    embedding,
     originalDocument: buffer,
   } as typeof uploadedWork.$inferInsert);
   return NextResponse.json({ ok: true });
