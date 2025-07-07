@@ -112,9 +112,21 @@ export class LLMClient {
           messages,
         });
         const completion = result as OpenAI.Chat.ChatCompletion;
-        const content = completion.choices[0]?.message?.content ?? '';
+        const raw = completion.choices[0]?.message?.content ?? '';
+        const content = raw.trim();
         try {
-          const data = schema.parse(JSON.parse(content));
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(content);
+          } catch (err) {
+            const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            if (match) {
+              parsed = JSON.parse(match[1]);
+            } else {
+              throw err;
+            }
+          }
+          const data = schema.parse(parsed);
           return { error: null, response: data };
         } catch (e) {
           if (e instanceof SyntaxError) {

@@ -26,6 +26,15 @@ describe('LLMClient', () => {
     expect(mockCreate).toHaveBeenCalled();
   });
 
+  test('parses json inside code fences', async () => {
+    const schema = z.object({ msg: z.string() });
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: '```json\n{"msg":"hi"}\n```' } }] });
+    const client = new LLMClient('key');
+    const result = await client.chat('hi', { schema, systemPrompt: 'system' });
+    expect(result.error).toBeNull();
+    expect(result.response).toEqual({ msg: 'hi' });
+  });
+
   test('retries on invalid json', async () => {
     const schema = z.object({ msg: z.string() });
     mockCreate
