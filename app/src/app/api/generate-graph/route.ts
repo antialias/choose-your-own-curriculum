@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
   const client = new LLMClient(apiKey || '');
   const schema = z.object({ graph: z.string() });
-  const prompt = `Create a mermaid DAG showing a progression from kindergarten math to these topics: ${topics.join(', ')}. Include prerequisite links.`;
+  const prompt = `Create a mermaid DAG flowing from left to right showing a progression from kindergarten math to these topics: ${topics.join(', ')}. The diagram should be as granular as possible by topic and include prerequisite links.`;
   const result = await client.chat(prompt, {
     systemPrompt: 'You are an expert math curriculum planner.',
     schema,
