@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, blob, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('user', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
@@ -68,3 +68,25 @@ export const authenticators = sqliteTable(
     pk: primaryKey(authenticator.userId, authenticator.credentialID),
   })
 );
+
+export const students = sqliteTable('student', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+});
+
+export const workUploads = sqliteTable('work_upload', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  studentId: text('student_id')
+    .notNull()
+    .references(() => students.id, { onDelete: 'cascade' }),
+  uploadedById: text('uploaded_by_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  uploadedAt: integer('uploaded_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  completedAt: integer('completed_at', { mode: 'timestamp_ms' }),
+  summary: text('summary'),
+  embedding: text('embedding'),
+  file: blob('file'),
+});
