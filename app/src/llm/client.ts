@@ -7,6 +7,9 @@ import { OpenAI } from 'openai';
 import { ZodSchema, ZodError } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
+/** Default model used when none is provided */
+const DEFAULT_MODEL = 'o4-mini';
+
 /**
  * An error returned by the LLM client.
  * - `openai_error` indicates the request to the API failed.
@@ -28,10 +31,8 @@ export interface LLMOptions<T> {
   templateVars?: Record<string, string | number>;
   /** Number of validation retries. Defaults to 3. */
   maxRetries?: number;
-  /** Additional OpenAI parameters. Must include the model name. */
-  params?: Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages' | 'model'> & {
-    model: string;
-  };
+  /** Additional OpenAI parameters. */
+  params?: Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
 }
 
 /**
@@ -55,6 +56,7 @@ export class LLMClient {
    */
   constructor(apiKey: string) {
     this.openai = new OpenAI({ apiKey });
+    console.log('LLMClient initialized');
   }
 
   /**
@@ -88,6 +90,7 @@ export class LLMClient {
     let lastError: LLMError | null = null;
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
+      console.log(`Sending chat prompt (attempt ${attempt + 1})`);
       const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         { role: 'system', content: systemTemplate },
         { role: 'user', content: userPrompt },
@@ -99,8 +102,12 @@ export class LLMClient {
         });
       }
       try {
+        const paramsWithModel = {
+          ...(params ?? {}),
+          model: params?.model ?? DEFAULT_MODEL,
+        } as Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
         const result = await this.openai.chat.completions.create({
-          ...(params as OpenAI.Chat.ChatCompletionCreateParams),
+          ...paramsWithModel,
           stream: false,
           messages,
         });
@@ -111,11 +118,13 @@ export class LLMClient {
           return { error: null, response: data };
         } catch (e) {
           if (e instanceof SyntaxError) {
+            console.error('Invalid JSON returned from LLM', e);
             lastError = {
               type: 'validation_error',
               message: `Invalid JSON: ${e.message}`,
             };
           } else if (e instanceof ZodError) {
+            console.error('LLM response failed schema validation', e);
             lastError = {
               type: 'validation_error',
               message: e.errors.map(err => err.message).join(', '),
@@ -129,6 +138,7 @@ export class LLMClient {
           typeof err === 'object' && err && 'message' in err
             ? String((err as { message?: unknown }).message)
             : 'Unknown OpenAI error';
+        console.error('OpenAI request failed', err);
         lastError = {
           type: 'openai_error',
           message,

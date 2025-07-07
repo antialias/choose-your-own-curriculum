@@ -28,3 +28,6 @@ if (result.error) {
 ```
 
 The client will try up to `maxRetries` times (default `3`) when the model returns output that cannot be parsed with the provided schema. On each retry it explains the validation error to the model via a system message.
+
+By default, the client sends requests using the `o4-mini` model. You can override
+the model and other OpenAI parameters via the `params` option passed to `chat`.
