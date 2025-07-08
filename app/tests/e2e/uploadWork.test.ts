@@ -42,7 +42,8 @@ describe('upload-work API', () => {
 
   it('requires auth for GET', async () => {
     (getServerSession as unknown as Mock).mockResolvedValue(null);
-    const res = await getWorks();
+    const req = new NextRequest(new Request('http://localhost/api/upload-work'));
+    const res = await getWorks(req);
     expect(res.status).toBe(401);
   });
 });
