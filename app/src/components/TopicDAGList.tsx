@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 interface Dag {
   id: string
@@ -27,8 +28,13 @@ export function TopicDAGList() {
     <ul>
       {dags.map((d) => (
         <li key={d.id} style={{ marginBottom: '1rem' }}>
-          <strong>{new Date(d.createdAt).toLocaleString()}</strong>
-          <div>{JSON.parse(d.topics).join(', ')}</div>
+          <Link
+            href={`/topic-dags/${d.id}`}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+          >
+            <strong>{new Date(d.createdAt).toLocaleString()}</strong>
+            <div>{JSON.parse(d.topics).join(', ')}</div>
+          </Link>
         </li>
       ))}
     </ul>

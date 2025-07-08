@@ -19,5 +19,7 @@ test('loads DAGs on mount', async () => {
   mockGet([{ id: '1', topics: JSON.stringify(['A', 'B']), graph: 'g', createdAt: new Date().toISOString() }])
   render(<TopicDAGList />)
   expect(mockFetch).toHaveBeenCalledWith('/api/topic-dags')
-  expect(await screen.findByText('A, B')).toBeInTheDocument()
+  const link = await screen.findByRole('link')
+  expect(link).toHaveAttribute('href', '/topic-dags/1')
+  expect(link).toHaveTextContent('A, B')
 })

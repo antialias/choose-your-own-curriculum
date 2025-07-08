@@ -8,14 +8,14 @@ export default async function TopicDAGsPage() {
   if (!userId) {
     return (
       <div style={{ padding: '2rem' }}>
-        <h1>Saved DAGs</h1>
+        <h1>My Curriculums</h1>
         <p>Please sign in to view your DAGs.</p>
       </div>
     )
   }
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Saved DAGs</h1>
+      <h1>My Curriculums</h1>
       <TopicDAGList />
     </div>
   )
