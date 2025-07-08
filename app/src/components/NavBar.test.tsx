@@ -34,5 +34,5 @@ test('shows uploaded work link', () => {
 test('shows saved dags link', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
   render(<NavBar />);
-  expect(screen.getByText('Saved DAGs')).toBeInTheDocument();
+  expect(screen.getByText('My Curriculums')).toBeInTheDocument();
 });
