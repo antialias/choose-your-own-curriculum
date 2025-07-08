@@ -3,6 +3,7 @@ import "./globals.css";
 import "../styles/index.css";
 import "katex/dist/katex.min.css";
 import AuthProvider from "@/components/AuthProvider";
+import QueryProvider from "@/components/QueryProvider";
 import { NavBar } from "@/components/NavBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
@@ -21,10 +22,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider session={session}>
-          <NavBar />
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider session={session}>
+            <NavBar />
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
