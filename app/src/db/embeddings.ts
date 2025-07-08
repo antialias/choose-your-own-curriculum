@@ -46,6 +46,20 @@ export function upsertTagEmbeddings(rows: TagEmbedding[]) {
   tagTx(rows);
 }
 
+const selectWorkStmt = sqlite.prepare(
+  'SELECT vector FROM uploaded_work_index WHERE work_id = ?'
+);
+
+export function getWorkEmbedding(workId: string): number[] | null {
+  const row = selectWorkStmt.get(workId) as { vector: string } | undefined;
+  if (!row) return null;
+  try {
+    return JSON.parse(row.vector) as number[];
+  } catch {
+    return null;
+  }
+}
+
 export function searchWorkEmbeddings(vector: number[], k: number) {
   return sqlite
     .prepare(
