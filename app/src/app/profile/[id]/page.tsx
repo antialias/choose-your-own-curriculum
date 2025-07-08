@@ -1,6 +1,10 @@
 import { UserProfile } from '@/components/UserProfile'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function ProfilePage({ params }: any) {
-  return <UserProfile name={`User ${params.id}`} bio="This is the bio." />
+export default async function ProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  return <UserProfile name={`User ${id}`} bio="This is the bio." />
 }
