@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
 const styles = {
   container: { padding: '2rem' },
@@ -29,6 +30,8 @@ export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
   const [saved, setSaved] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -37,15 +40,27 @@ export function MathSkillSelector() {
   };
 
   const generate = async () => {
-    const res = await fetch('/api/generate-graph', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topics: selected }),
-    });
-    if (res.ok) {
+    setStatus('loading');
+    setError(null);
+    try {
+      const res = await fetch('/api/generate-graph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topics: selected }),
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        setError(data.error || 'Unknown error');
+        setStatus('error');
+        return;
+      }
       const data = (await res.json()) as { graph: string };
       setGraph(data.graph);
       setSaved(false);
+      setStatus('idle');
+    } catch (err) {
+      setError((err as Error).message);
+      setStatus('error');
     }
   };
 
@@ -77,6 +92,14 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
+      {status === 'loading' && (
+        <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+      )}
+      {status === 'error' && (
+        <p className={css({ color: 'red.600', mt: '2' })}>
+          Failed to generate graph: {error}. Please try again later.
+        </p>
+      )}
       {graph && (
         <button style={styles.button} onClick={save} disabled={saved}>
           {saved ? 'Saved' : 'Save Graph'}
