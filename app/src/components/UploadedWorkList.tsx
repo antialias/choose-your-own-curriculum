@@ -1,6 +1,7 @@
 'use client'
 import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
 
@@ -20,7 +21,8 @@ interface Work {
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
   const [groups, setGroups] = useState<Record<string, Work[]>>({})
-  const [students, setStudents] = useState<{ id: string; name: string }[]>([])
+  const { data: studentsData } = useQuery({ queryKey: ['/students'] })
+  const students = (studentsData as { students: { id: string; name: string }[] } | undefined)?.students ?? []
   const [groupBy, setGroupBy] = useState('')
   const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
@@ -31,13 +33,6 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
     setFilterStudent(studentId)
   }, [studentId])
 
-  const loadStudents = async () => {
-    const res = await fetch('/api/students')
-    if (res.ok) {
-      const data = (await res.json()) as { students: { id: string; name: string }[] }
-      setStudents(data.students)
-    }
-  }
 
   const loadWorks = async () => {
     try {
@@ -56,9 +51,6 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
     }
   }
 
-  useEffect(() => {
-    loadStudents()
-  }, [])
 
   useEffect(() => {
     loadWorks()
