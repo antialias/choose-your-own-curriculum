@@ -16,6 +16,7 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  hasThumbnail: boolean
 }
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
@@ -134,18 +135,41 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
           }</h3>}
           <ul>
             {works.map((w) => (
-              <li key={w.id} style={{ marginBottom: '1rem' }}>
-                <strong>
-                  {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
-                </strong>
-                <SummaryWithMath text={w.summary ?? ''} />
-                {w.tags.length > 0 && (
-                  <div>
-                    {w.tags.map((t) => (
-                      <TagPill key={t.text} text={t.text} vector={t.vector} />
-                    ))}
-                  </div>
+              <li
+                key={w.id}
+                style={{
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  gap: '0.5rem',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {w.hasThumbnail && (
+                  <a
+                    href={`/api/upload-work/${w.id}/file`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={`/api/upload-work/${w.id}/thumbnail`}
+                      alt="thumbnail"
+                      style={{ maxWidth: '144px', maxHeight: '144px' }}
+                    />
+                  </a>
                 )}
+                <div>
+                  <strong>
+                    {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
+                  </strong>
+                  <SummaryWithMath text={w.summary ?? ''} />
+                  {w.tags.length > 0 && (
+                    <div>
+                      {w.tags.map((t) => (
+                        <TagPill key={t.text} text={t.text} vector={t.vector} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

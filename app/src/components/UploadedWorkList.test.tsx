@@ -18,6 +18,7 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  hasThumbnail: boolean
 }
 
 function mockGet(works: Work[]) {
@@ -41,6 +42,7 @@ describe('UploadedWorkList', () => {
         dateUploaded: new Date().toISOString(),
         dateCompleted: null,
         tags: [{ text: 't1', vector: [0, 0, 0] }],
+        hasThumbnail: true,
       },
     ])
     render(<UploadedWorkList />)
@@ -49,6 +51,7 @@ describe('UploadedWorkList', () => {
     expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work')
     expect(await screen.findByText('sum')).toBeInTheDocument()
     expect(await screen.findByText('t1')).toBeInTheDocument()
+    expect(await screen.findByRole('img')).toHaveAttribute('src', '/api/upload-work/1/thumbnail')
   })
 
 })
