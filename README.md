@@ -2,9 +2,9 @@
 
 A web application for planning and tracking long term learning goals. Users define topic graphs and upload work samples. The app stores metadata and embeddings to recommend what to study next.
 
-Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page and the **My Curriculums** page.
+Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar links to **Upload Work**, **Curriculums** and **Students**.
 
-The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
+The Curriculum Generator moved to `/curriculum-generator`. Start there from the **Curriculums** page to generate a mermaid DAG of prerequisites.
 
 ## Tech Stack
 
@@ -86,7 +86,7 @@ Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summar
 
 ## My Curriculums
 
-The **My Curriculums** page lists every topic graph you've generated and saved from the home page. Click a row to view the full graph. Each entry shows when it was created and which topics were included.
+The **My Curriculums** page lists every topic graph you've generated and saved from the Curriculum Generator. Click a row to view the full graph. Each entry shows when it was created and which topics were included.
 
 ## Student Progress
 

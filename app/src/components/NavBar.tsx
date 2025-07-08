@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { navItems } from '@/navItems';
 const styles = {
   bar: {
     display: 'flex',
@@ -35,15 +36,11 @@ export function NavBar() {
       <Link href="/" style={styles.link}>
         Home
       </Link>
-      <Link href="/uploaded-work" style={styles.link}>
-        Uploaded Work
-      </Link>
-      <Link href="/topic-dags" style={styles.link}>
-        My Curriculums
-      </Link>
-      <Link href="/students" style={styles.link}>
-        Students
-      </Link>
+      {navItems.map((item) => (
+        <Link key={item.href} href={item.href} style={styles.link}>
+          {item.label}
+        </Link>
+      ))}
       <div style={styles.spacer} />
       {session ? (
         <button style={styles.button} onClick={() => signOut()}>
