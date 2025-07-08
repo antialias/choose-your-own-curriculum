@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
+import mermaid from 'mermaid';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -32,6 +33,9 @@ export function MathSkillSelector() {
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [building, setBuilding] = useState(false);
+  const bufferRef = useRef('');
+  const hasRenderedRef = useRef(false);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -42,25 +46,70 @@ export function MathSkillSelector() {
   const generate = async () => {
     setStatus('loading');
     setError(null);
+    setBuilding(true);
+    bufferRef.current = '';
+    hasRenderedRef.current = false;
     try {
-      const res = await fetch('/api/generate-graph', {
+      const res = await fetch('/api/generate-graph-stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topics: selected }),
       });
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json().catch(() => ({ error: '' }))) as {
+          error?: string;
+        };
         setError(data.error || 'Unknown error');
         setStatus('error');
+        setBuilding(false);
         return;
       }
-      const data = (await res.json()) as { graph: string };
-      setGraph(data.graph);
+      if (!res.body) {
+        setError('Unknown error');
+        setStatus('error');
+        setBuilding(false);
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const debounce = (fn: () => void, delay: number) => {
+        let handle: NodeJS.Timeout | null = null;
+        const wrapper = () => {
+          if (handle) clearTimeout(handle);
+          handle = setTimeout(fn, delay);
+        };
+        wrapper.flush = () => {
+          if (handle) {
+            clearTimeout(handle);
+            handle = null;
+          }
+          fn();
+        };
+        return wrapper;
+      };
+      const tryRender = debounce(() => {
+        try {
+          mermaid.parse(bufferRef.current);
+          setGraph(bufferRef.current);
+          hasRenderedRef.current = true;
+          setBuilding(false);
+        } catch {
+          /* ignore parsing errors */
+        }
+      }, 200);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        bufferRef.current += decoder.decode(value, { stream: true });
+        tryRender();
+      }
+      tryRender.flush();
       setSaved(false);
       setStatus('idle');
     } catch (err) {
       setError((err as Error).message);
       setStatus('error');
+      setBuilding(false);
     }
   };
 
@@ -94,6 +143,9 @@ export function MathSkillSelector() {
       </button>
       {status === 'loading' && (
         <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+      )}
+      {building && !hasRenderedRef.current && (
+        <p className={css({ color: 'gray.700', mt: '2' })}>building graph…</p>
       )}
       {status === 'error' && (
         <p className={css({ color: 'red.600', mt: '2' })}>

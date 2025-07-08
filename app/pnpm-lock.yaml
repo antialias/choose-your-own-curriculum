@@ -11,9 +11,15 @@ importers:
       '@auth/drizzle-adapter':
         specifier: ^1.10.0
         version: 1.10.0(nodemailer@7.0.4)
+      '@biomejs/cli-linux-x64':
+        specifier: ^2.1.1
+        version: 2.1.1
       '@hookform/resolvers':
         specifier: ^3.3.1
         version: 3.10.0(react-hook-form@7.60.0(react@19.1.0))
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: ^4.44.2
+        version: 4.44.2
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@19.1.0)
@@ -32,6 +38,9 @@ importers:
       drizzle-orm:
         specifier: ^0.44.2
         version: 0.44.2(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(@types/better-sqlite3@7.6.13)(better-sqlite3@12.2.0)(prisma@6.11.1(typescript@5.8.3))(sqlite3@5.1.7)
+      mermaid:
+        specifier: 8.14.0
+        version: 8.14.0
       next:
         specifier: 15.3.5
         version: 15.3.5(@babel/core@7.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -994,6 +1003,11 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@biomejs/cli-linux-x64@2.1.1':
+    resolution: {integrity: sha512-3WJ1GKjU7NzZb6RTbwLB59v9cTIlzjbiFLDB0z4376TkDqoNYilJaC37IomCr/aXwuU8QKkrYoHrgpSq5ffJ4Q==}
+    engines: {node: '>=14.21.3'}
+    os: [linux]
+
   '@biomejs/cli-win32-arm64@2.0.6':
     resolution: {integrity: sha512-290V4oSFoKaprKE1zkYVsDfAdn0An5DowZ+GIABgjoq1ndhvNxkJcpxPsiYtT7slbVe3xmlT0ncdfOsN7KruzA==}
     engines: {node: '>=14.21.3'}
@@ -1938,7 +1952,6 @@ packages:
 
   '@rollup/rollup-linux-x64-gnu@4.44.2':
     resolution: {integrity: sha512-/bXb0bEsWMyEkIsUL2Yt5nFB5naLAwyOWMEviQfQY1x3l5WsLKgvZf66TM7UTfED6erckUVUJQ/jJ1FSpm3pRQ==}
-    cpu: [x64]
     os: [linux]
 
   '@rollup/rollup-linux-x64-musl@4.44.2':
@@ -11023,6 +11036,8 @@ snapshots:
   '@biomejs/cli-linux-x64@2.0.6':
     optional: true
 
+  '@biomejs/cli-linux-x64@2.1.1': {}
+
   '@biomejs/cli-win32-arm64@2.0.6':
     optional: true
 
@@ -11959,8 +11974,7 @@ snapshots:
   '@rollup/rollup-linux-s390x-gnu@4.44.2':
     optional: true
 
-  '@rollup/rollup-linux-x64-gnu@4.44.2':
-    optional: true
+  '@rollup/rollup-linux-x64-gnu@4.44.2': {}
 
   '@rollup/rollup-linux-x64-musl@4.44.2':
     optional: true
