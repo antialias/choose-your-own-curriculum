@@ -17,13 +17,13 @@ export async function POST(req: NextRequest) {
   const client = new LLMClient(apiKey || '');
   const schema = z.object({ graph: GraphSchema });
   const prompt = `Create a topic dependency graph flowing from left to right starting at kindergarten math and covering these topics: ${topics.join(', ')}. Use granular nodes and include prerequisite links.`;
-  const result = await client.chat(prompt, {
+  const stream = await client.streamChat(prompt, {
     systemPrompt: 'You are an expert math curriculum planner.',
     schema,
+    stream: true,
+    params: { model: 'o4-mini', max_tokens: 800 },
   });
-  if (result.error || !result.response) {
-    console.error('LLM chat failed', result.error);
-    return NextResponse.json({ error: result.error?.message || 'error' }, { status: 500 });
-  }
-  return NextResponse.json({ graph: result.response.graph });
+  return new NextResponse(stream, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
 }
