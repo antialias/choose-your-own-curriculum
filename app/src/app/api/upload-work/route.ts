@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { uploadedWork, teacherStudents } from '@/db/schema';
-import { upsertWorkEmbeddings } from '@/db/embeddings';
+import { upsertWorkEmbeddings, tagsForWork } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
@@ -114,5 +114,6 @@ export async function GET() {
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
-  return NextResponse.json({ works });
+  const results = works.map((w) => ({ ...w, tags: tagsForWork(w.id, 3) }));
+  return NextResponse.json({ works: results });
 }

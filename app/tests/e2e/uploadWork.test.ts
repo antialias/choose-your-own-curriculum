@@ -17,6 +17,10 @@ vi.mock('@/db', () => ({
     insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
   }
 }));
+vi.mock('@/db/embeddings', () => ({
+  upsertWorkEmbeddings: vi.fn(),
+  tagsForWork: vi.fn(() => [])
+}));
 
 describe('upload-work API', () => {
   it('rejects unauthenticated users', async () => {
@@ -44,5 +48,22 @@ describe('upload-work API', () => {
     (getServerSession as unknown as Mock).mockResolvedValue(null);
     const res = await getWorks();
     expect(res.status).toBe(401);
+  });
+
+  it('returns works with tags', async () => {
+    (getServerSession as unknown as Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const select = (require('@/db').db.select as unknown as Mock);
+    const fromMock = vi.fn(() => ({
+      where: vi.fn().mockResolvedValue([
+        { id: 'w1', summary: 's', dateUploaded: 'd', dateCompleted: null },
+      ]),
+    }));
+    select.mockReturnValue({ from: fromMock });
+    const embeddings = require('@/db/embeddings');
+    (embeddings.tagsForWork as Mock).mockReturnValue([{ id: 't1', text: 'math', distance: 0.1 }]);
+    const res = await getWorks();
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.works[0].tags[0].text).toBe('math');
   });
 });
