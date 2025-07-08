@@ -88,6 +88,7 @@ export const teacherStudents = sqliteTable(
     studentId: text('studentId')
       .notNull()
       .references(() => students.id, { onDelete: 'cascade' }),
+    topicDagId: text('topicDagId').references(() => topicDags.id),
   },
   (ts) => ({
     pk: primaryKey(ts.teacherId, ts.studentId),

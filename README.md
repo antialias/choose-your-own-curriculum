@@ -88,6 +88,10 @@ Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summar
 
 The **My Curriculums** page lists every topic graph you've generated and saved from the home page. Click a row to view the full graph. Each entry shows when it was created and which topics were included.
 
+## Student Progress
+
+Click a student's name from the **Students** page to open their progress view. The top of the page shows the selected curriculum along with the topics and rendered DAG. If no curriculum is assigned you can pick one from your saved DAGs. Below the curriculum section all uploaded work for that student is listed using the same interface as the **Uploaded Work** page.
+
 ## Tag Generation
 
 Run `pnpm run fetch-tags-for-embeddings` to generate tags for all uploaded work. The script queries every summary, asks the LLM for the top 100 tags, stores them in the database and embeds each tag using the model specified by the `EMBEDDING_MODEL` environment variable (defaults to `text-embedding-3-small`).

@@ -18,14 +18,18 @@ interface Work {
   tags: Tag[]
 }
 
-export function UploadedWorkList() {
+export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
   const [groups, setGroups] = useState<Record<string, Work[]>>({})
   const [students, setStudents] = useState<{ id: string; name: string }[]>([])
   const [groupBy, setGroupBy] = useState('')
-  const [filterStudent, setFilterStudent] = useState('')
+  const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setFilterStudent(studentId)
+  }, [studentId])
 
   const loadStudents = async () => {
     const res = await fetch('/api/students')

@@ -24,6 +24,9 @@ export function StudentManager() {
       <ul>
         {students.map((s) => (
           <li key={s.id}>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <a href={`/students/${s.id}`}>{s.name}</a>
+            </div>
             <StudentForm student={s} onSuccess={invalidate} />
           </li>
         ))}
