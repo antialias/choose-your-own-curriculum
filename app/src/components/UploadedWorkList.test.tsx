@@ -11,7 +11,7 @@ interface Work {
   summary: string
   dateUploaded: string
   dateCompleted: string | null
-  tags: string[]
+  tags: { text: string; color: string }[]
 }
 
 function mockGet(works: Work[]) {
@@ -32,14 +32,14 @@ describe('UploadedWorkList', () => {
         summary: 'sum',
         dateUploaded: new Date().toISOString(),
         dateCompleted: null,
-        tags: ['t1'],
+        tags: [{ text: 't1', color: '#111111' }],
       },
     ])
     render(<UploadedWorkList />)
     expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
     expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/upload-work')
     expect(await screen.findByText('sum')).toBeInTheDocument()
-    expect(await screen.findByText('Tags: t1')).toBeInTheDocument()
+    expect(await screen.findByText('t1')).toBeInTheDocument()
   })
 
 })
