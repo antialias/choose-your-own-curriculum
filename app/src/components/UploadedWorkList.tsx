@@ -5,6 +5,7 @@ import { UploadForm } from './UploadForm'
 
 interface Work {
   id: string
+  studentId: string
   summary: string | null
   dateUploaded: string
   dateCompleted: string | null
@@ -12,35 +13,50 @@ interface Work {
 }
 
 export function UploadedWorkList() {
-  const [works, setWorks] = useState<Work[]>([])
+  const [groups, setGroups] = useState<Record<string, Work[]>>({})
+  const [students, setStudents] = useState<{ id: string; name: string }[]>([])
+  const [groupBy, setGroupBy] = useState('')
+  const [filterStudent, setFilterStudent] = useState('')
+  const [filterDay, setFilterDay] = useState('')
+  const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  const loadStudents = async () => {
+    const res = await fetch('/api/students')
+    if (res.ok) {
+      const data = (await res.json()) as { students: { id: string; name: string }[] }
+      setStudents(data.students)
+    }
+  }
 
   const loadWorks = async () => {
     try {
-      const res = await fetch('/api/upload-work')
+      const params = new URLSearchParams()
+      if (groupBy) params.set('group', groupBy)
+      if (filterStudent) params.set('studentId', filterStudent)
+      if (filterDay) params.set('day', filterDay)
+      if (filterTag) params.set('tag', filterTag)
+      const url = `/api/upload-work${params.size ? `?${params.toString()}` : ''}`
+      const res = await fetch(url)
       if (!res.ok) throw new Error('load error')
-      const data = (await res.json()) as { works: Work[] }
-      setWorks(data.works)
+      const data = (await res.json()) as { groups: Record<string, Work[]> }
+      setGroups(data.groups)
     } catch {
       setError('Failed to load uploads')
     }
   }
 
   useEffect(() => {
-    loadWorks()
+    loadStudents()
   }, [])
 
+  useEffect(() => {
+    loadWorks()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupBy, filterStudent, filterDay, filterTag])
+
   const handleStart = () => {
-    setWorks((prev) => [
-      {
-        id: 'pending',
-        summary: 'Processing...',
-        dateUploaded: new Date().toISOString(),
-        dateCompleted: null,
-        tags: [],
-      },
-      ...prev,
-    ])
+    setError(null)
   }
 
   const handleSuccess = () => {
@@ -48,7 +64,6 @@ export function UploadedWorkList() {
   }
 
   const handleError = () => {
-    setWorks((prev) => prev.filter((w) => w.id !== 'pending'))
     setError('Upload failed')
   }
 
@@ -59,18 +74,69 @@ export function UploadedWorkList() {
         onSuccess={handleSuccess}
         onError={handleError}
       />
+      <div style={{ margin: '1rem 0', display: 'flex', gap: '0.5rem' }}>
+        <label>
+          Group by
+          <select value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+            <option value="">None</option>
+            <option value="student">Student</option>
+            <option value="day">Day</option>
+            <option value="tag">Tag</option>
+          </select>
+        </label>
+        <label>
+          Student
+          <select
+            value={filterStudent}
+            onChange={(e) => setFilterStudent(e.target.value)}
+          >
+            <option value="">All</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Day
+          <input
+            type="date"
+            value={filterDay}
+            onChange={(e) => setFilterDay(e.target.value)}
+          />
+        </label>
+        <label>
+          Tag
+          <input
+            value={filterTag}
+            onChange={(e) => setFilterTag(e.target.value)}
+          />
+        </label>
+      </div>
       {error && <p>{error}</p>}
-      <ul>
-        {works.map((w) => (
-          <li key={w.id} style={{ marginBottom: '1rem' }}>
-            <strong>{new Date(w.dateCompleted || w.dateUploaded).toDateString()}</strong>
-            <SummaryWithMath text={w.summary ?? ''} />
-            {w.tags.length > 0 && (
-              <div>Tags: {w.tags.join(', ')}</div>
-            )}
-          </li>
-        ))}
-      </ul>
+      {Object.entries(groups).map(([key, works]) => (
+        <div key={key} style={{ marginBottom: '1rem' }}>
+          {groupBy && <h3>{
+            groupBy === 'student'
+              ? students.find((s) => s.id === key)?.name || key
+              : key
+          }</h3>}
+          <ul>
+            {works.map((w) => (
+              <li key={w.id} style={{ marginBottom: '1rem' }}>
+                <strong>
+                  {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
+                </strong>
+                <SummaryWithMath text={w.summary ?? ''} />
+                {w.tags.length > 0 && (
+                  <div>Tags: {w.tags.join(', ')}</div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }

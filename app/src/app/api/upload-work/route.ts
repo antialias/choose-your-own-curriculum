@@ -111,18 +111,71 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const n = parseInt(req.nextUrl.searchParams.get('n') || '3', 10);
+  const group = req.nextUrl.searchParams.get('group');
+  const studentId = req.nextUrl.searchParams.get('studentId');
+  const day = req.nextUrl.searchParams.get('day');
+  const tag = req.nextUrl.searchParams.get('tag');
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
-  const workWithTags = works.map((w) => {
+  let workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
       .map((r) => tagStmt.get(r.id) as { text: string } | undefined)
       .filter((t): t is { text: string } => Boolean(t))
       .map((t) => t.text);
     return { ...w, tags };
   });
-  return NextResponse.json({ works: workWithTags });
+  if (studentId) {
+    workWithTags = workWithTags.filter((w) => w.studentId === studentId);
+  }
+  if (day) {
+    workWithTags = workWithTags.filter((w) => {
+      const d = new Date(w.dateCompleted || w.dateUploaded)
+        .toISOString()
+        .slice(0, 10);
+      return d === day;
+    });
+  }
+  if (tag) {
+    workWithTags = workWithTags.filter((w) => w.tags.includes(tag));
+  }
+
+  const groups: Record<string, typeof workWithTags> = {};
+  const push = (key: string, w: (typeof workWithTags)[number]) => {
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(w);
+  };
+
+  switch (group) {
+    case 'student':
+      for (const w of workWithTags) {
+        push(w.studentId, w);
+      }
+      break;
+    case 'day':
+      for (const w of workWithTags) {
+        const key = new Date(w.dateCompleted || w.dateUploaded)
+          .toISOString()
+          .slice(0, 10);
+        push(key, w);
+      }
+      break;
+    case 'tag':
+      for (const w of workWithTags) {
+        if (w.tags.length === 0) {
+          push('untagged', w);
+        }
+        for (const t of w.tags) {
+          push(t, w);
+        }
+      }
+      break;
+    default:
+      groups.all = workWithTags;
+  }
+
+  return NextResponse.json({ groups });
 }
