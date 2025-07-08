@@ -31,12 +31,12 @@ This repository is a Next.js TypeScript project that uses Biome for formatting a
 - Type `params` and `searchParams` as `Promise` objects and `await` them before use.
 
 ## Drizzle Migrations
-- Run `pnpm exec drizzle-kit push` after schema changes. Migrations live in `app/drizzle` and are ordered via `app/drizzle/meta/_journal.json`.
+- Run `pnpm run generate-migrations` after schema changes. Migrations live in `app/drizzle` and are ordered via `app/drizzle/meta/_journal.json`. Under normal circumstances, there should be no need to edit a migration file after it has been generated. Exceptions may include adding something that the generated migration didn't pick up on, or transforming data along with the migration.
 - Each SQL statement in a migration must end with `--> statement-breakpoint`. The command above generates these breakpoints and updates the journal file.
 - `src/db/index.ts` runs migrations on startup when the `drizzle` folder exists. Commit both the new SQL and updated metadata.
 
 ## Other Rules
 - Never manually edit files under `src/generated`.
-- Commit updates to `pnpm-lock.yaml` in full and ensure the diff starts with `lockfileVersion` and ends with a newline.
+- Commit updates to `pnpm-lock.yaml` in full and ensure the diff starts with `lockfileVersion` and ends with a newline. Never ever edit pnpm-lock by hand. If you need a change start first by looking at what you can change in package.json and then regenerate the lockfile.
 - Follow [Semantic Commit Messages](https://www.conventionalcommits.org/).
 - Update documentation when adding features.
