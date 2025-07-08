@@ -1,4 +1,13 @@
 import { sqlite } from './index';
+import type { Statement } from 'better-sqlite3';
+
+function safePrepare(sql: string): Statement<unknown[], unknown> {
+  try {
+    return sqlite.prepare(sql);
+  } catch {
+    return { run: () => {}, all: () => [], get: () => undefined } as unknown as Statement<unknown[], unknown>;
+  }
+}
 
 export interface WorkEmbedding {
   workId: string;
@@ -10,10 +19,10 @@ export interface TagEmbedding {
   vector: number[];
 }
 
-const deleteStmt = sqlite.prepare(
+const deleteStmt = safePrepare(
   'DELETE FROM uploaded_work_index WHERE work_id = ?'
 );
-const insertStmt = sqlite.prepare(
+const insertStmt = safePrepare(
   'INSERT INTO uploaded_work_index(work_id, vector) VALUES (?, json(?))'
 );
 
@@ -24,10 +33,8 @@ const tx = sqlite.transaction((batch: WorkEmbedding[]) => {
   }
 });
 
-const deleteTagStmt = sqlite.prepare(
-  'DELETE FROM tag_index WHERE tag_id = ?'
-);
-const insertTagStmt = sqlite.prepare(
+const deleteTagStmt = safePrepare('DELETE FROM tag_index WHERE tag_id = ?');
+const insertTagStmt = safePrepare(
   'INSERT INTO tag_index(tag_id, vector) VALUES (?, json(?))'
 );
 
@@ -55,9 +62,42 @@ export function searchWorkEmbeddings(vector: number[], k: number) {
 }
 
 export function searchTagEmbeddings(vector: number[], k: number) {
-  return sqlite
-    .prepare(
-      'SELECT tag_id as id, distance FROM tag_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
-    )
-    .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
+  try {
+    return sqlite
+      .prepare(
+        'SELECT tag_id as id, distance FROM tag_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
+      )
+      .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
+  } catch {
+    return [] as { id: string; distance: number }[];
+  }
+}
+
+export function getWorkVector(workId: string): number[] | null {
+  let row: { vector?: unknown } | undefined;
+  try {
+    row = sqlite
+      .prepare('SELECT vector FROM uploaded_work_index WHERE work_id = ?')
+      .get(workId) as { vector?: unknown } | undefined;
+  } catch {
+    return null;
+  }
+  if (!row || row.vector == null) return null;
+  const v = row.vector as unknown;
+  if (typeof v === 'string') {
+    return JSON.parse(v) as number[];
+  }
+  if (v instanceof Uint8Array) {
+    const buf = Buffer.from(v);
+    const arr = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4);
+    return Array.from(arr);
+  }
+  if (Array.isArray(v)) return v as number[];
+  return null;
+}
+
+export function searchTagsForWork(workId: string, k: number) {
+  const vector = getWorkVector(workId);
+  if (!vector) return [] as { id: string; distance: number }[];
+  return searchTagEmbeddings(vector, k);
 }

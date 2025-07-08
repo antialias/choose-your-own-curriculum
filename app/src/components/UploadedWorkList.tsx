@@ -8,6 +8,7 @@ interface Work {
   summary: string | null
   dateUploaded: string
   dateCompleted: string | null
+  tags: string[]
 }
 
 export function UploadedWorkList() {
@@ -36,6 +37,7 @@ export function UploadedWorkList() {
         summary: 'Processing...',
         dateUploaded: new Date().toISOString(),
         dateCompleted: null,
+        tags: [],
       },
       ...prev,
     ])
@@ -63,6 +65,9 @@ export function UploadedWorkList() {
           <li key={w.id} style={{ marginBottom: '1rem' }}>
             <strong>{new Date(w.dateCompleted || w.dateUploaded).toDateString()}</strong>
             <SummaryWithMath text={w.summary ?? ''} />
+            {w.tags.length > 0 && (
+              <div>Tags: {w.tags.join(', ')}</div>
+            )}
           </li>
         ))}
       </ul>
