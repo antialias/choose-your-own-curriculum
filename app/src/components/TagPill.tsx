@@ -8,10 +8,14 @@ export type TagPillProps = {
 
 function vectorToColor(v: number[]): string {
   if (v.length < 3) return '#999'
-  const hue = ((v[0] + 1) / 2) * 360
-  const sat = 50 + ((v[1] + 1) / 2) * 50
-  const light = 40 + ((v[2] + 1) / 2) * 20
-  return `hsl(${Math.floor(hue) % 360}, ${Math.floor(sat)}%, ${Math.floor(light)}%)`
+  const clamp = (n: number) => Math.max(-1, Math.min(1, n))
+  const normalize = (n: number) => (clamp(n) + 1) / 2
+
+  const h = (normalize(v[0]) + 0.15 * normalize(v[1]) + 0.05 * normalize(v[2])) % 1
+  const hue = h * 360
+  const sat = 60 + normalize(v[1]) * 30
+  const light = 45 + normalize(v[2]) * 30
+  return `hsl(${Math.round(hue)}, ${Math.round(sat)}%, ${Math.round(light)}%)`
 }
 
 export function TagPill({ text, vector }: TagPillProps) {
@@ -26,6 +30,7 @@ export function TagPill({ text, vector }: TagPillProps) {
         color: 'white',
         fontSize: 'sm',
         marginRight: '1',
+        marginBottom: '1',
       })}
       style={{ backgroundColor: color }}
     >
