@@ -1,5 +1,6 @@
-import type { Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 import { StudentForm } from './StudentForm'
+import QueryProvider from './QueryProvider'
 
 const meta: Meta<typeof StudentForm> = {
   title: 'StudentForm',
@@ -7,4 +8,12 @@ const meta: Meta<typeof StudentForm> = {
 }
 export default meta
 
-export const Default = {}
+type Story = StoryObj<typeof StudentForm>
+
+export const Default: Story = {
+  render: () => (
+    <QueryProvider>
+      <StudentForm />
+    </QueryProvider>
+  ),
+}

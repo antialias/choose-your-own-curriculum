@@ -1,6 +1,7 @@
 'use client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import {
   studentFieldsSchema,
   StudentFields,
@@ -24,18 +25,25 @@ export function StudentForm({ student, onSuccess }: Props) {
     },
   })
 
-  const onSubmit = async (data: StudentFields) => {
-    const res = await fetch(
-      student ? `/api/students/${student.id}` : '/api/students',
-      {
-        method: student ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      }
-    )
-    if (res.ok) {
+  const mutation = useMutation({
+    mutationFn: async (data: StudentFields) => {
+      const res = await fetch(
+        student ? `/api/students/${student.id}` : '/api/students',
+        {
+          method: student ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        }
+      )
+      if (!res.ok) throw new Error('Request failed')
+    },
+    onSuccess: () => {
       onSuccess?.()
-    }
+    },
+  })
+
+  const onSubmit = async (data: StudentFields) => {
+    await mutation.mutateAsync(data)
   }
 
   return (
@@ -44,7 +52,7 @@ export function StudentForm({ student, onSuccess }: Props) {
       {errors.name && <span>{errors.name.message}</span>}
       <input placeholder="Email" {...register('email')} />
       {errors.email && <span>{errors.email.message}</span>}
-      <button type="submit" disabled={isSubmitting}>
+      <button type="submit" disabled={isSubmitting || mutation.isPending}>
         {student ? 'Save' : 'Add'}
       </button>
     </form>
