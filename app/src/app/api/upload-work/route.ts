@@ -148,7 +148,9 @@ export async function GET(req: NextRequest) {
     });
   }
   if (tag) {
-    workWithTags = workWithTags.filter((w) => w.tags.includes(tag));
+    workWithTags = workWithTags.filter((w) =>
+      w.tags.some((t) => t.text === tag)
+    );
   }
 
   const groups: Record<string, typeof workWithTags> = {};
@@ -177,7 +179,7 @@ export async function GET(req: NextRequest) {
           push('untagged', w);
         }
         for (const t of w.tags) {
-          push(t, w);
+          push(t.text, w);
         }
       }
       break;
