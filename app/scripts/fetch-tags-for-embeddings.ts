@@ -2,11 +2,13 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 
 import crypto from 'node:crypto';
-import { sqlite } from '../src/db';
+import { getSqlite } from '../src/db';
 import { upsertTagEmbeddings } from '../src/db/embeddings';
 import OpenAI from 'openai';
 import { LLMClient } from '../src/llm/client';
 import { z } from 'zod';
+
+const sqlite = getSqlite();
 
 async function main() {
   const summaries = sqlite
