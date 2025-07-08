@@ -9,6 +9,12 @@ interface Tag {
   vector: number[]
 }
 
+interface Topic {
+  id: string
+  label: string
+  relevancy: number
+}
+
 interface Work {
   id: string
   studentId: string
@@ -16,9 +22,10 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  topics?: Topic[]
 }
 
-export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
+export function UploadedWorkList({ studentId = '', topicDagId }: { studentId?: string; topicDagId?: string } = {}) {
   const [groups, setGroups] = useState<Record<string, Work[]>>({})
   const [students, setStudents] = useState<{ id: string; name: string }[]>([])
   const [groupBy, setGroupBy] = useState('')
@@ -46,6 +53,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       if (filterStudent) params.set('studentId', filterStudent)
       if (filterDay) params.set('day', filterDay)
       if (filterTag) params.set('tag', filterTag)
+      if (topicDagId) params.set('topicDagId', topicDagId)
       const url = `/api/upload-work${params.size ? `?${params.toString()}` : ''}`
       const res = await fetch(url)
       if (!res.ok) throw new Error('load error')
@@ -63,7 +71,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   useEffect(() => {
     loadWorks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, filterStudent, filterDay, filterTag])
+  }, [groupBy, filterStudent, filterDay, filterTag, topicDagId])
 
   const handleStart = () => {
     setError(null)
@@ -145,6 +153,15 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                       <TagPill key={t.text} text={t.text} vector={t.vector} />
                     ))}
                   </div>
+                )}
+                {w.topics && w.topics.length > 0 && (
+                  <ul>
+                    {w.topics.map((t) => (
+                      <li key={t.id}>
+                        {t.label} - {t.relevancy}%
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             ))}

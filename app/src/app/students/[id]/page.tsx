@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/authOptions'
-import { StudentCurriculum } from '@/components/StudentCurriculum'
-import { UploadedWorkList } from '@/components/UploadedWorkList'
+import { StudentProgressClient } from '@/components/StudentProgressClient'
 
 export default async function StudentProgressPage({
   params,
@@ -19,11 +18,5 @@ export default async function StudentProgressPage({
     )
   }
   const { id } = await params
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Student Progress</h1>
-      <StudentCurriculum studentId={id} />
-      <UploadedWorkList studentId={id} />
-    </div>
-  )
+  return <StudentProgressClient studentId={id} />
 }

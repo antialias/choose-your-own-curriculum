@@ -6,6 +6,7 @@ import { authOptions } from '@/authOptions';
 import { z } from 'zod';
 import { GraphSchema } from '@/graphSchema';
 import { eq } from 'drizzle-orm';
+import { embedTagsForGraph } from '@/jobs/embedTags';
 
 const db = getDb();
 
@@ -24,6 +25,10 @@ export async function POST(req: NextRequest) {
     graph: JSON.stringify(data.graph),
     createdAt: new Date(),
   });
+  // kick off background embedding job without blocking response
+  embedTagsForGraph(data.graph).catch((err) =>
+    console.error('embedTagsForGraph failed', err)
+  );
   return NextResponse.json({ ok: true });
 }
 

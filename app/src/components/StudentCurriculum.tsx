@@ -16,7 +16,7 @@ interface StudentData {
   graph: Graph | null
 }
 
-export function StudentCurriculum({ studentId }: { studentId: string }) {
+export function StudentCurriculum({ studentId, onChange }: { studentId: string; onChange?: (id: string | null) => void }) {
   const [data, setData] = useState<StudentData | null>(null)
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
@@ -38,6 +38,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         graph: s.graph,
       })
       setSelected(s.topicDagId || '')
+      onChange?.(s.topicDagId)
     }
   }
 
@@ -55,6 +56,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topicDagId: selected }),
     })
+    onChange?.(selected || null)
     load()
   }
 
