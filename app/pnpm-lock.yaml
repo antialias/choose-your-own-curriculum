@@ -75,6 +75,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.0.6
         version: 2.0.6
+      '@biomejs/cli-linux-x64':
+        specifier: ^2.1.1
+        version: 2.1.1
       '@chromatic-com/storybook':
         specifier: ^4.0.1
         version: 4.0.1(storybook@9.0.15(@testing-library/dom@10.4.0)(prettier@3.2.5))
@@ -87,6 +90,9 @@ importers:
       '@pandacss/preset-panda':
         specifier: ^0.54.0
         version: 0.54.0
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: ^4.44.2
+        version: 4.44.2
       '@storybook/addon-a11y':
         specifier: ^9.0.15
         version: 9.0.15(storybook@9.0.15(@testing-library/dom@10.4.0)(prettier@3.2.5))
@@ -992,6 +998,11 @@ packages:
     resolution: {integrity: sha512-geM1MkHTV1Kh2Cs/Xzot9BOF3WBacihw6bkEmxkz4nSga8B9/hWy5BDiOG3gHDGIBa8WxT0nzsJs2f/hPqQIQw==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
+    os: [linux]
+
+  '@biomejs/cli-linux-x64@2.1.1':
+    resolution: {integrity: sha512-3WJ1GKjU7NzZb6RTbwLB59v9cTIlzjbiFLDB0z4376TkDqoNYilJaC37IomCr/aXwuU8QKkrYoHrgpSq5ffJ4Q==}
+    engines: {node: '>=14.21.3'}
     os: [linux]
 
   '@biomejs/cli-win32-arm64@2.0.6':
@@ -1938,7 +1949,6 @@ packages:
 
   '@rollup/rollup-linux-x64-gnu@4.44.2':
     resolution: {integrity: sha512-/bXb0bEsWMyEkIsUL2Yt5nFB5naLAwyOWMEviQfQY1x3l5WsLKgvZf66TM7UTfED6erckUVUJQ/jJ1FSpm3pRQ==}
-    cpu: [x64]
     os: [linux]
 
   '@rollup/rollup-linux-x64-musl@4.44.2':
@@ -11023,6 +11033,8 @@ snapshots:
   '@biomejs/cli-linux-x64@2.0.6':
     optional: true
 
+  '@biomejs/cli-linux-x64@2.1.1': {}
+
   '@biomejs/cli-win32-arm64@2.0.6':
     optional: true
 
@@ -11959,8 +11971,7 @@ snapshots:
   '@rollup/rollup-linux-s390x-gnu@4.44.2':
     optional: true
 
-  '@rollup/rollup-linux-x64-gnu@4.44.2':
-    optional: true
+  '@rollup/rollup-linux-x64-gnu@4.44.2': {}
 
   '@rollup/rollup-linux-x64-musl@4.44.2':
     optional: true
