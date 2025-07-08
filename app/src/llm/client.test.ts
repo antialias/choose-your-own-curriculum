@@ -56,4 +56,19 @@ describe('LLMClient', () => {
     expect(result.response).toBeNull();
     expect(mockCreate).toHaveBeenCalledTimes(1);
   });
+
+  test('streamChat returns readable tokens', async () => {
+    mockCreate.mockResolvedValue({
+      [Symbol.asyncIterator]: async function* () {
+        yield { choices: [{ delta: { content: 'hi' } }] };
+      },
+      controller: new AbortController(),
+    });
+    const client = new LLMClient('key');
+    const stream = await client.streamChat('hi', { systemPrompt: 'sys' });
+    const reader = stream.getReader();
+    const { value, done } = await reader.read();
+    expect(done).toBe(false);
+    expect(new TextDecoder().decode(value)).toBe('hi');
+  });
 });

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
+import mermaid from 'mermaid';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -29,9 +30,25 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+  const [buffer, setBuffer] = useState('');
+  const [hasValid, setHasValid] = useState(false);
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!buffer) return;
+    const handle = setTimeout(() => {
+      try {
+        mermaid.parse(buffer);
+        setGraph(buffer);
+        setHasValid(true);
+      } catch {
+        /* ignore invalid partial graph */
+      }
+    }, 200);
+    return () => clearTimeout(handle);
+  }, [buffer]);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -42,20 +59,31 @@ export function MathSkillSelector() {
   const generate = async () => {
     setStatus('loading');
     setError(null);
+    setGraph('');
+    setBuffer('');
+    setHasValid(false);
     try {
       const res = await fetch('/api/generate-graph', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topics: selected }),
       });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setError(data.error || 'Unknown error');
+      if (!res.ok || !res.body) {
+        const data = res.body ? await res.text() : '';
+        setError(data || 'Unknown error');
         setStatus('error');
         return;
       }
-      const data = (await res.json()) as { graph: string };
-      setGraph(data.graph);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      while (!done) {
+        const { value, done: d } = await reader.read();
+        done = d;
+        if (value) {
+          setBuffer((prev) => prev + decoder.decode(value));
+        }
+      }
       setSaved(false);
       setStatus('idle');
     } catch (err) {
@@ -92,8 +120,8 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-      {status === 'loading' && (
-        <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+      {(status === 'loading' || (!hasValid && status !== 'error')) && (
+        <p className={css({ color: 'blue.600', mt: '2' })}>building graph…</p>
       )}
       {status === 'error' && (
         <p className={css({ color: 'red.600', mt: '2' })}>
@@ -108,9 +136,9 @@ export function MathSkillSelector() {
       {graph && (
         <div id="graph-container" style={styles.graph}>
           {/* re-mount Mermaid when chart string changes to ensure re-render */}
-            <Mermaid key={graph} chart={graph} />
-          </div>
-        )}
+          <Mermaid key={graph} chart={graph} />
+        </div>
+      )}
     </div>
   );
 }
