@@ -43,12 +43,29 @@ CREATE TABLE `student` (
 	FOREIGN KEY (`accountUserId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
+CREATE TABLE `tag` (
+	`id` text PRIMARY KEY NOT NULL,
+	`text` text NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `tag_text_unique` ON `tag` (`text`);--> statement-breakpoint
 CREATE TABLE `teacher_student` (
 	`teacherId` text NOT NULL,
 	`studentId` text NOT NULL,
+	`topicDagId` text,
 	PRIMARY KEY(`teacherId`, `studentId`),
 	FOREIGN KEY (`teacherId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`studentId`) REFERENCES `student`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`studentId`) REFERENCES `student`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`topicDagId`) REFERENCES `topic_dag`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `topic_dag` (
+	`id` text PRIMARY KEY NOT NULL,
+	`userId` text NOT NULL,
+	`topics` text NOT NULL,
+	`graph` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `uploaded_work` (
