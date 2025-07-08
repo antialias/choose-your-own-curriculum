@@ -61,3 +61,20 @@ export function searchTagEmbeddings(vector: number[], k: number) {
     )
     .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
 }
+
+export function tagsForWork(workId: string, k = 3) {
+  const row = sqlite
+    .prepare('SELECT vector FROM uploaded_work_index WHERE work_id = ?')
+    .get(workId) as { vector?: string } | undefined;
+  if (!row?.vector) return [] as { id: string; text: string; distance: number }[];
+  const vector = JSON.parse(row.vector) as number[];
+  if (!vector.length) return [] as { id: string; text: string; distance: number }[];
+  const nearest = searchTagEmbeddings(vector, k);
+  if (nearest.length === 0) return [] as { id: string; text: string; distance: number }[];
+  const placeholders = nearest.map(() => '?').join(',');
+  const tags = sqlite
+    .prepare(`SELECT id, text FROM tag WHERE id IN (${placeholders})`)
+    .all(...nearest.map((n) => n.id)) as { id: string; text: string }[];
+  const map = new Map(tags.map((t) => [t.id, t.text]));
+  return nearest.map((n) => ({ id: n.id, text: map.get(n.id) || '', distance: n.distance }));
+}
