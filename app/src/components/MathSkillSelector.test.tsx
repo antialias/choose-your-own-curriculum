@@ -24,3 +24,31 @@ test('calls API with selected topics and saves', async () => {
   // ensure saved state is applied
   await screen.findByText('Saved');
 });
+
+test('shows loading indicator', async () => {
+  let resolve: (() => void) | undefined;
+  mockFetch.mockImplementationOnce(
+    () =>
+      new Promise((r) => {
+        resolve = () =>
+          r({ ok: true, json: () => Promise.resolve({ graph: 'g' }) });
+      })
+  );
+  render(<MathSkillSelector />);
+  await user.click(screen.getByText('Generate Graph'));
+  expect(screen.getByText('Generating...')).toBeInTheDocument();
+  resolve?.();
+  await screen.findByTestId('mermaid');
+});
+
+test('shows error message when request fails', async () => {
+  mockFetch.mockResolvedValueOnce({
+    ok: false,
+    json: () => Promise.resolve({ error: 'bad' }),
+  });
+  render(<MathSkillSelector />);
+  await user.click(screen.getByText('Generate Graph'));
+  expect(
+    await screen.findByText(/Failed to generate graph: bad/)
+  ).toBeInTheDocument();
+});

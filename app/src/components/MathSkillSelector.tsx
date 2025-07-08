@@ -29,6 +29,8 @@ export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -37,15 +39,30 @@ export function MathSkillSelector() {
   };
 
   const generate = async () => {
-    const res = await fetch('/api/generate-graph', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topics: selected }),
-    });
-    if (res.ok) {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/generate-graph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topics: selected }),
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error || 'request failed');
+      }
       const data = (await res.json()) as { graph: string };
       setGraph(data.graph);
       setSaved(false);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'unknown error';
+      setError(
+        `Failed to generate graph: ${message}. ` +
+          'Please check your network connection and try again.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,14 +91,15 @@ export function MathSkillSelector() {
           </label>
         ))}
       </div>
-      <button style={styles.button} onClick={generate}>
-        Generate Graph
+      <button style={styles.button} onClick={generate} disabled={loading}>
+        {loading ? 'Generating...' : 'Generate Graph'}
       </button>
       {graph && (
         <button style={styles.button} onClick={save} disabled={saved}>
           {saved ? 'Saved' : 'Save Graph'}
         </button>
       )}
+      {error && <p>{error}</p>}
       {graph && (
         <div id="graph-container" style={styles.graph}>
           {/* re-mount Mermaid when chart string changes to ensure re-render */}
