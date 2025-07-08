@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { db, sqlite } from '@/db';
 import { uploadedWork, teacherStudents } from '@/db/schema';
-import { upsertWorkEmbeddings } from '@/db/embeddings';
+import { upsertWorkEmbeddings, searchTagsForWork } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
@@ -104,15 +104,25 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
   if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  const n = parseInt(req.nextUrl.searchParams.get('n') || '3', 10);
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
-  return NextResponse.json({ works });
+
+  const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
+  const workWithTags = works.map((w) => {
+    const tags = searchTagsForWork(w.id, n)
+      .map((r) => tagStmt.get(r.id) as { text: string } | undefined)
+      .filter((t): t is { text: string } => Boolean(t))
+      .map((t) => t.text);
+    return { ...w, tags };
+  });
+  return NextResponse.json({ works: workWithTags });
 }
