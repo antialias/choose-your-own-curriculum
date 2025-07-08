@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import type { Mock } from 'vitest';
 vi.mock('react-mermaid2', () => ({ default: () => <div data-testid="mermaid" /> }));
 import { MathSkillSelector } from './MathSkillSelector';
@@ -16,5 +16,6 @@ test('calls API with selected topics and saves', async () => {
   // wait for graph to render
   await screen.findByTestId('mermaid');
   fireEvent.click(screen.getByText('Save Graph'));
+  await waitFor(() => expect(screen.getByText('Saved')).toBeInTheDocument());
   expect(mockFetch).toHaveBeenLastCalledWith('/api/topic-dags', expect.objectContaining({ method: 'POST' }));
 });
