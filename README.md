@@ -4,7 +4,7 @@ A web application for planning and tracking long term learning goals. Users defi
 
 Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page.
 
-The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
+The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client. After generating a graph you can save it and review all of your saved DAGs from the **Topic DAGs** page in the navigation bar.
 
 ## Tech Stack
 
@@ -76,6 +76,10 @@ pnpm storybook
 Ensure all tests pass and lint using Biome before submitting PRs. See `AGENTS.md` for automation guidelines.
 Run `pnpm lint` to check formatting and linting or `pnpm format` to apply fixes.
 Remaining tasks and future work are documented in `TASKS.md`.
+
+## Topic DAGs
+
+After generating a prerequisite graph on the home page you can save it. The **Topic DAGs** page lists every graph you've saved with the creation date and the topics used to generate it.
 
 ## Uploaded Work
 

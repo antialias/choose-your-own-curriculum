@@ -9,4 +9,7 @@ test('calls API with selected topics', async () => {
   fireEvent.click(screen.getByLabelText('Algebra'));
   fireEvent.click(screen.getByText('Generate Graph'));
   expect(fetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
+  expect(await screen.findByText('Save Graph')).toBeInTheDocument();
+  fireEvent.click(screen.getByText('Save Graph'));
+  expect(fetch).toHaveBeenCalledWith('/api/topic-dags', expect.objectContaining({ method: 'POST' }));
 });

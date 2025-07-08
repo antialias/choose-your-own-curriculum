@@ -28,6 +28,7 @@ const skills = [
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
   const [graph, setGraph] = useState('');
+  const [saved, setSaved] = useState(false);
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -44,6 +45,18 @@ export function MathSkillSelector() {
     if (res.ok) {
       const data = (await res.json()) as { graph: string };
       setGraph(data.graph);
+      setSaved(false);
+    }
+  };
+
+  const save = async () => {
+    const res = await fetch('/api/topic-dags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topics: selected, graph }),
+    });
+    if (res.ok) {
+      setSaved(true);
     }
   };
 
@@ -64,9 +77,14 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-        {graph && (
-          <div id="graph-container" style={styles.graph}>
-            {/* re-mount Mermaid when chart string changes to ensure re-render */}
+      {graph && (
+        <button style={styles.button} onClick={save} disabled={saved}>
+          {saved ? 'Saved' : 'Save Graph'}
+        </button>
+      )}
+      {graph && (
+        <div id="graph-container" style={styles.graph}>
+          {/* re-mount Mermaid when chart string changes to ensure re-render */}
             <Mermaid key={graph} chart={graph} />
           </div>
         )}
