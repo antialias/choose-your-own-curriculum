@@ -1,4 +1,3 @@
-'use client'
 import { css } from '@/styled-system/css'
 
 export type TagPillProps = {
