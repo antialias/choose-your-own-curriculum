@@ -30,3 +30,9 @@ test('shows uploaded work link', () => {
   render(<NavBar />);
   expect(screen.getByText('Uploaded Work')).toBeInTheDocument();
 });
+
+test('shows my graphs link', () => {
+  mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
+  render(<NavBar />);
+  expect(screen.getByText('My Graphs')).toBeInTheDocument();
+});

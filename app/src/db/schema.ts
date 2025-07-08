@@ -116,3 +116,15 @@ export const tags = sqliteTable('tag', {
   text: text('text').notNull().unique(),
 });
 
+export const topicDags = sqliteTable('topic_dag', {
+  id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  topics: text('topics').notNull(),
+  graph: text('graph').notNull(),
+  dateCreated: integer('dateCreated', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
