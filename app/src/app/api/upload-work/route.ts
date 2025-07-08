@@ -4,6 +4,7 @@ import { getDb, getSqlite } from '@/db';
 const db = getDb();
 const sqlite = getSqlite();
 import { uploadedWork, teacherStudents } from '@/db/schema';
+import sharp from 'sharp';
 import {
   upsertWorkEmbeddings,
   searchTagsForWork,
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
+  let thumbnail: Buffer | null = null;
 
   let summary = '';
 
@@ -70,6 +72,14 @@ export async function POST(req: NextRequest) {
         ],
       });
       summary = chat.choices[0].message.content || '';
+      try {
+        thumbnail = await sharp(buffer)
+          .resize({ width: 144, height: 144, fit: 'inside' })
+          .png()
+          .toBuffer();
+      } catch (err) {
+        console.error('thumbnail error', err);
+      }
     } catch (err) {
       console.error('summary error', err);
     }
@@ -104,6 +114,9 @@ export async function POST(req: NextRequest) {
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
     originalDocument: buffer,
+    mimeType: file.type,
+    thumbnail: thumbnail ?? null,
+    thumbnailType: thumbnail ? 'image/png' : null,
   } as typeof uploadedWork.$inferInsert);
   if (vector.length) {
     upsertWorkEmbeddings([{ workId, vector }]);
@@ -137,7 +150,15 @@ export async function GET(req: NextRequest) {
         return { text: textRow.text, vector };
       })
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
-    return { ...w, tags };
+    return {
+      id: w.id,
+      studentId: w.studentId,
+      summary: w.summary,
+      dateUploaded: w.dateUploaded,
+      dateCompleted: w.dateCompleted,
+      tags,
+      hasThumbnail: Boolean(w.thumbnail),
+    };
   });
   if (studentId) {
     workWithTags = workWithTags.filter((w) => w.studentId === studentId);

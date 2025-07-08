@@ -59,6 +59,9 @@ importers:
       react-mermaid2:
         specifier: ^0.1.4
         version: 0.1.4(@testing-library/dom@10.4.0)(@types/react@19.1.8)(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
+      sharp:
+        specifier: ^0.34.2
+        version: 0.34.2
       sqlite-vec:
         specifier: 0.1.7-alpha.2
         version: 0.1.7-alpha.2
@@ -11539,7 +11542,9 @@ snapshots:
       source-map: 0.6.1
       string-length: 2.0.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@jest/source-map@24.9.0':
     dependencies:
@@ -13861,7 +13866,6 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
       color-string: 1.9.1
-    optional: true
 
   combined-stream@1.0.8:
     dependencies:
@@ -16815,7 +16819,9 @@ snapshots:
       pretty-format: 24.9.0
       throat: 4.1.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   jest-leak-detector@24.9.0:
     dependencies:
@@ -19790,7 +19796,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.2
       '@img/sharp-win32-ia32': 0.34.2
       '@img/sharp-win32-x64': 0.34.2
-    optional: true
 
   shebang-command@1.2.0:
     dependencies:
