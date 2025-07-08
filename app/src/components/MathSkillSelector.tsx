@@ -34,6 +34,8 @@ export function MathSkillSelector() {
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const MAX_TOKENS = 800;
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -44,10 +46,14 @@ export function MathSkillSelector() {
   const generate = async () => {
     setStatus('loading');
     setError(null);
+    setProgress(0);
     try {
       const res = await fetch('/api/generate-graph', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'text/event-stream',
+        },
         body: JSON.stringify({ topics: selected }),
       });
       if (!res.ok) {
@@ -56,10 +62,33 @@ export function MathSkillSelector() {
         setStatus('error');
         return;
       }
-      const data = (await res.json()) as { graph: Graph };
-      setGraph(data.graph);
-      setSaved(false);
-      setStatus('idle');
+      if (res.headers.get('content-type')?.includes('text/event-stream') && res.body) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let count = 0;
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          buffer += chunk;
+          count += chunk.split(/\s+/).length;
+          setProgress(count);
+          try {
+            const obj = JSON.parse(buffer) as { graph: Graph };
+            setGraph(obj.graph);
+          } catch {
+            // ignore partial JSON
+          }
+        }
+        setSaved(false);
+        setStatus('idle');
+      } else {
+        const data = (await res.json()) as { graph: Graph };
+        setGraph(data.graph);
+        setSaved(false);
+        setStatus('idle');
+      }
     } catch (err) {
       setError((err as Error).message);
       setStatus('error');
@@ -95,6 +124,16 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
+      <div style={{ width: '100%', background: '#eee', height: '0.5rem', marginTop: '0.5rem' }}>
+        <div
+          style={{
+            width: `${(progress / MAX_TOKENS) * 100}%`,
+            height: '100%',
+            background: '#4caf50',
+            transition: 'width 0.2s linear',
+          }}
+        />
+      </div>
       {status === 'loading' && (
         <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
       )}
