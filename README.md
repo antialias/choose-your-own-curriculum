@@ -2,7 +2,7 @@
 
 A web application for planning and tracking long term learning goals. Users define topic graphs and upload work samples. The app stores metadata and embeddings to recommend what to study next.
 
-Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page.
+Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page and the **Saved DAGs** page.
 
 The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
 
@@ -83,6 +83,10 @@ Authenticated users can upload documents from the **Uploaded Work** page. The se
 New uploads appear immediately in the list with a temporary "Processing..." placeholder while the LLM generates the summary. Any upload errors are shown next to the list.
 
 Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summaries are rendered with KaTeX.
+
+## Saved DAGs
+
+The **Saved DAGs** page lists every topic graph you've generated and saved from the home page. Each entry shows when it was created and which topics were included.
 
 ## Tag Generation
 
