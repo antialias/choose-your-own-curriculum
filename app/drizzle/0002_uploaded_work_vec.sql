@@ -1,4 +1,4 @@
-CREATE VIRTUAL TABLE uploaded_work_index USING vec0(
+CREATE VIRTUAL TABLE uploaded_work_index USING vss0(
   work_id TEXT PRIMARY KEY,
   vector FLOAT[1536]
 );

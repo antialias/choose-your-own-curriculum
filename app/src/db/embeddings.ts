@@ -58,7 +58,7 @@ export function upsertTagEmbeddings(rows: TagEmbedding[]) {
 export function searchWorkEmbeddings(vector: number[], k: number) {
   return sqlite
     .prepare(
-      'SELECT work_id as id, distance FROM uploaded_work_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
+      'SELECT work_id as id, distance FROM uploaded_work_index WHERE vss_search(vector, json(?)) LIMIT ?'
     )
     .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
 }
@@ -67,7 +67,7 @@ export function searchTagEmbeddings(vector: number[], k: number) {
   try {
     return sqlite
       .prepare(
-        'SELECT tag_id as id, distance FROM tag_index WHERE vector MATCH json(?) ORDER BY distance LIMIT ?'
+        'SELECT tag_id as id, distance FROM tag_index WHERE vss_search(vector, json(?)) LIMIT ?'
       )
       .all(JSON.stringify(vector), k) as { id: string; distance: number }[];
   } catch {
