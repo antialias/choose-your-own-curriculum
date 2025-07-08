@@ -1,7 +1,5 @@
-'use client'
-
-import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link'
+import type { Session } from 'next-auth'
 const styles = {
   bar: {
     display: 'flex',
@@ -28,8 +26,7 @@ const styles = {
   },
 };
 
-export function NavBar() {
-  const { data: session } = useSession();
+export function NavBar({ session }: { session: Session | null }) {
   return (
     <nav style={styles.bar}>
       <Link href="/" style={styles.link}>
@@ -46,9 +43,11 @@ export function NavBar() {
       </Link>
       <div style={styles.spacer} />
       {session ? (
-        <button style={styles.button} onClick={() => signOut()}>
-          Sign out
-        </button>
+        <form action="/api/auth/signout" method="post">
+          <button type="submit" style={styles.button}>
+            Sign out
+          </button>
+        </form>
       ) : (
         <Link href="/login" style={styles.link}>
           Sign in

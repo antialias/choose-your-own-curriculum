@@ -24,7 +24,7 @@ export default async function RootLayout({
       <body>
         <QueryProvider>
           <AuthProvider session={session}>
-            <NavBar />
+            <NavBar session={session} />
             {children}
           </AuthProvider>
         </QueryProvider>
