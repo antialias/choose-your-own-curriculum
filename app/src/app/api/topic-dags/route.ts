@@ -6,6 +6,7 @@ import { authOptions } from '@/authOptions';
 import { z } from 'zod';
 import { GraphSchema } from '@/graphSchema';
 import { eq } from 'drizzle-orm';
+import { embedDagTags } from '@/jobs/embedDagTags';
 
 const db = getDb();
 
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     graph: JSON.stringify(data.graph),
     createdAt: new Date(),
   });
+  void embedDagTags(data.graph);
   return NextResponse.json({ ok: true });
 }
 

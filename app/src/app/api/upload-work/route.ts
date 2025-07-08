@@ -3,11 +3,12 @@ import { getDb, getSqlite } from '@/db';
 
 const db = getDb();
 const sqlite = getSqlite();
-import { uploadedWork, teacherStudents } from '@/db/schema';
+import { uploadedWork, teacherStudents, topicDags } from '@/db/schema';
 import {
   upsertWorkEmbeddings,
   searchTagsForWork,
   getTagVector,
+  getWorkVector,
 } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
@@ -15,6 +16,21 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
+import type { Graph } from '@/graphSchema';
+
+function cosineSimilarity(a: number[], b: number[]) {
+  if (a.length !== b.length || a.length === 0) return 0;
+  let dot = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  if (!normA || !normB) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -122,12 +138,25 @@ export async function GET(req: NextRequest) {
   const studentId = req.nextUrl.searchParams.get('studentId');
   const day = req.nextUrl.searchParams.get('day');
   const tag = req.nextUrl.searchParams.get('tag');
+  const topicDagId = req.nextUrl.searchParams.get('topicDagId');
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
+  const tagByTextStmt = sqlite.prepare('SELECT id FROM tag WHERE text = ?');
+  let dagNodes: { id: string; label: string; tags: string[] }[] = [];
+  if (topicDagId) {
+    const [row] = await db
+      .select({ graph: topicDags.graph })
+      .from(topicDags)
+      .where(eq(topicDags.id, topicDagId));
+    if (row) {
+      const g = JSON.parse(row.graph) as Graph;
+      dagNodes = g.nodes;
+    }
+  }
   let workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
       .map((r) => {
@@ -139,6 +168,35 @@ export async function GET(req: NextRequest) {
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
     return { ...w, tags };
   });
+  if (dagNodes.length) {
+    workWithTags = workWithTags.map((w) => {
+      const wVec = getWorkVector(w.id) || [];
+      const nodes = dagNodes
+        .map((node) => {
+          const vecs = node.tags
+            .map((t) => {
+              const idRow = tagByTextStmt.get(t) as { id: string } | undefined;
+              return idRow ? getTagVector(idRow.id) : null;
+            })
+            .filter((v): v is number[] => Array.isArray(v));
+          if (!vecs.length || !wVec.length) return null;
+          const avg = new Array(vecs[0].length).fill(0);
+          for (const v of vecs) {
+            for (let i = 0; i < v.length; i++) avg[i] += v[i];
+          }
+          for (let i = 0; i < avg.length; i++) avg[i] /= vecs.length;
+          const sim = cosineSimilarity(wVec, avg);
+          const relevancy = Math.round(((sim + 1) / 2) * 100);
+          return { id: node.id, label: node.label, relevancy };
+        })
+        .filter((n): n is { id: string; label: string; relevancy: number } =>
+          Boolean(n)
+        )
+        .sort((a, b) => b.relevancy - a.relevancy)
+        .slice(0, n);
+      return { ...w, nodes };
+    });
+  }
   if (studentId) {
     workWithTags = workWithTags.filter((w) => w.studentId === studentId);
   }

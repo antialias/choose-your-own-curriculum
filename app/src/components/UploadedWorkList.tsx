@@ -18,6 +18,7 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  nodes?: { id: string; label: string; relevancy: number }[]
 }
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
@@ -28,11 +29,24 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
+  const [topicDagId, setTopicDagId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const { t } = useTranslation()
 
   useEffect(() => {
     setFilterStudent(studentId)
+    if (studentId) {
+      fetch(`/api/students/${studentId}`).then(async (res) => {
+        if (res.ok) {
+          const data = (await res.json()) as {
+            student: { topicDagId: string | null }
+          }
+          setTopicDagId(data.student.topicDagId || '')
+        }
+      })
+    } else {
+      setTopicDagId('')
+    }
   }, [studentId])
 
 
@@ -43,6 +57,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       if (filterStudent) params.set('studentId', filterStudent)
       if (filterDay) params.set('day', filterDay)
       if (filterTag) params.set('tag', filterTag)
+      if (topicDagId) params.set('topicDagId', topicDagId)
       const url = `/api/upload-work${params.size ? `?${params.toString()}` : ''}`
       const res = await fetch(url)
       if (!res.ok) throw new Error('load error')
@@ -57,7 +72,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   useEffect(() => {
     loadWorks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, filterStudent, filterDay, filterTag])
+  }, [groupBy, filterStudent, filterDay, filterTag, topicDagId])
 
   const handleStart = () => {
     setError(null)
@@ -139,6 +154,15 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                       <TagPill key={t.text} text={t.text} vector={t.vector} />
                     ))}
                   </div>
+                )}
+                {w.nodes && w.nodes.length > 0 && (
+                  <ul style={{ marginTop: '0.5rem' }}>
+                    {w.nodes.map((n) => (
+                      <li key={n.id}>
+                        {n.label} - {n.relevancy}%
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             ))}
