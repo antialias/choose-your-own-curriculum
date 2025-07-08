@@ -50,7 +50,11 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       const res = await fetch(url)
       if (!res.ok) throw new Error('load error')
       const data = (await res.json()) as { groups: Record<string, Work[]> }
-      setGroups(data.groups)
+      const normalized: Record<string, Work[]> = {}
+      for (const [key, works] of Object.entries(data.groups)) {
+        normalized[key] = works.map((w) => ({ ...w, tags: w.tags ?? [] }))
+      }
+      setGroups(normalized)
     } catch {
       setError('Failed to load uploads')
     }
