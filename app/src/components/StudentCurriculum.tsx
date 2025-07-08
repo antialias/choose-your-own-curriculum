@@ -1,17 +1,19 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Mermaid from 'react-mermaid2'
+import { Graph } from '@/graphSchema'
+import { graphToMermaid } from '@/graphToMermaid'
 
 interface Dag {
   id: string
   topics: string
-  graph: string
+  graph: Graph
 }
 
 interface StudentData {
   topicDagId: string | null
   topics: string[]
-  graph: string | null
+  graph: Graph | null
 }
 
 export function StudentCurriculum({ studentId }: { studentId: string }) {
@@ -26,7 +28,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         student: {
           topicDagId: string | null
           topics: string[] | null
-          graph: string | null
+          graph: Graph | null
         }
       }
       const s = json.student
@@ -94,7 +96,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
         <div style={{ marginTop: '1rem' }}>
-          <Mermaid chart={data.graph} />
+          <Mermaid chart={graphToMermaid(data.graph)} />
         </div>
       )}
     </div>

@@ -44,7 +44,7 @@ export async function GET(
       email: row.email,
       topicDagId: row.topicDagId,
       topics: row.topics ? JSON.parse(row.topics) : null,
-      graph: row.graph ?? null,
+      graph: row.graph ? JSON.parse(row.graph) : null,
     },
   })
 }

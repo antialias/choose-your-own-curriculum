@@ -4,11 +4,12 @@ import { topicDags } from '@/db/schema';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import { z } from 'zod';
+import { GraphSchema } from '@/graphSchema';
 import { eq } from 'drizzle-orm';
 
 const db = getDb();
 
-const postSchema = z.object({ topics: z.array(z.string()), graph: z.string() });
+const postSchema = z.object({ topics: z.array(z.string()), graph: GraphSchema });
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
   await db.insert(topicDags).values({
     userId,
     topics: JSON.stringify(data.topics),
-    graph: data.graph,
+    graph: JSON.stringify(data.graph),
     createdAt: new Date(),
   });
   return NextResponse.json({ ok: true });
@@ -36,5 +37,6 @@ export async function GET() {
     .select()
     .from(topicDags)
     .where(eq(topicDags.userId, userId));
-  return NextResponse.json({ dags: rows });
+  const dags = rows.map(r => ({ ...r, graph: JSON.parse(r.graph) }));
+  return NextResponse.json({ dags });
 }
