@@ -9,18 +9,28 @@ const mockFetch = fetch as unknown as Mock;
 const user = userEvent.setup();
 
 test('calls API with selected topics and saves', async () => {
-  let resolveFetch: (v: { ok: boolean; json: () => Promise<unknown> }) => void;
+  let resolveFetch: (v: { ok: boolean; json: () => Promise<unknown>; headers: { get: () => null } }) => void;
   mockFetch.mockImplementationOnce(
-    () => new Promise((r) => {
-      resolveFetch = r;
-    })
+    () =>
+      new Promise((r) => {
+        resolveFetch = r;
+      })
   );
-  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ ok: true }) });
+  mockFetch.mockResolvedValueOnce({
+    ok: true,
+    json: () => Promise.resolve({ ok: true }),
+    headers: { get: () => null },
+  });
   render(<MathSkillSelector />);
   await user.click(screen.getByLabelText('Algebra'));
   await user.click(screen.getByText('Generate Graph'));
   expect(await screen.findByText('Generating graph...')).toBeInTheDocument();
-  resolveFetch!({ ok: true, json: () => Promise.resolve({ graph: { nodes: [{ id: 'a', label: 'A', desc: '', tags: ['t1','t2','t3'] }], edges: [] } }) });
+  resolveFetch!({
+    ok: true,
+    json: () =>
+      Promise.resolve({ graph: { nodes: [{ id: 'a', label: 'A', desc: '', tags: ['t1', 't2', 't3'] }], edges: [] } }),
+    headers: { get: () => null },
+  });
   expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
   // wait for graph to render and save button to appear
   await screen.findByTestId('mermaid');
@@ -36,6 +46,7 @@ test('shows error message on failure', async () => {
   mockFetch.mockResolvedValueOnce({
     ok: false,
     json: () => Promise.resolve({ error: 'bad' }),
+    headers: { get: () => null },
   });
   render(<MathSkillSelector />);
   await user.click(screen.getByText('Generate Graph'));
