@@ -5,13 +5,21 @@ import { POST as generateGraph } from '@/app/api/generate-graph/route';
 vi.mock('@/llm/client', () => {
   return {
     LLMClient: vi.fn().mockImplementation(() => ({
-      chat: vi.fn(async () => ({ error: null, response: { graph: 'test-graph' } }))
-    }))
+      streamChat: vi.fn(
+        async () =>
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new TextEncoder().encode('test-graph'));
+              controller.close();
+            },
+          }),
+      ),
+    })),
   };
 });
 
 describe('generate-graph API', () => {
-  it('returns graph json', async () => {
+  it('returns graph text', async () => {
     const req = new NextRequest(new Request('http://localhost/api/generate-graph', {
       method: 'POST',
       body: JSON.stringify({ topics: ['algebra'] }),
@@ -19,7 +27,7 @@ describe('generate-graph API', () => {
     }));
     const res = await generateGraph(req);
     expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.graph).toBe('test-graph');
+    const text = await res.text();
+    expect(text).toBe('test-graph');
   });
 });

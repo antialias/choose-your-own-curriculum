@@ -32,6 +32,9 @@ importers:
       drizzle-orm:
         specifier: ^0.44.2
         version: 0.44.2(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(@types/better-sqlite3@7.6.13)(better-sqlite3@12.2.0)(prisma@6.11.1(typescript@5.8.3))(sqlite3@5.1.7)
+      mermaid:
+        specifier: 8.14.0
+        version: 8.14.0
       next:
         specifier: 15.3.5
         version: 15.3.5(@babel/core@7.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -11525,7 +11528,9 @@ snapshots:
       source-map: 0.6.1
       string-length: 2.0.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@jest/source-map@24.9.0':
     dependencies:
@@ -16802,7 +16807,9 @@ snapshots:
       pretty-format: 24.9.0
       throat: 4.1.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   jest-leak-detector@24.9.0:
     dependencies:

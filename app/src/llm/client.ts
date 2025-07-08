@@ -60,6 +60,48 @@ export class LLMClient {
   }
 
   /**
+   * Stream a chat completion and return a readable stream of tokens.
+   *
+   * @param prompt - The user prompt to send to the model.
+   * @param options - Prompt details and OpenAI params.
+   * @returns A ReadableStream of text tokens.
+   */
+  async streamChat(
+    prompt: string,
+    options: Omit<LLMOptions<unknown>, 'schema' | 'maxRetries'>,
+  ): Promise<ReadableStream> {
+    const { systemPrompt, templateVars = {}, params } = options;
+    const interpolatedSystem = this.interpolate(systemPrompt, templateVars);
+    const userPrompt = this.interpolate(prompt, templateVars);
+    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: 'system', content: interpolatedSystem },
+      { role: 'user', content: userPrompt },
+    ];
+    const paramsWithModel = {
+      ...(params ?? {}),
+      model: params?.model ?? DEFAULT_MODEL,
+    } as Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
+    const stream = await this.openai.chat.completions.create({
+      ...paramsWithModel,
+      stream: true,
+      messages,
+    });
+    const encoder = new TextEncoder();
+    return new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream as AsyncIterable<{ choices: { delta?: { content?: string } }[] }>) {
+          const token = chunk.choices?.[0]?.delta?.content;
+          if (token) controller.enqueue(encoder.encode(token));
+        }
+        controller.close();
+      },
+      cancel() {
+        stream.controller.abort();
+      },
+    });
+  }
+
+  /**
    * Replace `{{var}}` tokens in a template string.
    *
    * @param template - The template containing placeholders.

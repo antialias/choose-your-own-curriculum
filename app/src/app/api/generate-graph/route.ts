@@ -14,15 +14,11 @@ export async function POST(req: NextRequest) {
     console.log('OPENAI_API_KEY loaded');
   }
   const client = new LLMClient(apiKey || '');
-  const schema = z.object({ graph: z.string() });
-  const prompt = `Create a mermaid DAG flowing from left to right showing a progression from kindergarten math to these topics: ${topics.join(', ')}. The diagram should be as granular as possible by topic and include prerequisite links.`;
-  const result = await client.chat(prompt, {
+  const prompt = `Create a mermaid DAG flowing from left to right showing a progression from kindergarten math to these topics: ${topics.join(', ')}. Respond only with valid mermaid code.`;
+  const stream = await client.streamChat(prompt, {
     systemPrompt: 'You are an expert math curriculum planner.',
-    schema,
   });
-  if (result.error || !result.response) {
-    console.error('LLM chat failed', result.error);
-    return NextResponse.json({ error: result.error?.message || 'error' }, { status: 500 });
-  }
-  return NextResponse.json({ graph: result.response.graph });
+  return new NextResponse(stream, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
 }
