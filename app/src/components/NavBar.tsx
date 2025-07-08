@@ -39,7 +39,7 @@ export function NavBar() {
         Uploaded Work
       </Link>
       <Link href="/topic-dags" style={styles.link}>
-        Saved DAGs
+        My Curriculums
       </Link>
       <Link href="/students" style={styles.link}>
         Students
