@@ -124,6 +124,9 @@ export const topicDags = sqliteTable('topic_dag', {
     .references(() => users.id, { onDelete: 'cascade' }),
   topics: text('topics').notNull(),
   graph: text('graph').notNull(),
+  tagEmbeddingStatus: text('tagEmbeddingStatus').notNull().default('pending'),
+  tagEmbeddingsTotal: integer('tagEmbeddingsTotal').notNull().default(0),
+  tagEmbeddingsComplete: integer('tagEmbeddingsComplete').notNull().default(0),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date()),

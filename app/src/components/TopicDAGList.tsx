@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
@@ -9,22 +9,39 @@ interface Dag {
   topics: string
   graph: Graph
   createdAt: string
+  tagEmbeddingStatus: string
+  tagEmbeddingsTotal: number
+  tagEmbeddingsComplete: number
 }
 
 export function TopicDAGList() {
   const [dags, setDags] = useState<Dag[]>([])
   const [expanded, setExpanded] = useState<string | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const load = async () => {
     const res = await fetch('/api/topic-dags')
     if (res.ok) {
       const data = (await res.json()) as { dags: Dag[] }
       setDags(data.dags)
+      if (data.dags.some((d) => d.tagEmbeddingStatus !== 'complete') && !intervalRef.current) {
+        intervalRef.current = setInterval(() => {
+          load()
+        }, 5000)
+      }
+      if (data.dags.every((d) => d.tagEmbeddingStatus === 'complete') && intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
     }
   }
 
   useEffect(() => {
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [])
 
   return (
@@ -39,6 +56,11 @@ export function TopicDAGList() {
         >
           <strong>{new Date(d.createdAt).toLocaleString()}</strong>
           <div>{JSON.parse(d.topics).join(', ')}</div>
+          <div style={{ fontSize: '0.9rem' }}>
+            {d.tagEmbeddingStatus === 'complete'
+              ? 'Tags ready'
+              : `Tag processing: ${d.tagEmbeddingsComplete}/${d.tagEmbeddingsTotal}`}
+          </div>
           {expanded === d.id && (
             <div style={{ marginTop: '1rem' }}>
               <Mermaid chart={graphToMermaid(d.graph)} />
