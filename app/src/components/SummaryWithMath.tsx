@@ -3,7 +3,7 @@ import { InlineMath, BlockMath } from 'react-katex'
 
 export function SummaryWithMath({ text }: { text: string }) {
   const parts = text.split(
-    /(\$\$[^$]*\$\$|\$[^$]*\$|\\\[[^\]]*\\\]|\\\([^\)]*\\\))/g
+    /(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g
   )
   return (
     <span>
