@@ -1,6 +1,7 @@
 'use client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 import {
   studentFieldsSchema,
   StudentFields,
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function StudentForm({ student, onSuccess }: Props) {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -45,7 +47,7 @@ export function StudentForm({ student, onSuccess }: Props) {
       <input placeholder="Email" {...register('email')} />
       {errors.email && <span>{errors.email.message}</span>}
       <button type="submit" disabled={isSubmitting}>
-        {student ? 'Save' : 'Add'}
+        {student ? t('save') : t('add')}
       </button>
     </form>
   )

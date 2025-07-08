@@ -1,6 +1,7 @@
 import { UploadedWorkList } from '@/components/UploadedWorkList';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
+import i18n from '@/i18n';
 
 export default async function UploadedWorkPage() {
   const session = await getServerSession(authOptions);
@@ -8,14 +9,14 @@ export default async function UploadedWorkPage() {
   if (!userId) {
     return (
       <div style={{ padding: '2rem' }}>
-        <h1>Uploaded Work</h1>
-        <p>Please sign in to view your uploads.</p>
+        <h1>{i18n.t('uploadedWork.title')}</h1>
+        <p>{i18n.t('uploadedWork.signinPrompt')}</p>
       </div>
     );
   }
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Uploaded Work</h1>
+      <h1>{i18n.t('uploadedWork.title')}</h1>
       <UploadedWorkList />
     </div>
   );

@@ -1,0 +1,51 @@
+{
+  "home": {
+    "title": "Elige Tu Propio Plan de Estudios",
+    "description": "Crea rutas de aprendizaje personalizadas para tus estudiantes."
+  },
+  "navbar": {
+    "home": "Inicio",
+    "signin": "Iniciar sesión",
+    "signout": "Cerrar sesión"
+  },
+  "nav": {
+    "students": "Estudiantes",
+    "curriculums": "Currículums",
+    "upload-work": "Subir Trabajo"
+  },
+  "login": {
+    "title": "Iniciar Sesión",
+    "signin": "Entrar con Email"
+  },
+  "uploadedWork": {
+    "title": "Trabajos Subidos",
+    "signinPrompt": "Por favor inicia sesión para ver tus subidas."
+  },
+  "students": {
+    "title": "Estudiantes",
+    "signinPrompt": "Por favor inicia sesión para administrar estudiantes."
+  },
+  "studentProgress": {
+    "title": "Progreso del Estudiante",
+    "signinPrompt": "Por favor inicia sesión para ver el progreso."
+  },
+  "curriculumGenerator": {
+    "title": "Generador de Currículum",
+    "description": "Selecciona temas avanzados de matemáticas para ver sus prerrequisitos."
+  },
+  "myCurriculums": {
+    "title": "Mis Currículums",
+    "signinPrompt": "Por favor inicia sesión para ver tus DAGs."
+  },
+  "selectStudent": "Seleccionar estudiante",
+  "groupBy": "Agrupar por",
+  "student": "Estudiante",
+  "day": "Día",
+  "tag": "Etiqueta",
+  "none": "Ninguno",
+  "upload": "Subir",
+  "save": "Guardar",
+  "add": "Agregar",
+  "loadError": "Error al cargar subidas",
+  "uploadError": "Error al subir"
+}

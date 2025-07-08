@@ -2,6 +2,7 @@ import { TopicDAGList } from '@/components/TopicDAGList'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/authOptions'
+import i18n from '@/i18n'
 
 export default async function TopicDAGsPage() {
   const session = await getServerSession(authOptions)
@@ -9,16 +10,16 @@ export default async function TopicDAGsPage() {
   if (!userId) {
     return (
       <div style={{ padding: '2rem' }}>
-        <h1>My Curriculums</h1>
-        <p>Please sign in to view your DAGs.</p>
+        <h1>{i18n.t('myCurriculums.title')}</h1>
+        <p>{i18n.t('myCurriculums.signinPrompt')}</p>
       </div>
     )
   }
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>My Curriculums</h1>
+      <h1>{i18n.t('myCurriculums.title')}</h1>
       <p style={{ marginBottom: '1rem' }}>
-        <Link href="/curriculum-generator">New Curriculum</Link>
+        <Link href="/curriculum-generator">{i18n.t('curriculumGenerator.title')}</Link>
       </p>
       <TopicDAGList />
     </div>
