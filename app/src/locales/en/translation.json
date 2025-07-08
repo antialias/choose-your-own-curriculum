@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "home": "Home",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "students": "Students",
+    "curriculums": "Curriculums",
+    "uploadWork": "Upload Work"
+  },
+  "home": {
+    "title": "Choose Your Own Curriculum",
+    "tagline": "Build personalized learning paths for your students."
+  },
+  "studentForm": {
+    "namePlaceholder": "Name",
+    "emailPlaceholder": "Email",
+    "save": "Save",
+    "add": "Add"
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 import {
   studentFieldsSchema,
   StudentFields,
@@ -24,6 +25,8 @@ export function StudentForm({ student, onSuccess }: Props) {
     },
   })
 
+  const { t } = useTranslation()
+
   const onSubmit = async (data: StudentFields) => {
     const res = await fetch(
       student ? `/api/students/${student.id}` : '/api/students',
@@ -40,12 +43,12 @@ export function StudentForm({ student, onSuccess }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-      <input placeholder="Name" {...register('name')} />
+      <input placeholder={t('studentForm.namePlaceholder')} {...register('name')} />
       {errors.name && <span>{errors.name.message}</span>}
-      <input placeholder="Email" {...register('email')} />
+      <input placeholder={t('studentForm.emailPlaceholder')} {...register('email')} />
       {errors.email && <span>{errors.email.message}</span>}
       <button type="submit" disabled={isSubmitting}>
-        {student ? 'Save' : 'Add'}
+        {student ? t('studentForm.save') : t('studentForm.add')}
       </button>
     </form>
   )

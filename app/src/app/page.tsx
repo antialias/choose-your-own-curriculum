@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth';
+import { headers } from 'next/headers';
 import { authOptions } from '@/authOptions';
 import { navItems } from '@/navItems';
 import { getDb } from '@/db';
@@ -7,8 +8,12 @@ import { eq } from 'drizzle-orm';
 import { HomeCard } from '@/components/HomeCard';
 import { css } from '@/styled-system/css';
 import { pluralize } from '@/lib/pluralize';
+import { initI18next } from '@/i18n';
 
 export default async function HomePage() {
+  const headersList = await headers();
+  const locale = headersList.get('accept-language')?.split(',')[0] ?? 'en';
+  const i18n = await initI18next(locale);
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
@@ -34,10 +39,10 @@ export default async function HomePage() {
   return (
     <div className={css({ px: '8', py: '12', textAlign: 'center' })}>
       <h1 className={css({ fontSize: '4xl', fontWeight: 'bold', mb: '4' })}>
-        Choose Your Own Curriculum
+        {i18n.t('home.title')}
       </h1>
       <p className={css({ mb: '8', color: 'gray.600' })}>
-        Build personalized learning paths for your students.
+        {i18n.t('home.tagline')}
       </p>
       <div
         className={css({
@@ -49,7 +54,7 @@ export default async function HomePage() {
         })}
       >
         {navItems.map((item) => {
-          let text = item.label;
+          let text = i18n.t(`nav.${item.key}`);
           if (item.key === 'students') {
             text = pluralize(studentCount, 'student');
           }

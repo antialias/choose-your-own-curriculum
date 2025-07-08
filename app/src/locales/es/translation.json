@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "students": "Estudiantes",
+    "curriculums": "Planes de estudio",
+    "uploadWork": "Subir trabajo"
+  },
+  "home": {
+    "title": "Elige Tu Propio Plan de Estudios",
+    "tagline": "Crea rutas de aprendizaje personalizadas para tus estudiantes."
+  },
+  "studentForm": {
+    "namePlaceholder": "Nombre",
+    "emailPlaceholder": "Correo electrónico",
+    "save": "Guardar",
+    "add": "Añadir"
+  }
+}
