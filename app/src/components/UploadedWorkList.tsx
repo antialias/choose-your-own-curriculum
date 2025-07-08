@@ -3,10 +3,17 @@ import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import { css } from '@/styled-system/css'
 
 interface Tag {
   text: string
   vector: number[]
+}
+
+interface Topic {
+  id: string
+  label: string
+  relevancy: number
 }
 
 interface Work {
@@ -16,20 +23,28 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  topics?: Topic[]
 }
 
-export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
+export function UploadedWorkList({
+  studentId = '',
+  topicDagId = '',
+}: { studentId?: string; topicDagId?: string } = {}) {
   const [groups, setGroups] = useState<Record<string, Work[]>>({})
   const [students, setStudents] = useState<{ id: string; name: string }[]>([])
   const [groupBy, setGroupBy] = useState('')
   const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
+  const [filterDag, setFilterDag] = useState(topicDagId)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setFilterStudent(studentId)
   }, [studentId])
+  useEffect(() => {
+    setFilterDag(topicDagId)
+  }, [topicDagId])
 
   const loadStudents = async () => {
     const res = await fetch('/api/students')
@@ -46,6 +61,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       if (filterStudent) params.set('studentId', filterStudent)
       if (filterDay) params.set('day', filterDay)
       if (filterTag) params.set('tag', filterTag)
+      if (filterDag) params.set('topicDagId', filterDag)
       const url = `/api/upload-work${params.size ? `?${params.toString()}` : ''}`
       const res = await fetch(url)
       if (!res.ok) throw new Error('load error')
@@ -63,7 +79,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   useEffect(() => {
     loadWorks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, filterStudent, filterDay, filterTag])
+  }, [groupBy, filterStudent, filterDay, filterTag, filterDag])
 
   const handleStart = () => {
     setError(null)
@@ -143,6 +159,15 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                   <div>
                     {w.tags.map((t) => (
                       <TagPill key={t.text} text={t.text} vector={t.vector} />
+                    ))}
+                  </div>
+                )}
+                {w.topics && w.topics.length > 0 && (
+                  <div className={css({ mt: '1', fontSize: 'sm', color: 'gray.700' })}>
+                    {w.topics.map((t) => (
+                      <span key={t.id} className={css({ mr: '2' })}>
+                        {t.label} ({t.relevancy}%){" "}
+                      </span>
                     ))}
                   </div>
                 )}

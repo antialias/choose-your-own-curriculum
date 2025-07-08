@@ -3,11 +3,12 @@ import { getDb, getSqlite } from '@/db';
 
 const db = getDb();
 const sqlite = getSqlite();
-import { uploadedWork, teacherStudents } from '@/db/schema';
+import { uploadedWork, teacherStudents, topicDags } from '@/db/schema';
 import {
   upsertWorkEmbeddings,
   searchTagsForWork,
   getTagVector,
+  getWorkVector,
 } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
@@ -122,12 +123,41 @@ export async function GET(req: NextRequest) {
   const studentId = req.nextUrl.searchParams.get('studentId');
   const day = req.nextUrl.searchParams.get('day');
   const tag = req.nextUrl.searchParams.get('tag');
+  const topicDagId = req.nextUrl.searchParams.get('topicDagId');
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
+  const tagIdStmt = sqlite.prepare('SELECT id FROM tag WHERE text = ?');
+  const nodeVectors: Record<string, { label: string; vector: number[] }> = {};
+  if (topicDagId) {
+    const row = await db
+      .select({ graph: topicDags.graph })
+      .from(topicDags)
+      .where(eq(topicDags.id, topicDagId));
+    if (row.length) {
+      const graph = JSON.parse(row[0].graph) as import('@/graphSchema').Graph;
+      for (const node of graph.nodes) {
+        const vectors: number[][] = [];
+        for (const t of node.tags) {
+          const idRow = tagIdStmt.get(t) as { id: string } | undefined;
+          if (!idRow) continue;
+          const v = getTagVector(idRow.id);
+          if (v) vectors.push(v);
+        }
+        if (vectors.length) {
+          const avg = new Array(vectors[0].length).fill(0);
+          for (const v of vectors) {
+            for (let i = 0; i < v.length; i++) avg[i] += v[i];
+          }
+          for (let i = 0; i < avg.length; i++) avg[i] /= vectors.length;
+          nodeVectors[node.id] = { label: node.label, vector: avg };
+        }
+      }
+    }
+  }
   let workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
       .map((r) => {
@@ -137,7 +167,29 @@ export async function GET(req: NextRequest) {
         return { text: textRow.text, vector };
       })
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
-    return { ...w, tags };
+    let topics: { id: string; label: string; relevancy: number }[] = [];
+    if (topicDagId) {
+      const wv = getWorkVector(w.id) || [];
+      if (wv.length) {
+        topics = Object.entries(nodeVectors)
+          .map(([id, { label, vector }]) => {
+            let dot = 0,
+              asq = 0,
+              bsq = 0;
+            for (let i = 0; i < Math.min(wv.length, vector.length); i++) {
+              dot += wv[i] * vector[i];
+              asq += wv[i] * wv[i];
+              bsq += vector[i] * vector[i];
+            }
+            const sim = asq && bsq ? dot / Math.sqrt(asq * bsq) : 0;
+            const relevancy = Math.round(((sim + 1) / 2) * 100);
+            return { id, label, relevancy };
+          })
+          .sort((a, b) => b.relevancy - a.relevancy)
+          .slice(0, 3);
+      }
+    }
+    return { ...w, tags, topics };
   });
   if (studentId) {
     workWithTags = workWithTags.filter((w) => w.studentId === studentId);

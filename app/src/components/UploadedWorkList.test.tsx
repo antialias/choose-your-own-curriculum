@@ -43,10 +43,10 @@ describe('UploadedWorkList', () => {
         tags: [{ text: 't1', vector: [0, 0, 0] }],
       },
     ])
-    render(<UploadedWorkList />)
+    render(<UploadedWorkList topicDagId="d1" studentId="s1" />)
     expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
     expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/students')
-    expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work')
+    expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work?studentId=s1&topicDagId=d1')
     expect(await screen.findByText('sum')).toBeInTheDocument()
     expect(await screen.findByText('t1')).toBeInTheDocument()
   })
