@@ -20,7 +20,11 @@ interface Work {
 }
 
 function mockGet(works: Work[]) {
-  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ works }) })
+  mockFetch.mockResolvedValueOnce({
+    ok: true,
+    json: () =>
+      Promise.resolve({ works, range: { min: [-1, -1, -1], max: [1, 1, 1] } }),
+  })
 }
 
 

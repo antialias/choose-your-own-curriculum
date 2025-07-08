@@ -13,6 +13,17 @@ import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
+function getVectorFromRow(v: unknown): number[] {
+  if (typeof v === 'string') return JSON.parse(v) as number[]
+  if (v instanceof Uint8Array) {
+    const buf = Buffer.from(v)
+    const arr = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4)
+    return Array.from(arr)
+  }
+  if (Array.isArray(v)) return v as number[]
+  return []
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
@@ -121,16 +132,33 @@ export async function GET(req: NextRequest) {
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
+  const vectorRows = sqlite.prepare('SELECT vector FROM tag_index').all() as { vector: unknown }[]
+  const min = [Infinity, Infinity, Infinity]
+  const max = [-Infinity, -Infinity, -Infinity]
+  for (const row of vectorRows) {
+    const v = getVectorFromRow(row.vector)
+    for (let i = 0; i < 3; i++) {
+      const val = v[i]
+      if (val == null) continue
+      if (val < min[i]) min[i] = val
+      if (val > max[i]) max[i] = val
+    }
+  }
+  const range = {
+    min: min.map((v) => (Number.isFinite(v) ? v : -1)),
+    max: max.map((v) => (Number.isFinite(v) ? v : 1)),
+  }
+
   const workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
       .map((r) => {
-        const textRow = tagStmt.get(r.id) as { text: string } | undefined;
-        const vector = getTagVector(r.id) || [];
-        if (!textRow) return undefined;
-        return { text: textRow.text, vector };
+        const textRow = tagStmt.get(r.id) as { text: string } | undefined
+        const vector = getTagVector(r.id) || []
+        if (!textRow) return undefined
+        return { text: textRow.text, vector }
       })
-      .filter((t): t is { text: string; vector: number[] } => Boolean(t));
-    return { ...w, tags };
-  });
-  return NextResponse.json({ works: workWithTags });
+      .filter((t): t is { text: string; vector: number[] } => Boolean(t))
+    return { ...w, tags }
+  })
+  return NextResponse.json({ works: workWithTags, range })
 }
