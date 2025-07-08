@@ -4,5 +4,6 @@ CREATE TABLE `topic_dag` (
 	`topics` text NOT NULL,
 	`graph` text NOT NULL,
 	`createdAt` integer NOT NULL,
-	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+        FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
+--> statement-breakpoint
