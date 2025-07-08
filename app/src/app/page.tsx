@@ -6,6 +6,7 @@ import { teacherStudents, topicDags } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { HomeCard } from '@/components/HomeCard';
 import { css } from '@/styled-system/css';
+import { pluralize } from '@/lib/pluralize';
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -49,8 +50,12 @@ export default async function HomePage() {
       >
         {navItems.map((item) => {
           let text = item.label;
-          if (item.key === 'students') text = `${studentCount} students`;
-          if (item.key === 'curriculums') text = `${curriculumCount} curriculums`;
+          if (item.key === 'students') {
+            text = pluralize(studentCount, 'student');
+          }
+          if (item.key === 'curriculums') {
+            text = pluralize(curriculumCount, 'curriculum', 'curriculums');
+          }
           return <HomeCard key={item.href} href={item.href} label={text} />;
         })}
       </div>
