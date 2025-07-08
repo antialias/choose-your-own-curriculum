@@ -1,14 +1,20 @@
 'use client'
-import { SummaryWithMath } from '@/components/SummaryWithMath';
+import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
 import { UploadForm } from './UploadForm'
+import { TagPill } from './TagPill'
+
+interface Tag {
+  text: string
+  vector: number[]
+}
 
 interface Work {
   id: string
   summary: string | null
   dateUploaded: string
   dateCompleted: string | null
-  tags: string[]
+  tags: Tag[]
 }
 
 export function UploadedWorkList() {
@@ -66,7 +72,11 @@ export function UploadedWorkList() {
             <strong>{new Date(w.dateCompleted || w.dateUploaded).toDateString()}</strong>
             <SummaryWithMath text={w.summary ?? ''} />
             {w.tags.length > 0 && (
-              <div>Tags: {w.tags.join(', ')}</div>
+              <div>
+                {w.tags.map((t) => (
+                  <TagPill key={t.text} text={t.text} vector={t.vector} />
+                ))}
+              </div>
             )}
           </li>
         ))}
