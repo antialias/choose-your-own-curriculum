@@ -104,6 +104,12 @@ export function MathSkillSelector() {
         tryRender();
       }
       tryRender.flush();
+      if (!hasRenderedRef.current) {
+        setError('Invalid diagram syntax');
+        setStatus('error');
+        setBuilding(false);
+        return;
+      }
       setSaved(false);
       setStatus('idle');
     } catch (err) {

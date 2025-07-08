@@ -43,3 +43,18 @@ test('shows error message on failure', async () => {
   expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph-stream', expect.objectContaining({ method: 'POST' }));
   expect(await screen.findByText('Failed to generate graph: bad. Please try again later.')).toBeInTheDocument();
 });
+
+test('shows error when response has invalid mermaid', async () => {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode('invalid'));
+      controller.close();
+    },
+  });
+  mockFetch.mockResolvedValueOnce({ ok: true, body: stream });
+  render(<MathSkillSelector />);
+  await user.click(screen.getByText('Generate Graph'));
+  expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph-stream', expect.objectContaining({ method: 'POST' }));
+  expect(await screen.findByText('Failed to generate graph: Invalid diagram syntax. Please try again later.')).toBeInTheDocument();
+});
