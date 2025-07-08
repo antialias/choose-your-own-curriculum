@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
@@ -20,6 +21,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [data, setData] = useState<StudentData | null>(null)
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
+  const { t } = useTranslation()
 
   const load = async () => {
     const res = await fetch(`/api/students/${studentId}`)
@@ -70,12 +72,12 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     return (
       <div style={{ marginBottom: '1rem' }}>
         <label>
-          Curriculum
+          {t('curriculum')}
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('select')}</option>
             {dags.map((d) => (
               <option key={d.id} value={d.id}>
                 {JSON.parse(d.topics).join(', ')}
@@ -84,7 +86,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
           </select>
         </label>
         <button onClick={save} disabled={!selected} style={{ marginLeft: '0.5rem' }}>
-          Save
+          {t('save')}
         </button>
       </div>
     )
@@ -92,7 +94,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <h2>Curriculum</h2>
+      <h2>{t('curriculum')}</h2>
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
         <div style={{ marginTop: '1rem' }}>

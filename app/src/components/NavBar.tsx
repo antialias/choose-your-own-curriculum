@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { navItems } from '@/navItems';
+import { useTranslation } from 'react-i18next';
 const styles = {
   bar: {
     display: 'flex',
@@ -31,24 +32,25 @@ const styles = {
 
 export function NavBar() {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   return (
     <nav style={styles.bar}>
       <Link href="/" style={styles.link}>
-        Home
+        {t('home')}
       </Link>
       {navItems.map((item) => (
         <Link key={item.href} href={item.href} style={styles.link}>
-          {item.label}
+          {t(item.label)}
         </Link>
       ))}
       <div style={styles.spacer} />
       {session ? (
         <button style={styles.button} onClick={() => signOut()}>
-          Sign out
+          {t('signOut')}
         </button>
       ) : (
         <Link href="/login" style={styles.link}>
-          Sign in
+          {t('signIn')}
         </Link>
       )}
     </nav>

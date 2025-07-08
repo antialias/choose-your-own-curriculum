@@ -6,9 +6,10 @@ import { teacherStudents, topicDags } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { HomeCard } from '@/components/HomeCard';
 import { css } from '@/styled-system/css';
-import { pluralize } from '@/lib/pluralize';
+import { initI18n } from '@/i18n';
 
 export default async function HomePage() {
+  const i18n = await initI18n('en');
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
@@ -34,10 +35,10 @@ export default async function HomePage() {
   return (
     <div className={css({ px: '8', py: '12', textAlign: 'center' })}>
       <h1 className={css({ fontSize: '4xl', fontWeight: 'bold', mb: '4' })}>
-        Choose Your Own Curriculum
+        {i18n.t('chooseCurriculum')}
       </h1>
       <p className={css({ mb: '8', color: 'gray.600' })}>
-        Build personalized learning paths for your students.
+        {i18n.t('buildPaths')}
       </p>
       <div
         className={css({
@@ -49,14 +50,26 @@ export default async function HomePage() {
         })}
       >
         {navItems.map((item) => {
-          let text = item.label;
+          const textKey = item.label;
           if (item.key === 'students') {
-            text = pluralize(studentCount, 'student');
+            return (
+              <HomeCard
+                key={item.href}
+                href={item.href}
+                label={i18n.t('studentCount', { count: studentCount })}
+              />
+            );
           }
           if (item.key === 'curriculums') {
-            text = pluralize(curriculumCount, 'curriculum', 'curriculums');
+            return (
+              <HomeCard
+                key={item.href}
+                href={item.href}
+                label={i18n.t('curriculumCount', { count: curriculumCount })}
+              />
+            );
           }
-          return <HomeCard key={item.href} href={item.href} label={text} />;
+          return <HomeCard key={item.href} href={item.href} label={i18n.t(textKey)} />;
         })}
       </div>
     </div>
