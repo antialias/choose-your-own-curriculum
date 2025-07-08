@@ -38,6 +38,9 @@ export function NavBar() {
       <Link href="/uploaded-work" style={styles.link}>
         Uploaded Work
       </Link>
+      <Link href="/topic-dags" style={styles.link}>
+        Saved DAGs
+      </Link>
       <Link href="/students" style={styles.link}>
         Students
       </Link>
