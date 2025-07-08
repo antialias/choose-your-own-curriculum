@@ -34,6 +34,8 @@ export function MathSkillSelector() {
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [tokens, setTokens] = useState(0);
+  const maxTokens = 800;
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -44,20 +46,35 @@ export function MathSkillSelector() {
   const generate = async () => {
     setStatus('loading');
     setError(null);
+    setTokens(0);
     try {
       const res = await fetch('/api/generate-graph', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topics: selected }),
       });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setError(data.error || 'Unknown error');
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error || 'Unknown error');
         setStatus('error');
         return;
       }
-      const data = (await res.json()) as { graph: Graph };
-      setGraph(data.graph);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        setTokens((t) => t + chunk.split(/\s+/).filter(Boolean).length);
+        try {
+          const data = JSON.parse(buffer) as { graph: Graph };
+          setGraph(data.graph);
+        } catch {
+          // ignore until valid json
+        }
+      }
       setSaved(false);
       setStatus('idle');
     } catch (err) {
@@ -96,7 +113,26 @@ export function MathSkillSelector() {
         Generate Graph
       </button>
       {status === 'loading' && (
-        <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+        <>
+          <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+          <div
+            data-testid="progress-bar"
+            style={{
+              marginTop: '0.5rem',
+              width: '100%',
+              height: '0.5rem',
+              background: '#eee',
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.min(100, (tokens / maxTokens) * 100)}%`,
+                height: '100%',
+                background: '#3b82f6',
+              }}
+            />
+          </div>
+        </>
       )}
       {status === 'error' && (
         <p className={css({ color: 'red.600', mt: '2' })}>

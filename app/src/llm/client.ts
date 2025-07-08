@@ -4,6 +4,7 @@
  * consistent structure.
  */
 import { OpenAI } from 'openai';
+import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { ZodSchema, ZodError } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
@@ -33,6 +34,12 @@ export interface LLMOptions<T> {
   maxRetries?: number;
   /** Additional OpenAI parameters. */
   params?: Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
+}
+
+/** Options for streaming responses. */
+export interface LLMStreamOptions<T> extends LLMOptions<T> {
+  /** Whether to stream tokens back. */
+  stream: true;
 }
 
 /**
@@ -159,5 +166,49 @@ export class LLMClient {
       }
     }
     return { error: lastError, response: null };
+  }
+
+  /**
+   * Stream a chat completion. Emits raw content chunks as they arrive.
+   *
+   * @param prompt - The user prompt to send.
+   * @param options - Same as {@link LLMOptions} but with `stream: true`.
+   * @returns A readable stream of UTF-8 encoded chunks.
+   */
+  async streamChat<T>(
+    prompt: string,
+    options: LLMStreamOptions<T>
+  ): Promise<ReadableStream<Uint8Array>> {
+    const { schema, systemPrompt, templateVars = {}, params } = options;
+    const jsonSchema = JSON.stringify(zodToJsonSchema(schema), null, 2);
+    const interpolatedSystem = this.interpolate(systemPrompt, templateVars);
+    const systemTemplate = `${interpolatedSystem}\nRespond ONLY with JSON that matches this schema:\n${jsonSchema}`;
+    const userPrompt = this.interpolate(prompt, templateVars);
+    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: 'system', content: systemTemplate },
+      { role: 'user', content: userPrompt },
+    ];
+    const paramsWithModel = {
+      ...(params ?? {}),
+      model: params?.model ?? DEFAULT_MODEL,
+    } as Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
+    const openaiStream = await this.openai.chat.completions.create({
+      ...paramsWithModel,
+      stream: true,
+      messages,
+    });
+    const encoder = new TextEncoder();
+    return new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const stream = openaiStream as AsyncIterable<ChatCompletionChunk>;
+        for await (const chunk of stream) {
+          const content: string | null = chunk.choices?.[0]?.delta?.content ?? null;
+          if (content) {
+            controller.enqueue(encoder.encode(content));
+          }
+        }
+        controller.close();
+      },
+    });
   }
 }
