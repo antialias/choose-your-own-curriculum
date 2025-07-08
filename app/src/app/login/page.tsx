@@ -1,6 +1,7 @@
 'use client'
 
 import { signIn } from 'next-auth/react';
+import { useTranslation } from 'react-i18next';
 const styles = {
   container: {
     padding: '2rem',
@@ -14,11 +15,12 @@ const styles = {
 };
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   return (
     <div style={styles.container}>
-      <h1>Log In</h1>
+      <h1>{t('logIn')}</h1>
       <button style={styles.button} onClick={() => signIn()}>
-        Sign in with Email
+        {t('signInWithEmail')}
       </button>
     </div>
   );

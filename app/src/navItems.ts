@@ -5,7 +5,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { key: 'students', href: '/students', label: 'Students' },
-  { key: 'curriculums', href: '/topic-dags', label: 'Curriculums' },
-  { key: 'upload-work', href: '/uploaded-work', label: 'Upload Work' },
+  { key: 'students', href: '/students', label: 'students' },
+  { key: 'curriculums', href: '/topic-dags', label: 'curriculums' },
+  { key: 'upload-work', href: '/uploaded-work', label: 'uploadWork' },
 ];

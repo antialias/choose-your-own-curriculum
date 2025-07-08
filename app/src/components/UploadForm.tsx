@@ -2,6 +2,7 @@
 import { css } from '@/styled-system/css'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 import { uploadWorkClientSchema, UploadWorkClient } from '@/forms/uploadWork'
 import { useEffect, useState } from 'react'
 
@@ -13,6 +14,7 @@ interface Props {
 
 export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
   const [students, setStudents] = useState<{ id: string; name: string }[]>([])
+  const { t } = useTranslation()
 
   useEffect(() => {
     const load = async () => {
@@ -59,7 +61,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
       <input type="date" {...register('dateCompleted')} />
       <select {...register('studentId')} defaultValue="">
         <option value="" disabled>
-          Select student
+          {t('selectStudent')}
         </option>
         {students.map((s) => (
           <option key={s.id} value={s.id}>
@@ -68,7 +70,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
         ))}
       </select>
       {errors.studentId && <span>{errors.studentId.message}</span>}
-      <button type="submit" disabled={isSubmitting}>Upload</button>
+      <button type="submit" disabled={isSubmitting}>{t('upload')}</button>
     </form>
   )
 }

@@ -3,6 +3,7 @@ import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import { useTranslation } from 'react-i18next'
 
 interface Tag {
   text: string
@@ -26,6 +27,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     setFilterStudent(studentId)
@@ -52,7 +54,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       const data = (await res.json()) as { groups: Record<string, Work[]> }
       setGroups(data.groups)
     } catch {
-      setError('Failed to load uploads')
+      setError('failedLoad')
     }
   }
 
@@ -74,7 +76,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   }
 
   const handleError = () => {
-    setError('Upload failed')
+    setError('uploadFailed')
   }
 
   return (
@@ -86,21 +88,21 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
       />
       <div style={{ margin: '1rem 0', display: 'flex', gap: '0.5rem' }}>
         <label>
-          Group by
+          {t('groupBy')}
           <select value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
-            <option value="">None</option>
-            <option value="student">Student</option>
-            <option value="day">Day</option>
-            <option value="tag">Tag</option>
+            <option value="">{t('none')}</option>
+            <option value="student">{t('student')}</option>
+            <option value="day">{t('day')}</option>
+            <option value="tag">{t('tag')}</option>
           </select>
         </label>
         <label>
-          Student
+          {t('student')}
           <select
             value={filterStudent}
             onChange={(e) => setFilterStudent(e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">{t('all')}</option>
             {students.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -109,7 +111,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
           </select>
         </label>
         <label>
-          Day
+          {t('day')}
           <input
             type="date"
             value={filterDay}
@@ -117,14 +119,14 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
           />
         </label>
         <label>
-          Tag
+          {t('tag')}
           <input
             value={filterTag}
             onChange={(e) => setFilterTag(e.target.value)}
           />
         </label>
       </div>
-      {error && <p>{error}</p>}
+      {error && <p>{t(error)}</p>}
       {Object.entries(groups).map(([key, works]) => (
         <div key={key} style={{ marginBottom: '1rem' }}>
           {groupBy && <h3>{

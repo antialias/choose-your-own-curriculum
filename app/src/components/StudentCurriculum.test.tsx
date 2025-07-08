@@ -1,6 +1,7 @@
 vi.mock('react-mermaid2', () => ({ default: () => <div data-testid="mermaid" /> }))
 import { render, screen } from '@testing-library/react'
 import { StudentCurriculum } from './StudentCurriculum'
+import I18nProvider from './I18nProvider'
 import type { Mock } from 'vitest'
 
 vi.stubGlobal('fetch', vi.fn())
@@ -34,7 +35,11 @@ describe('StudentCurriculum', () => {
   it('shows selector when no curriculum', async () => {
     mockStudent(null)
     mockDags()
-    render(<StudentCurriculum studentId="s1" />)
+    render(
+      <I18nProvider lng="en">
+        <StudentCurriculum studentId="s1" />
+      </I18nProvider>
+    )
     expect(await screen.findByText('Curriculum')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
   })
@@ -42,7 +47,11 @@ describe('StudentCurriculum', () => {
   it('shows graph when curriculum set', async () => {
     mockStudent('d1')
     mockDags()
-    render(<StudentCurriculum studentId="s1" />)
+    render(
+      <I18nProvider lng="en">
+        <StudentCurriculum studentId="s1" />
+      </I18nProvider>
+    )
     expect(await screen.findByText('A, B')).toBeInTheDocument()
   })
 })
