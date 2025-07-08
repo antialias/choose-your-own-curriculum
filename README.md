@@ -1,6 +1,20 @@
 # Choose Your Own Curriculum
 
+<<<<<<< HEAD
 Choose Your Own Curriculum is a web application for planning and tracking long term learning goals. It lets users define topic graphs, upload work samples and stores embeddings to recommend what to study next.
+||||||| 5f73234
+A web application for planning and tracking long term learning goals. Users define topic graphs and upload work samples. The app stores metadata and embeddings to recommend what to study next.
+
+Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page and the **My Curriculums** page.
+
+The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
+=======
+A web application for planning and tracking long term learning goals. Users define topic graphs and upload work samples. The app stores metadata and embeddings to recommend what to study next.
+
+Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar links to **Upload Work**, **Curriculums** and **Students**.
+
+The Curriculum Generator moved to `/curriculum-generator`. Start there from the **Curriculums** page to generate a mermaid DAG of prerequisites.
+>>>>>>> vze0e8-codex/rename-home-page-to-curriculum-generator
 
 ## Tech Stack
 
@@ -33,4 +47,4 @@ Before opening a pull request run `pnpm format`, `pnpm lint`, `pnpm run typechec
 
 ## Documentation
 
-Usage documentation has moved to the [docs](docs/) directory. Refer to those files for feature guides and additional information.
+Usage documentation is in the [docs](docs/) directory. Refer to those files for feature guides and additional information.

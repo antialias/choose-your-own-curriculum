@@ -25,14 +25,14 @@ test('shows sign out when authenticated', () => {
   expect(screen.getByText('Sign out')).toBeInTheDocument();
 });
 
-test('shows uploaded work link', () => {
+test('shows upload work link', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
   render(<NavBar />);
-  expect(screen.getByText('Uploaded Work')).toBeInTheDocument();
+  expect(screen.getByText('Upload Work')).toBeInTheDocument();
 });
 
-test('shows saved dags link', () => {
+test('shows curriculums link', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
   render(<NavBar />);
-  expect(screen.getByText('My Curriculums')).toBeInTheDocument();
+  expect(screen.getByText('Curriculums')).toBeInTheDocument();
 });
