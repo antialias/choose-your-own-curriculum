@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8c849e10-c359-42b2-b0da-81c21def18b5",
-  "prevId": "54c73670-6a25-419c-8163-a70fb5f690c7",
+  "id": "3ed9f221-d45c-4a3f-9c5d-bd6174ab62ff",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
       "name": "account",
@@ -354,6 +354,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "topicDagId": {
+          "name": "topicDagId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -382,6 +389,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "teacher_student_topicDagId_topic_dag_id_fk": {
+          "name": "teacher_student_topicDagId_topic_dag_id_fk",
+          "tableFrom": "teacher_student",
+          "tableTo": "topic_dag",
+          "columnsFrom": [
+            "topicDagId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

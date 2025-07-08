@@ -3,24 +3,10 @@
   "dialect": "sqlite",
   "entries": [
     {
-      "idx": 0,
-      "version": "6",
-      "when": 1751920357807,
-      "tag": "0000_fancy_blue_shield",
-      "breakpoints": true
-    },
-    {
       "idx": 2,
       "version": "6",
       "when": 1751919923226,
       "tag": "0002_uploaded_work_vec",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1751926284771,
-      "tag": "0003_quiet_virginia_dare",
       "breakpoints": true
     },
     {
@@ -33,16 +19,8 @@
     {
       "idx": 5,
       "version": "6",
-      "when": 1751931141170,
-      "tag": "0005_salty_wolfsbane",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1751996416430,
-      "tag": "0006_amusing_sprite",
+      "when": 1752012315851,
+      "tag": "0005_dashing_blockbuster",
       "breakpoints": true
     }
-  ]
-}
+  ]}
