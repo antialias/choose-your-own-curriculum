@@ -65,6 +65,9 @@ importers:
       react-mermaid2:
         specifier: ^0.1.4
         version: 0.1.4(@testing-library/dom@10.4.0)(@types/react@19.1.8)(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
+      sharp:
+        specifier: ^0.34.2
+        version: 0.34.2
       sqlite-vec:
         specifier: 0.1.7-alpha.2
         version: 0.1.7-alpha.2
@@ -135,6 +138,9 @@ importers:
       '@types/react-katex':
         specifier: ^3.0.4
         version: 3.0.4
+      '@types/sharp':
+        specifier: ^0.31.1
+        version: 0.31.1
       '@vitejs/plugin-react':
         specifier: ^4.6.0
         version: 4.6.0(vite@7.0.2(@types/node@20.19.4)(jiti@2.4.2)(lightningcss@1.25.1)(terser@5.43.1)(tsx@4.20.3))
@@ -2295,6 +2301,9 @@ packages:
 
   '@types/resolve@1.20.6':
     resolution: {integrity: sha512-A4STmOXPhMUtHH+S6ymgE2GiBSMqf4oTvcQZMcHzokuTLVYzXTB8ttjcgxOVaAp2lGwEdzZ0J+cRbbeevQj1UQ==}
+
+  '@types/sharp@0.31.1':
+    resolution: {integrity: sha512-5nWwamN9ZFHXaYEincMSuza8nNfOof8nmO+mcI+Agx1uMUk4/pQnNIcix+9rLPXzKrm1pS34+6WRDbDV0Jn7ag==}
 
   '@types/stack-utils@1.0.1':
     resolution: {integrity: sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==}
@@ -11574,7 +11583,9 @@ snapshots:
       source-map: 0.6.1
       string-length: 2.0.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@jest/source-map@24.9.0':
     dependencies:
@@ -12398,6 +12409,10 @@ snapshots:
       csstype: 3.1.3
 
   '@types/resolve@1.20.6': {}
+
+  '@types/sharp@0.31.1':
+    dependencies:
+      '@types/node': 20.19.4
 
   '@types/stack-utils@1.0.1': {}
 
@@ -13896,7 +13911,6 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
       color-string: 1.9.1
-    optional: true
 
   combined-stream@1.0.8:
     dependencies:
@@ -16860,7 +16874,9 @@ snapshots:
       pretty-format: 24.9.0
       throat: 4.1.0
     transitivePeerDependencies:
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   jest-leak-detector@24.9.0:
     dependencies:
@@ -19845,7 +19861,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.2
       '@img/sharp-win32-ia32': 0.34.2
       '@img/sharp-win32-x64': 0.34.2
-    optional: true
 
   shebang-command@1.2.0:
     dependencies:

@@ -109,6 +109,8 @@ export const uploadedWork = sqliteTable('uploaded_work', {
   dateCompleted: integer('dateCompleted', { mode: 'timestamp_ms' }),
   summary: text('summary'),
   embeddings: text('embeddings'),
+  mimeType: text('mimeType'),
+  thumbnail: blob('thumbnail', { mode: 'buffer' }),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
 });
 

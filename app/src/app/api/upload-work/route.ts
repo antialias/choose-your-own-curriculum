@@ -14,6 +14,7 @@ import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import sharp from 'sharp';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -48,6 +49,16 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
+  let thumbnail: Buffer | null = null;
+  if (isImage) {
+    try {
+      thumbnail = await sharp(buffer)
+        .resize(144, 144, { fit: 'inside' })
+        .toBuffer();
+    } catch (err) {
+      console.error('thumbnail error', err);
+    }
+  }
 
   let summary = '';
 
@@ -103,6 +114,8 @@ export async function POST(req: NextRequest) {
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
+    mimeType: file.type,
+    thumbnail,
     originalDocument: buffer,
   } as typeof uploadedWork.$inferInsert);
   if (vector.length) {
@@ -123,7 +136,14 @@ export async function GET(req: NextRequest) {
   const day = req.nextUrl.searchParams.get('day');
   const tag = req.nextUrl.searchParams.get('tag');
   const works = await db
-    .select()
+    .select({
+      id: uploadedWork.id,
+      studentId: uploadedWork.studentId,
+      summary: uploadedWork.summary,
+      dateUploaded: uploadedWork.dateUploaded,
+      dateCompleted: uploadedWork.dateCompleted,
+      thumbnail: uploadedWork.thumbnail,
+    })
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
 
@@ -137,7 +157,7 @@ export async function GET(req: NextRequest) {
         return { text: textRow.text, vector };
       })
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
-    return { ...w, tags };
+    return { ...w, tags, hasThumbnail: Boolean(w.thumbnail) };
   });
   if (studentId) {
     workWithTags = workWithTags.filter((w) => w.studentId === studentId);

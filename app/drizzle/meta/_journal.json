@@ -43,6 +43,12 @@
       "when": 1751996416430,
       "tag": "0006_amusing_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1751999284482,
+      "tag": "0007_magical_ironclad",
+      "breakpoints": true
     }
-  ]
-}
+  ]}
