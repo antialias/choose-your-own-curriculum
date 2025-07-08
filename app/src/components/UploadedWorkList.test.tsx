@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { UploadedWorkList } from './UploadedWorkList'
+import QueryProvider from './QueryProvider'
 import type { Mock } from 'vitest'
 
 vi.stubGlobal('fetch', vi.fn())
@@ -43,9 +44,13 @@ describe('UploadedWorkList', () => {
         tags: [{ text: 't1', vector: [0, 0, 0] }],
       },
     ])
-    render(<UploadedWorkList />)
+    render(
+      <QueryProvider>
+        <UploadedWorkList />
+      </QueryProvider>
+    )
     expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
-    expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/students')
+    expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/students', undefined)
     expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work')
     expect(await screen.findByText('sum')).toBeInTheDocument()
     expect(await screen.findByText('t1')).toBeInTheDocument()
