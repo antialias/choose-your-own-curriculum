@@ -18,6 +18,8 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  thumbnailUrl: string | null
+  fileUrl: string
 }
 
 function mockGet(works: Work[]) {
@@ -41,6 +43,8 @@ describe('UploadedWorkList', () => {
         dateUploaded: new Date().toISOString(),
         dateCompleted: null,
         tags: [{ text: 't1', vector: [0, 0, 0] }],
+        thumbnailUrl: '/thumb',
+        fileUrl: '/file',
       },
     ])
     render(<UploadedWorkList />)

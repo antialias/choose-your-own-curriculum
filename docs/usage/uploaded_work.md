@@ -4,4 +4,6 @@ Authenticated users can upload documents from the **Uploaded Work** page. The se
 
 Each upload appears in the list with its summary for easy review. New uploads show a temporary `Processing...` placeholder while the summary is generated. Any errors are shown next to the list.
 
+When an uploaded file is an image, the server generates a small thumbnail. This thumbnail is displayed to the left of the summary and links to the original document. Thumbnails are sized to fit within a 1.5" square while maintaining the original aspect ratio so nothing is cropped.
+
 Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` inside summaries are rendered with KaTeX.

@@ -1,0 +1,1 @@
+ALTER TABLE `uploaded_work` ADD `mimeType` text;

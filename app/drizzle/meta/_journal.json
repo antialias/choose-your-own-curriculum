@@ -43,6 +43,19 @@
       "when": 1751996416430,
       "tag": "0006_amusing_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1751999290017,
+      "tag": "0007_big_the_hunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1751999558670,
+      "tag": "0008_free_tigra",
+      "breakpoints": true
     }
-  ]
-}
+  ]}
