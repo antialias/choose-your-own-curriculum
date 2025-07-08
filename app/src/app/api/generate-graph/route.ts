@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { LLMClient } from '@/llm/client';
+import { GraphSchema } from '@/graphSchema';
 
 const bodySchema = z.object({ topics: z.array(z.string()) });
 
@@ -14,8 +15,8 @@ export async function POST(req: NextRequest) {
     console.log('OPENAI_API_KEY loaded');
   }
   const client = new LLMClient(apiKey || '');
-  const schema = z.object({ graph: z.string() });
-  const prompt = `Create a mermaid DAG flowing from left to right showing a progression from kindergarten math to these topics: ${topics.join(', ')}. The diagram should be as granular as possible by topic and include prerequisite links.`;
+  const schema = z.object({ graph: GraphSchema });
+  const prompt = `Create a topic dependency graph flowing from left to right starting at kindergarten math and covering these topics: ${topics.join(', ')}. Use granular nodes and include prerequisite links.`;
   const result = await client.chat(prompt, {
     systemPrompt: 'You are an expert math curriculum planner.',
     schema,

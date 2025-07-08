@@ -1,11 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Mermaid from 'react-mermaid2'
+import { Graph } from '@/graphSchema'
+import { graphToMermaid } from '@/graphToMermaid'
 
 interface Dag {
   id: string
   topics: string
-  graph: string
+  graph: Graph
   createdAt: string
 }
 
@@ -39,7 +41,7 @@ export function TopicDAGList() {
           <div>{JSON.parse(d.topics).join(', ')}</div>
           {expanded === d.id && (
             <div style={{ marginTop: '1rem' }}>
-              <Mermaid chart={d.graph} />
+              <Mermaid chart={graphToMermaid(d.graph)} />
             </div>
           )}
         </li>

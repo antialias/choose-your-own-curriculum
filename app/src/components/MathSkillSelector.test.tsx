@@ -20,7 +20,7 @@ test('calls API with selected topics and saves', async () => {
   await user.click(screen.getByLabelText('Algebra'));
   await user.click(screen.getByText('Generate Graph'));
   expect(await screen.findByText('Generating graph...')).toBeInTheDocument();
-  resolveFetch!({ ok: true, json: () => Promise.resolve({ graph: 'g' }) });
+  resolveFetch!({ ok: true, json: () => Promise.resolve({ graph: { nodes: [{ id: 'a', label: 'A', desc: '', tags: ['t1','t2','t3'] }], edges: [] } }) });
   expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
   // wait for graph to render and save button to appear
   await screen.findByTestId('mermaid');

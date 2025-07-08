@@ -11,7 +11,13 @@ function mockStudent(topicDagId: string | null) {
     ok: true,
     json: () =>
       Promise.resolve({
-        student: { topicDagId, topics: topicDagId ? ['A', 'B'] : null, graph: topicDagId ? 'graph' : null },
+        student: {
+          topicDagId,
+          topics: topicDagId ? ['A', 'B'] : null,
+          graph: topicDagId
+            ? { nodes: [{ id: 'a', label: 'A', desc: '', tags: ['t1','t2','t3'] }], edges: [] }
+            : null,
+        },
       }),
   })
 }

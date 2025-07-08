@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
+import { Graph } from '@/graphSchema';
+import { graphToMermaid } from '@/graphToMermaid';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -28,7 +30,7 @@ const skills = [
 
 export function MathSkillSelector() {
   const [selected, setSelected] = useState<string[]>([]);
-  const [graph, setGraph] = useState('');
+  const [graph, setGraph] = useState<Graph | null>(null);
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export function MathSkillSelector() {
         setStatus('error');
         return;
       }
-      const data = (await res.json()) as { graph: string };
+      const data = (await res.json()) as { graph: Graph };
       setGraph(data.graph);
       setSaved(false);
       setStatus('idle');
@@ -75,6 +77,7 @@ export function MathSkillSelector() {
     }
   };
 
+  const mermaid = graph ? graphToMermaid(graph) : '';
   return (
     <div style={styles.container}>
       <div style={styles.list}>
@@ -108,7 +111,7 @@ export function MathSkillSelector() {
       {graph && (
         <div id="graph-container" style={styles.graph}>
           {/* re-mount Mermaid when chart string changes to ensure re-render */}
-            <Mermaid key={graph} chart={graph} />
+            <Mermaid key={mermaid} chart={mermaid} />
           </div>
         )}
     </div>
