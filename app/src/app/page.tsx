@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import { css } from "@/styled-system/css";
+import { NavCard } from "@/components/NavCard";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import { navItems } from '@/navItems';
@@ -32,20 +33,28 @@ export default async function HomePage() {
   const items = navItems;
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Choose Your Own Curriculum</h1>
-      <ul>
+    <div
+      className={css({
+        maxW: "xl",
+        mx: "auto",
+        py: "8",
+        px: "4",
+        textAlign: "center",
+      })}
+    >
+      <h1 className={css({ fontSize: "3xl", fontWeight: "bold", mb: "6" })}>
+        Choose Your Own Curriculum
+      </h1>
+      <div className={css({ display: "grid", gap: "4", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" })}>
         {items.map((item) => {
-          let text = item.label;
-          if (item.key === 'students') text = `${studentCount} students`;
-          if (item.key === 'curriculums') text = `${curriculumCount} curriculums`;
+          let count: number | undefined;
+          if (item.key === "students") count = studentCount;
+          if (item.key === "curriculums") count = curriculumCount;
           return (
-            <li key={item.href} style={{ marginBottom: '0.5rem' }}>
-              <Link href={item.href}>{text}</Link>
-            </li>
+            <NavCard key={item.href} href={item.href} label={item.label} count={count} />
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 }
