@@ -9,15 +9,17 @@ import { z } from 'zod'
 
 const db = getDb()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function GET(req: NextRequest, context: any) {
-  const { params } = context as { params: { id: string } }
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params
   const session = await getServerSession(authOptions)
   const teacherId = (session?.user as { id?: string } | undefined)?.id
   if (!teacherId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
-  const id = params.id
+  const { id } = params
   const [row] = await db
     .select({
       id: students.id,
@@ -47,15 +49,17 @@ export async function GET(req: NextRequest, context: any) {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function PUT(req: NextRequest, context: any) {
-  const { params } = context as { params: { id: string } }
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params
   const session = await getServerSession(authOptions)
   const teacherId = (session?.user as { id?: string } | undefined)?.id
   if (!teacherId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
-  const id = params.id
+  const { id } = params
   const link = await db
     .select()
     .from(teacherStudents)

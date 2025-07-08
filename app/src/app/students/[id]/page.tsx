@@ -3,8 +3,11 @@ import { authOptions } from '@/authOptions'
 import { StudentCurriculum } from '@/components/StudentCurriculum'
 import { UploadedWorkList } from '@/components/UploadedWorkList'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function StudentProgressPage({ params }: any) {
+export default async function StudentProgressPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const session = await getServerSession(authOptions)
   const userId = (session?.user as { id?: string } | undefined)?.id
   if (!userId) {
@@ -15,7 +18,7 @@ export default async function StudentProgressPage({ params }: any) {
       </div>
     )
   }
-  const id = params.id as string
+  const { id } = await params
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Student Progress</h1>
