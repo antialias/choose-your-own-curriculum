@@ -13,8 +13,11 @@ test('calls API with selected topics and saves', async () => {
   fireEvent.click(screen.getByLabelText('Algebra'));
   fireEvent.click(screen.getByText('Generate Graph'));
   expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
-  // wait for graph to render
+  // wait for graph to render and save button to appear
   await screen.findByTestId('mermaid');
+  await screen.findByText('Save Graph');
   fireEvent.click(screen.getByText('Save Graph'));
   expect(mockFetch).toHaveBeenLastCalledWith('/api/topic-dags', expect.objectContaining({ method: 'POST' }));
+  // ensure saved state is applied
+  await screen.findByText('Saved');
 });
