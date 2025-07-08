@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, sqlite } from '@/db';
 import { uploadedWork, teacherStudents } from '@/db/schema';
-import { upsertWorkEmbeddings, searchTagsForWork } from '@/db/embeddings';
+import {
+  upsertWorkEmbeddings,
+  searchTagsForWork,
+  getTagVector,
+} from '@/db/embeddings';
+import { vectorToColor } from '@/utils/color';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
@@ -119,10 +124,15 @@ export async function GET(req: NextRequest) {
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
   const workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
-      .map((r) => tagStmt.get(r.id) as { text: string } | undefined)
-      .filter((t): t is { text: string } => Boolean(t))
-      .map((t) => t.text);
-    return { ...w, tags };
+      .map((r) => {
+        const textRow = tagStmt.get(r.id) as { text: string } | undefined
+        const vector = getTagVector(r.id)
+        if (!textRow) return undefined
+        const color = vector ? vectorToColor(vector) : '#999'
+        return { text: textRow.text, color }
+      })
+      .filter((t): t is { text: string; color: string } => Boolean(t))
+    return { ...w, tags }
   });
   return NextResponse.json({ works: workWithTags });
 }
