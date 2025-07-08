@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, sqlite } from '@/db';
 import { uploadedWork, teacherStudents } from '@/db/schema';
-import { upsertWorkEmbeddings, searchTagsForWork } from '@/db/embeddings';
+import { upsertWorkEmbeddings, searchTagsForWork, getTagVector } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
@@ -117,11 +117,26 @@ export async function GET(req: NextRequest) {
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
+
+  const vectorToColor = (vector: number[]): string => {
+    const r = Math.floor(((vector[0] ?? 0) + 1) / 2 * 255);
+    const g = Math.floor(((vector[1] ?? 0) + 1) / 2 * 255);
+    const b = Math.floor(((vector[2] ?? 0) + 1) / 2 * 255);
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b
+      .toString(16)
+      .padStart(2, '0')}`;
+  };
+
   const workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
-      .map((r) => tagStmt.get(r.id) as { text: string } | undefined)
-      .filter((t): t is { text: string } => Boolean(t))
-      .map((t) => t.text);
+      .map((r) => {
+        const textRow = tagStmt.get(r.id) as { text: string } | undefined;
+        if (!textRow) return null;
+        const vector = getTagVector(r.id);
+        const color = vector ? vectorToColor(vector) : '#888888';
+        return { text: textRow.text, color };
+      })
+      .filter((t): t is { text: string; color: string } => Boolean(t));
     return { ...w, tags };
   });
   return NextResponse.json({ works: workWithTags });

@@ -96,6 +96,29 @@ export function getWorkVector(workId: string): number[] | null {
   return null;
 }
 
+export function getTagVector(tagId: string): number[] | null {
+  let row: { vector?: unknown } | undefined
+  try {
+    row = sqlite
+      .prepare('SELECT vector FROM tag_index WHERE tag_id = ?')
+      .get(tagId) as { vector?: unknown } | undefined
+  } catch {
+    return null
+  }
+  if (!row || row.vector == null) return null
+  const v = row.vector as unknown
+  if (typeof v === 'string') {
+    return JSON.parse(v) as number[]
+  }
+  if (v instanceof Uint8Array) {
+    const buf = Buffer.from(v)
+    const arr = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4)
+    return Array.from(arr)
+  }
+  if (Array.isArray(v)) return v as number[]
+  return null
+}
+
 export function searchTagsForWork(workId: string, k: number) {
   const vector = getWorkVector(workId);
   if (!vector) return [] as { id: string; distance: number }[];
