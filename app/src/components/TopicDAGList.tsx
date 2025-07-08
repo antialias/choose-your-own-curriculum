@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
@@ -12,20 +13,9 @@ interface Dag {
 }
 
 export function TopicDAGList() {
-  const [dags, setDags] = useState<Dag[]>([])
+  const { data } = useQuery<{ dags: Dag[] }>({ queryKey: ['/topic-dags'] })
+  const dags = data?.dags ?? []
   const [expanded, setExpanded] = useState<string | null>(null)
-
-  const load = async () => {
-    const res = await fetch('/api/topic-dags')
-    if (res.ok) {
-      const data = (await res.json()) as { dags: Dag[] }
-      setDags(data.dags)
-    }
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
 
   return (
     <ul>
