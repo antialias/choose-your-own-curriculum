@@ -11,12 +11,21 @@ vi.mock('openai', () => ({
   }))
 }));
 vi.mock('@/authOptions', () => ({ authOptions: {} }));
-vi.mock('@/db', () => ({
-  db: {
-    select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
-    insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
-  }
-}));
+vi.mock('@/db', () => {
+  const where = vi
+    .fn()
+    .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
+    .mockResolvedValue([]);
+  const from = vi.fn(() => ({ where }));
+  const select = vi.fn(() => ({ from }));
+  const insert = vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }));
+  const db = { select, insert };
+  const sqlite = {
+    prepare: vi.fn(() => ({ run: vi.fn(), all: vi.fn(() => []), get: vi.fn() })),
+    transaction: vi.fn(() => vi.fn()),
+  };
+  return { getDb: () => db, getSqlite: () => sqlite };
+});
 
 describe('upload-work API', () => {
   it('rejects unauthenticated users', async () => {
