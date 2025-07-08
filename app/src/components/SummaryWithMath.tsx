@@ -1,4 +1,4 @@
-"use client"
+
 import { InlineMath, BlockMath } from 'react-katex'
 
 export function SummaryWithMath({ text }: { text: string }) {
