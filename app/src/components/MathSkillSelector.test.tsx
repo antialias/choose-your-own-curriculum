@@ -8,20 +8,22 @@ vi.stubGlobal('fetch', vi.fn());
 const mockFetch = fetch as unknown as Mock;
 const user = userEvent.setup();
 
+function stream(text: string) {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(text));
+      controller.close();
+    },
+  });
+}
+
 test('calls API with selected topics and saves', async () => {
-  let resolveFetch: (v: { ok: boolean; json: () => Promise<unknown> }) => void;
-  mockFetch.mockImplementationOnce(
-    () => new Promise((r) => {
-      resolveFetch = r;
-    })
-  );
+  mockFetch.mockResolvedValueOnce({ ok: true, body: stream('graph') });
   mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ ok: true }) });
   render(<MathSkillSelector />);
   await user.click(screen.getByLabelText('Algebra'));
   await user.click(screen.getByText('Generate Graph'));
-  expect(await screen.findByText('Generating graph...')).toBeInTheDocument();
-  resolveFetch!({ ok: true, json: () => Promise.resolve({ graph: 'g' }) });
-  expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
+  expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph/stream', expect.objectContaining({ method: 'POST' }));
   // wait for graph to render and save button to appear
   await screen.findByTestId('mermaid');
   await screen.findByText('Save Graph');

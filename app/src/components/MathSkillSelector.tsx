@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
+import mermaid from 'mermaid';
 const styles = {
   container: { padding: '2rem' },
   list: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '0.25rem' },
@@ -42,20 +43,49 @@ export function MathSkillSelector() {
   const generate = async () => {
     setStatus('loading');
     setError(null);
+    setGraph('');
     try {
-      const res = await fetch('/api/generate-graph', {
+      const res = await fetch('/api/generate-graph/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topics: selected }),
       });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setError(data.error || 'Unknown error');
+      if (!res.ok || !res.body) {
+        const data = res.ok ? null : ((await res.json()) as { error?: string });
+        setError(data?.error || 'Unknown error');
         setStatus('error');
         return;
       }
-      const data = (await res.json()) as { graph: string };
-      setGraph(data.graph);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let chunk = '';
+      let timer: NodeJS.Timeout | null = null;
+      const schedule = () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          try {
+            mermaid.parse(chunk);
+            setGraph(chunk);
+          } catch {
+            // ignore parse errors
+          }
+        }, 200);
+      };
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunk += decoder.decode(value, { stream: true });
+        schedule();
+      }
+      if (timer) {
+        clearTimeout(timer);
+        try {
+          mermaid.parse(chunk);
+          setGraph(chunk);
+        } catch {
+          // ignore final parse error
+        }
+      }
       setSaved(false);
       setStatus('idle');
     } catch (err) {
@@ -92,15 +122,15 @@ export function MathSkillSelector() {
       <button style={styles.button} onClick={generate}>
         Generate Graph
       </button>
-      {status === 'loading' && (
-        <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+      {status === 'loading' && !graph && (
+        <p className={css({ color: 'blue.600', mt: '2' })}>Building graph...</p>
       )}
       {status === 'error' && (
         <p className={css({ color: 'red.600', mt: '2' })}>
           Failed to generate graph: {error}. Please try again later.
         </p>
       )}
-      {graph && (
+      {graph && status !== 'loading' && (
         <button style={styles.button} onClick={save} disabled={saved}>
           {saved ? 'Saved' : 'Save Graph'}
         </button>
