@@ -94,6 +94,24 @@ export const teacherStudents = sqliteTable(
   })
 );
 
+export const teacherStudentCurriculums = sqliteTable(
+  'teacher_student_curriculum',
+  {
+    teacherId: text('teacherId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    studentId: text('studentId')
+      .notNull()
+      .references(() => students.id, { onDelete: 'cascade' }),
+    dagId: text('dagId')
+      .notNull()
+      .references(() => topicDags.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({
+    pk: primaryKey(t.teacherId, t.studentId),
+  })
+);
+
 export const uploadedWork = sqliteTable('uploaded_work', {
   id: text('id').primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
   userId: text('userId')
