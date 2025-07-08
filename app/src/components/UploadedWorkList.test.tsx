@@ -8,6 +8,7 @@ const mockFetch = fetch as unknown as Mock
 
 interface Work {
   id: string
+  studentId: string
   summary: string
   dateUploaded: string
   dateCompleted: string | null
@@ -15,7 +16,7 @@ interface Work {
 }
 
 function mockGet(works: Work[]) {
-  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ works }) })
+  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ groups: [{ group: '', works }] }) })
 }
 
 
@@ -26,9 +27,11 @@ describe('UploadedWorkList', () => {
 
   it('loads works on mount', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
     mockGet([
       {
         id: '1',
+        studentId: 's1',
         summary: 'sum',
         dateUploaded: new Date().toISOString(),
         dateCompleted: null,
@@ -37,7 +40,7 @@ describe('UploadedWorkList', () => {
     ])
     render(<UploadedWorkList />)
     expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
-    expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/upload-work')
+    expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work?groupBy=')
     expect(await screen.findByText('sum')).toBeInTheDocument()
     expect(await screen.findByText('Tags: t1')).toBeInTheDocument()
   })

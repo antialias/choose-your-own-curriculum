@@ -111,18 +111,74 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const n = parseInt(req.nextUrl.searchParams.get('n') || '3', 10);
+  const groupBy = req.nextUrl.searchParams.get('groupBy') || '';
+  const studentId = req.nextUrl.searchParams.get('studentId') || '';
+  const dateFilter = req.nextUrl.searchParams.get('date') || '';
+  const tagFilter = req.nextUrl.searchParams.get('tag') || '';
+
   const works = await db
     .select()
     .from(uploadedWork)
     .where(eq(uploadedWork.userId, userId));
 
   const tagStmt = sqlite.prepare('SELECT text FROM tag WHERE id = ?');
-  const workWithTags = works.map((w) => {
+  let workWithTags = works.map((w) => {
     const tags = searchTagsForWork(w.id, n)
       .map((r) => tagStmt.get(r.id) as { text: string } | undefined)
       .filter((t): t is { text: string } => Boolean(t))
       .map((t) => t.text);
     return { ...w, tags };
   });
-  return NextResponse.json({ works: workWithTags });
+
+  if (studentId) {
+    workWithTags = workWithTags.filter((w) => w.studentId === studentId);
+  }
+  if (dateFilter) {
+    workWithTags = workWithTags.filter((w) => {
+      const date = new Date(w.dateCompleted || w.dateUploaded)
+        .toISOString()
+        .slice(0, 10);
+      return date === dateFilter;
+    });
+  }
+  if (tagFilter) {
+    workWithTags = workWithTags.filter((w) => w.tags.includes(tagFilter));
+  }
+
+  const groupsMap: Record<string, typeof workWithTags> = {} as Record<
+    string,
+    typeof workWithTags
+  >;
+
+  if (groupBy === 'student') {
+    for (const w of workWithTags) {
+      const key = w.studentId;
+      groupsMap[key] = groupsMap[key] || [];
+      groupsMap[key].push(w);
+    }
+  } else if (groupBy === 'day') {
+    for (const w of workWithTags) {
+      const key = new Date(w.dateCompleted || w.dateUploaded)
+        .toISOString()
+        .slice(0, 10);
+      groupsMap[key] = groupsMap[key] || [];
+      groupsMap[key].push(w);
+    }
+  } else if (groupBy === 'tag') {
+    for (const w of workWithTags) {
+      for (const tag of w.tags) {
+        groupsMap[tag] = groupsMap[tag] || [];
+        groupsMap[tag].push(w);
+      }
+    }
+  } else {
+    groupsMap[''] = workWithTags;
+  }
+
+  const groups = Object.entries(groupsMap).map(([group, works]) => ({
+    group,
+    works,
+  }));
+
+  return NextResponse.json({ groups });
 }
