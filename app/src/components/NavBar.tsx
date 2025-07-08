@@ -41,6 +41,9 @@ export function NavBar() {
       <Link href="/students" style={styles.link}>
         Students
       </Link>
+      <Link href="/dags" style={styles.link}>
+        My Graphs
+      </Link>
       <div style={styles.spacer} />
       {session ? (
         <button style={styles.button} onClick={() => signOut()}>
