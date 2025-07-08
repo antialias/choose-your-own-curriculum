@@ -7,3 +7,5 @@ INSERT INTO uploaded_work_index(work_id, vector)
 SELECT id, json_extract(embeddings, '$.data[0].embedding')
 FROM uploaded_work
 WHERE embeddings IS NOT NULL AND embeddings != '';
+
+--> statement-breakpoint

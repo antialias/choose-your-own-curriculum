@@ -79,3 +79,5 @@ CREATE TABLE `verificationToken` (
 	`expires` integer NOT NULL,
 	PRIMARY KEY(`identifier`, `token`)
 );
+
+--> statement-breakpoint
