@@ -26,7 +26,7 @@ export function TagPill({ text, vector }: TagPillProps) {
         color: 'white',
         fontSize: 'sm',
         marginRight: '1',
-        marginBottom: '1',
+        marginTop: '3',
       })}
       style={{ backgroundColor: color }}
     >
