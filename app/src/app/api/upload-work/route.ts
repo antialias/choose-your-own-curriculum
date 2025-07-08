@@ -5,6 +5,7 @@ import {
   upsertWorkEmbeddings,
   searchTagsForWork,
   getTagVector,
+  getTagVectorRange,
 } from '@/db/embeddings';
 import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
@@ -132,5 +133,6 @@ export async function GET(req: NextRequest) {
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
     return { ...w, tags };
   });
-  return NextResponse.json({ works: workWithTags });
+  const range = getTagVectorRange();
+  return NextResponse.json({ works: workWithTags, range });
 }

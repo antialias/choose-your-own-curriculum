@@ -11,5 +11,6 @@ export const Default = {
   args: {
     text: 'example',
     vector: [0.1, 0.2, 0.3],
+    range: { min: [-1, -1, -1], max: [1, 1, 1] },
   },
 }

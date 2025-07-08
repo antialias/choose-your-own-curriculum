@@ -125,3 +125,45 @@ export function getTagVector(tagId: string): number[] | null {
   return null;
 }
 
+export function getTagVectorRange() {
+  let rows: { vector?: unknown }[] = [];
+  try {
+    rows = sqlite.prepare('SELECT vector FROM tag_index').all() as {
+      vector?: unknown
+    }[];
+  } catch {
+    return {
+      min: [-1, -1, -1],
+      max: [1, 1, 1],
+    };
+  }
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (const row of rows) {
+    const v = row.vector as unknown;
+    let vec: number[] | null = null;
+    if (typeof v === 'string') {
+      vec = JSON.parse(v) as number[];
+    } else if (v instanceof Uint8Array) {
+      const buf = Buffer.from(v);
+      const arr = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4);
+      vec = Array.from(arr);
+    } else if (Array.isArray(v)) {
+      vec = v as number[];
+    }
+    if (!vec) continue;
+    for (let i = 0; i < 3; i++) {
+      const val = vec[i] ?? 0;
+      if (val < min[i]) min[i] = val;
+      if (val > max[i]) max[i] = val;
+    }
+  }
+  if (min.some((v) => v === Infinity) || max.some((v) => v === -Infinity)) {
+    return {
+      min: [-1, -1, -1],
+      max: [1, 1, 1],
+    };
+  }
+  return { min, max };
+}
+

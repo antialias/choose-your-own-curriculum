@@ -17,16 +17,23 @@ interface Work {
   tags: Tag[]
 }
 
+interface Range {
+  min: number[]
+  max: number[]
+}
+
 export function UploadedWorkList() {
   const [works, setWorks] = useState<Work[]>([])
+  const [range, setRange] = useState<Range | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const loadWorks = async () => {
     try {
       const res = await fetch('/api/upload-work')
       if (!res.ok) throw new Error('load error')
-      const data = (await res.json()) as { works: Work[] }
+      const data = (await res.json()) as { works: Work[]; range: Range }
       setWorks(data.works)
+      setRange(data.range)
     } catch {
       setError('Failed to load uploads')
     }
@@ -74,7 +81,12 @@ export function UploadedWorkList() {
             {w.tags.length > 0 && (
               <div>
                 {w.tags.map((t) => (
-                  <TagPill key={t.text} text={t.text} vector={t.vector} />
+                  <TagPill
+                    key={t.text}
+                    text={t.text}
+                    vector={t.vector}
+                    range={range || undefined}
+                  />
                 ))}
               </div>
             )}
