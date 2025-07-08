@@ -4,7 +4,7 @@ A web application for planning and tracking long term learning goals. Users defi
 
 Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar also links to the **Uploaded Work** page and the **My Curriculums** page.
 
-The home page includes a math skill selector that generates a mermaid DAG of prerequisites using the built-in LLM client.
+The home page provides an overview with links to your students, saved curriculums, uploaded work, and the curriculum generator.
 
 ## Tech Stack
 
@@ -86,7 +86,7 @@ Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summar
 
 ## My Curriculums
 
-The **My Curriculums** page lists every topic graph you've generated and saved from the home page. Click a row to view the full graph. Each entry shows when it was created and which topics were included.
+The **My Curriculums** page lists every topic graph you've generated and saved from the Curriculum Generator page. Click a row to view the full graph. Each entry shows when it was created and which topics were included.
 
 ## Student Progress
 

@@ -36,3 +36,9 @@ test('shows saved dags link', () => {
   render(<NavBar />);
   expect(screen.getByText('My Curriculums')).toBeInTheDocument();
 });
+
+test('shows curriculum generator link', () => {
+  mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
+  render(<NavBar />);
+  expect(screen.getByText('Curriculum Generator')).toBeInTheDocument();
+});
