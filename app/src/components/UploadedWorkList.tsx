@@ -18,11 +18,15 @@ interface Work {
   tags: Tag[]
 }
 
-export function UploadedWorkList() {
+interface Props {
+  studentId?: string
+}
+
+export function UploadedWorkList({ studentId: propStudentId }: Props) {
   const [groups, setGroups] = useState<Record<string, Work[]>>({})
   const [students, setStudents] = useState<{ id: string; name: string }[]>([])
   const [groupBy, setGroupBy] = useState('')
-  const [filterStudent, setFilterStudent] = useState('')
+  const [filterStudent, setFilterStudent] = useState(propStudentId ?? '')
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +43,11 @@ export function UploadedWorkList() {
     try {
       const params = new URLSearchParams()
       if (groupBy) params.set('group', groupBy)
-      if (filterStudent) params.set('studentId', filterStudent)
+      if (propStudentId) {
+        params.set('studentId', propStudentId)
+      } else if (filterStudent) {
+        params.set('studentId', filterStudent)
+      }
       if (filterDay) params.set('day', filterDay)
       if (filterTag) params.set('tag', filterTag)
       const url = `/api/upload-work${params.size ? `?${params.toString()}` : ''}`
@@ -59,7 +67,7 @@ export function UploadedWorkList() {
   useEffect(() => {
     loadWorks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, filterStudent, filterDay, filterTag])
+  }, [groupBy, filterStudent, filterDay, filterTag, propStudentId])
 
   const handleStart = () => {
     setError(null)
@@ -90,20 +98,22 @@ export function UploadedWorkList() {
             <option value="tag">Tag</option>
           </select>
         </label>
-        <label>
-          Student
-          <select
-            value={filterStudent}
-            onChange={(e) => setFilterStudent(e.target.value)}
-          >
-            <option value="">All</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {!propStudentId && (
+          <label>
+            Student
+            <select
+              value={filterStudent}
+              onChange={(e) => setFilterStudent(e.target.value)}
+            >
+              <option value="">All</option>
+              {students.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
           Day
           <input
