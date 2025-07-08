@@ -4,4 +4,4 @@ Authenticated users can upload documents from the **Uploaded Work** page. The se
 
 Each upload appears in the list with its summary for easy review. New uploads show a temporary `Processing...` placeholder while the summary is generated. Any errors are shown next to the list.
 
-Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` inside summaries are rendered with KaTeX.
+Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summaries are rendered with KaTeX.
