@@ -1,10 +1,11 @@
-import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import { navItems } from '@/navItems';
 import { getDb } from '@/db';
 import { teacherStudents, topicDags } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { HomeCard } from '@/components/HomeCard';
+import { css } from '@/styled-system/css';
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -29,23 +30,30 @@ export default async function HomePage() {
     ).length;
   }
 
-  const items = navItems;
-
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Choose Your Own Curriculum</h1>
-      <ul>
-        {items.map((item) => {
+    <div className={css({ px: '8', py: '12', textAlign: 'center' })}>
+      <h1 className={css({ fontSize: '4xl', fontWeight: 'bold', mb: '4' })}>
+        Choose Your Own Curriculum
+      </h1>
+      <p className={css({ mb: '8', color: 'gray.600' })}>
+        Build personalized learning paths for your students.
+      </p>
+      <div
+        className={css({
+          display: 'grid',
+          gap: '4',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          maxW: '3xl',
+          mx: 'auto',
+        })}
+      >
+        {navItems.map((item) => {
           let text = item.label;
           if (item.key === 'students') text = `${studentCount} students`;
           if (item.key === 'curriculums') text = `${curriculumCount} curriculums`;
-          return (
-            <li key={item.href} style={{ marginBottom: '0.5rem' }}>
-              <Link href={item.href}>{text}</Link>
-            </li>
-          );
+          return <HomeCard key={item.href} href={item.href} label={text} />;
         })}
-      </ul>
+      </div>
     </div>
   );
 }
