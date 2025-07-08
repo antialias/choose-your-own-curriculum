@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "concurrently 'panda --watch' 'next dev'",
+    "generate-migrations": "pnpm exec drizzle-kit generate",
     "build": "panda && next build",
     "start": "next start",
     "lint": "biome check .",
