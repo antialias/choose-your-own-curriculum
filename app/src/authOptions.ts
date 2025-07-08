@@ -1,7 +1,9 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import type { NextAuthOptions } from 'next-auth'
 import EmailProvider from 'next-auth/providers/email'
-import { db } from '@/db'
+import { getDb } from '@/db'
+
+const db = getDb()
 
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db),

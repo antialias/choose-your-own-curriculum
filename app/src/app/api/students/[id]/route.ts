@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/db'
+import { getDb } from '@/db'
 import { students, teacherStudents, users } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/authOptions'
 import { studentFieldsSchema } from '@/forms/student'
+
+const db = getDb()
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PUT(req: NextRequest, context: any) {

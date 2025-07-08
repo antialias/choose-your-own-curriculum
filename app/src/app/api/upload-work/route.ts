@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, sqlite } from '@/db';
+import { getDb, getSqlite } from '@/db';
+
+const db = getDb();
+const sqlite = getSqlite();
 import { uploadedWork, teacherStudents } from '@/db/schema';
 import {
   upsertWorkEmbeddings,

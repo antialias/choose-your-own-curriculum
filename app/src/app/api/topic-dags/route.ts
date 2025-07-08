@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { topicDags } from '@/db/schema';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
+
+const db = getDb();
 
 const postSchema = z.object({ topics: z.array(z.string()), graph: z.string() });
 

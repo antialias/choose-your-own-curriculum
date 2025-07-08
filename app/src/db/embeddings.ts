@@ -1,5 +1,7 @@
-import { sqlite } from './index';
+import { getSqlite } from './index';
 import type { Statement } from 'better-sqlite3';
+
+const sqlite = getSqlite();
 
 function safePrepare(sql: string): Statement<unknown[], unknown> {
   try {
