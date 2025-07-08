@@ -3,6 +3,7 @@ import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import { css } from '@/styled-system/css'
 
 interface Tag {
   text: string
@@ -16,6 +17,7 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  hasThumbnail: boolean
 }
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
@@ -134,18 +136,27 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
           }</h3>}
           <ul>
             {works.map((w) => (
-              <li key={w.id} style={{ marginBottom: '1rem' }}>
-                <strong>
-                  {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
-                </strong>
-                <SummaryWithMath text={w.summary ?? ''} />
-                {w.tags.length > 0 && (
-                  <div>
-                    {w.tags.map((t) => (
-                      <TagPill key={t.text} text={t.text} vector={t.vector} />
-                    ))}
-                  </div>
+              <li key={w.id} className={css({ display: 'flex', gap: '4', mb: '4' })}>
+                {w.hasThumbnail && (
+                  <img
+                    src={`/api/upload-work/${w.id}/thumbnail`}
+                    alt="thumbnail"
+                    className={css({ maxW: '144px', maxH: '144px' })}
+                  />
                 )}
+                <div>
+                  <strong>
+                    {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
+                  </strong>
+                  <SummaryWithMath text={w.summary ?? ''} />
+                  {w.tags.length > 0 && (
+                    <div>
+                      {w.tags.map((t) => (
+                        <TagPill key={t.text} text={t.text} vector={t.vector} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
