@@ -1,0 +1,51 @@
+{
+  "home": {
+    "title": "Choose Your Own Curriculum",
+    "description": "Build personalized learning paths for your students."
+  },
+  "navbar": {
+    "home": "Home",
+    "signin": "Sign in",
+    "signout": "Sign out"
+  },
+  "nav": {
+    "students": "Students",
+    "curriculums": "Curriculums",
+    "upload-work": "Upload Work"
+  },
+  "login": {
+    "title": "Log In",
+    "signin": "Sign in with Email"
+  },
+  "uploadedWork": {
+    "title": "Uploaded Work",
+    "signinPrompt": "Please sign in to view your uploads."
+  },
+  "students": {
+    "title": "Students",
+    "signinPrompt": "Please sign in to manage students."
+  },
+  "studentProgress": {
+    "title": "Student Progress",
+    "signinPrompt": "Please sign in to view progress."
+  },
+  "curriculumGenerator": {
+    "title": "Curriculum Generator",
+    "description": "Select advanced math topics to see their prerequisites."
+  },
+  "myCurriculums": {
+    "title": "My Curriculums",
+    "signinPrompt": "Please sign in to view your DAGs."
+  },
+  "selectStudent": "Select student",
+  "groupBy": "Group by",
+  "student": "Student",
+  "day": "Day",
+  "tag": "Tag",
+  "none": "None",
+  "upload": "Upload",
+  "save": "Save",
+  "add": "Add",
+  "loadError": "Failed to load uploads",
+  "uploadError": "Upload failed"
+}

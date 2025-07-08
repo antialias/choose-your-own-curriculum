@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { NavBar } from './NavBar';
+import I18nProvider from './I18nProvider';
 import { useSession } from 'next-auth/react';
 import type { Mock } from 'vitest';
 
@@ -15,24 +16,40 @@ const mockedUseSession = useSession as unknown as Mock;
 
 test('shows sign in link when unauthenticated', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
-  render(<NavBar />);
+  render(
+    <I18nProvider>
+      <NavBar />
+    </I18nProvider>
+  );
   expect(screen.getByText('Sign in')).toBeInTheDocument();
 });
 
 test('shows sign out when authenticated', () => {
   mockedUseSession.mockReturnValue({ data: { user: { name: 'a' }, expires: '1' }, status: 'authenticated' });
-  render(<NavBar />);
+  render(
+    <I18nProvider>
+      <NavBar />
+    </I18nProvider>
+  );
   expect(screen.getByText('Sign out')).toBeInTheDocument();
 });
 
 test('shows upload work link', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
-  render(<NavBar />);
+  render(
+    <I18nProvider>
+      <NavBar />
+    </I18nProvider>
+  );
   expect(screen.getByText('Upload Work')).toBeInTheDocument();
 });
 
 test('shows curriculums link', () => {
   mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' });
-  render(<NavBar />);
+  render(
+    <I18nProvider>
+      <NavBar />
+    </I18nProvider>
+  );
   expect(screen.getByText('Curriculums')).toBeInTheDocument();
 });

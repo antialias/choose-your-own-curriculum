@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { UploadedWorkList } from './UploadedWorkList'
+import I18nProvider from './I18nProvider'
 import type { Mock } from 'vitest'
 
 vi.stubGlobal('fetch', vi.fn())
@@ -43,7 +44,11 @@ describe('UploadedWorkList', () => {
         tags: [{ text: 't1', vector: [0, 0, 0] }],
       },
     ])
-    render(<UploadedWorkList />)
+    render(
+      <I18nProvider>
+        <UploadedWorkList />
+      </I18nProvider>
+    )
     expect(mockFetch).toHaveBeenNthCalledWith(1, '/api/students')
     expect(mockFetch).toHaveBeenNthCalledWith(2, '/api/students')
     expect(mockFetch).toHaveBeenNthCalledWith(3, '/api/upload-work')

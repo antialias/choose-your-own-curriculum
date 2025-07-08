@@ -1,4 +1,5 @@
 import { MathSkillSelector } from '@/components/MathSkillSelector';
+import i18n from '@/i18n';
 
 const styles = {
   container: {
@@ -10,8 +11,8 @@ const styles = {
 export default function Home() {
   return (
     <div style={styles.container}>
-      <h1>Curriculum Generator</h1>
-      <p>Select advanced math topics to see their prerequisites.</p>
+      <h1>{i18n.t('curriculumGenerator.title')}</h1>
+      <p>{i18n.t('curriculumGenerator.description')}</p>
       <MathSkillSelector />
     </div>
   );

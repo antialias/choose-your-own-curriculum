@@ -1,0 +1,51 @@
+{
+  "home": {
+    "title": "Choisissez Votre Propre Programme",
+    "description": "Créez des parcours d'apprentissage personnalisés pour vos étudiants."
+  },
+  "navbar": {
+    "home": "Accueil",
+    "signin": "Se connecter",
+    "signout": "Se déconnecter"
+  },
+  "nav": {
+    "students": "Étudiants",
+    "curriculums": "Programmes",
+    "upload-work": "Téléverser"
+  },
+  "login": {
+    "title": "Connexion",
+    "signin": "Se connecter par email"
+  },
+  "uploadedWork": {
+    "title": "Travaux Téléversés",
+    "signinPrompt": "Veuillez vous connecter pour voir vos téléversements."
+  },
+  "students": {
+    "title": "Étudiants",
+    "signinPrompt": "Veuillez vous connecter pour gérer les étudiants."
+  },
+  "studentProgress": {
+    "title": "Progression de l'Étudiant",
+    "signinPrompt": "Veuillez vous connecter pour voir la progression."
+  },
+  "curriculumGenerator": {
+    "title": "Générateur de Programme",
+    "description": "Sélectionnez des sujets mathématiques avancés pour voir leurs prérequis."
+  },
+  "myCurriculums": {
+    "title": "Mes Programmes",
+    "signinPrompt": "Veuillez vous connecter pour voir vos DAG."
+  },
+  "selectStudent": "Sélectionner un étudiant",
+  "groupBy": "Grouper par",
+  "student": "Étudiant",
+  "day": "Jour",
+  "tag": "Étiquette",
+  "none": "Aucun",
+  "upload": "Téléverser",
+  "save": "Enregistrer",
+  "add": "Ajouter",
+  "loadError": "Échec du chargement",
+  "uploadError": "Échec de l'envoi"
+}
