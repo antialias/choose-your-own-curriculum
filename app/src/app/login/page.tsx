@@ -19,7 +19,7 @@ export default function LoginPage() {
   return (
     <div style={styles.container}>
       <h1>{t('logIn')}</h1>
-      <button style={styles.button} onClick={() => signIn()}>
+      <button style={styles.button} onClick={() => signIn('email', { callbackUrl: '/' })}>
         {t('signInWithEmail')}
       </button>
     </div>
