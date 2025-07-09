@@ -3,8 +3,9 @@ import { SummaryWithMath } from '@/components/SummaryWithMath'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UploadForm } from './UploadForm'
-import { TagPill } from './TagPill'
+import { TagTooltip } from './TagTooltip'
 import { useTranslation } from 'react-i18next'
+import { Graph } from '@/graphSchema'
 
 interface Tag {
   text: string
@@ -30,10 +31,17 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [graph, setGraph] = useState<Graph | null>(null)
   const { t } = useTranslation()
 
   useEffect(() => {
     setFilterStudent(studentId)
+    if (studentId) {
+      fetch(`/api/students/${studentId}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => setGraph(d?.student.graph ?? null))
+        .catch(() => setGraph(null))
+    }
   }, [studentId])
 
 
@@ -148,7 +156,12 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                   {w.tags.length > 0 && (
                     <div>
                       {w.tags.map((t) => (
-                        <TagPill key={t.text} text={t.text} vector={t.vector} />
+                        <TagTooltip
+                          key={t.text}
+                          text={t.text}
+                          vector={t.vector}
+                          graph={graph}
+                        />
                       ))}
                     </div>
                   )}
