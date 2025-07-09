@@ -17,6 +17,11 @@ interface Work {
   id: string
   studentId: string
   summary: string | null
+  grade: string | null
+  extractedStudentName: string | null
+  extractedDateOfWork: string | null
+  masteryPercent: number | null
+  feedback: string | null
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
@@ -170,6 +175,32 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                     {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
                   </strong>
                   <SummaryWithMath text={w.summary ?? ''} />
+                  {w.grade && (
+                    <div>
+                      {t('grade')}: {w.grade}
+                    </div>
+                  )}
+                  {w.masteryPercent !== null && (
+                    <div>
+                      {t('masteryPercent')}: {w.masteryPercent}%
+                    </div>
+                  )}
+                  {w.extractedStudentName && (
+                    <div>
+                      {t('studentName')}: {w.extractedStudentName}
+                    </div>
+                  )}
+                  {w.extractedDateOfWork && (
+                    <div>
+                      {t('dateOfWork')}:{' '}
+                      {new Date(w.extractedDateOfWork).toDateString()}
+                    </div>
+                  )}
+                  {w.feedback && (
+                    <div>
+                      {t('feedback')}: {w.feedback}
+                    </div>
+                  )}
                   {w.tags.length > 0 && (
                     <div>
                       {w.tags.map((t) => (

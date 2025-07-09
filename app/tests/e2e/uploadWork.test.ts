@@ -13,7 +13,14 @@ vi.mock('@/llm/client', () => ({
   LLMClient: vi.fn().mockImplementation(() => ({
     chatMessages: vi.fn(async () => ({
       error: null,
-      response: { summary: 'sum' }
+      response: {
+        summary: 'sum',
+        grade: 'A',
+        studentName: 'Test Student',
+        dateOfWork: '2024-01-01',
+        masteryPercent: 80,
+        feedback: 'Great job'
+      }
     }))
   }))
 }));
@@ -23,7 +30,28 @@ vi.mock('@/db', () => {
     .fn()
     .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
     .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
-    .mockResolvedValue([]);
+    .mockResolvedValueOnce([
+      {
+        id: 'w1',
+        userId: 'u1',
+        studentId: '1',
+        dateUploaded: new Date(),
+        dateCompleted: null,
+        summary: 'sum',
+        grade: 'A',
+        extractedStudentName: 'Test Student',
+        extractedDateOfWork: '2024-01-01',
+        masteryPercent: 80,
+        feedback: 'Great job',
+        note: null,
+        embeddings: null,
+        originalDocument: null,
+        originalFilename: null,
+        originalMimeType: null,
+        thumbnail: null,
+        thumbnailMimeType: null
+      }
+    ]);
   const from = vi.fn(() => ({ where }));
   const select = vi.fn(() => ({ from }));
   const insert = vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }));
@@ -72,5 +100,15 @@ describe('upload-work API', () => {
     const req = new NextRequest(new Request('http://localhost/api/upload-work'));
     const res = await getWorks(req);
     expect(res.status).toBe(401);
+  });
+
+  it('returns uploaded work with metadata', async () => {
+    (getServerSession as unknown as Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const req = new NextRequest(new Request('http://localhost/api/upload-work'));
+    const res = await getWorks(req);
+    expect(res.status).toBe(200);
+    const data = (await res.json()) as { groups: Record<string, any[]> };
+    expect(data.groups.all[0].grade).toBe('A');
+    expect(data.groups.all[0].masteryPercent).toBe(80);
   });
 });

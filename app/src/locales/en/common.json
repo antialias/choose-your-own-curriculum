@@ -56,5 +56,10 @@
   "saveGraph": "Save Graph",
   "saved": "Saved",
   "cancel": "Cancel",
-  "change": "Change curriculum"
+  "change": "Change curriculum",
+  "grade": "Grade",
+  "masteryPercent": "Mastery",
+  "studentName": "Student Name",
+  "dateOfWork": "Date of Work",
+  "feedback": "Feedback"
 }

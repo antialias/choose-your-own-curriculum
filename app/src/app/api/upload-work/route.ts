@@ -70,6 +70,11 @@ export async function POST(req: NextRequest) {
   }
 
   let summary = '';
+  let grade: string | null = null;
+  let extractedStudentName: string | null = null;
+  let extractedDateOfWork: string | null = null;
+  let masteryPercent: number | null = null;
+  let feedback: string | null = null;
   const summarySchema = z.object({
     summary: z.string(),
     grade: z.string().optional().nullable(),
@@ -104,6 +109,14 @@ export async function POST(req: NextRequest) {
       );
       if (!res.error && res.response) {
         summary = res.response.summary;
+        grade = res.response.grade ?? null;
+        extractedStudentName = res.response.studentName ?? null;
+        extractedDateOfWork = res.response.dateOfWork ?? null;
+        masteryPercent =
+          typeof res.response.masteryPercent === 'number'
+            ? res.response.masteryPercent
+            : null;
+        feedback = res.response.feedback ?? null;
       }
     }
   } catch (err) {
@@ -128,6 +141,11 @@ export async function POST(req: NextRequest) {
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
+    grade,
+    extractedStudentName,
+    extractedDateOfWork,
+    masteryPercent,
+    feedback,
     note: fields.note || null,
     originalDocument: buffer,
     originalFilename: file instanceof File ? file.name : null,
