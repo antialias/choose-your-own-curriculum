@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import { ThumbnailPlaceholder } from './ThumbnailPlaceholder'
 import { useTranslation } from 'react-i18next'
 
 interface Tag {
@@ -19,6 +20,7 @@ interface Work {
   dateCompleted: string | null
   tags: Tag[]
   hasThumbnail: boolean
+  originalMimeType: string | null
 }
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
@@ -30,6 +32,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [thumbError, setThumbError] = useState<Record<string, boolean>>({})
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -133,12 +136,15 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                 key={w.id}
                 style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}
               >
-                {w.hasThumbnail && (
+                {w.hasThumbnail && !thumbError[w.id] ? (
                   <img
                     src={`/api/upload-work/${w.id}?type=thumbnail`}
                     alt="thumbnail"
                     style={{ maxWidth: '1.5in', maxHeight: '1.5in' }}
+                    onError={() => setThumbError((e) => ({ ...e, [w.id]: true }))}
                   />
+                ) : (
+                  <ThumbnailPlaceholder mime={w.originalMimeType} />
                 )}
                 <div>
                   <strong>

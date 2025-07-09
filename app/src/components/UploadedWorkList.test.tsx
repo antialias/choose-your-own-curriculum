@@ -20,6 +20,7 @@ interface Work {
   dateCompleted: string | null
   tags: Tag[]
   hasThumbnail: boolean
+  originalMimeType: string | null
 }
 
 function mockGet(works: Work[]) {
@@ -33,19 +34,20 @@ describe('UploadedWorkList', () => {
   })
 
   it('loads works on mount', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
-    mockGet([
-      {
-        id: '1',
-        studentId: 's1',
-        summary: 'sum',
-        dateUploaded: new Date().toISOString(),
-        dateCompleted: null,
-        tags: [{ text: 't1', vector: [0, 0, 0] }],
-        hasThumbnail: true,
-      },
-    ])
+  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+  mockGet([
+    {
+      id: '1',
+      studentId: 's1',
+      summary: 'sum',
+      dateUploaded: new Date().toISOString(),
+      dateCompleted: null,
+      tags: [{ text: 't1', vector: [0, 0, 0] }],
+      hasThumbnail: true,
+      originalMimeType: 'image/png',
+    },
+  ])
     render(
       <QueryProvider>
         <UploadedWorkList />
@@ -60,6 +62,30 @@ describe('UploadedWorkList', () => {
       'src',
       '/api/upload-work/1?type=thumbnail'
     )
+  })
+
+  it('shows placeholder when thumbnail missing', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+    mockGet([
+      {
+        id: '2',
+        studentId: 's1',
+        summary: 'sum2',
+        dateUploaded: new Date().toISOString(),
+        dateCompleted: null,
+        tags: [],
+        hasThumbnail: false,
+        originalMimeType: 'application/pdf',
+      },
+    ])
+    render(
+      <QueryProvider>
+        <UploadedWorkList />
+      </QueryProvider>
+    )
+    const placeholder = await screen.findByTestId('thumbnail-placeholder')
+    expect(placeholder).toHaveTextContent('PDF')
   })
 
 })
