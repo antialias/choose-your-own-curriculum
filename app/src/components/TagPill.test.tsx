@@ -5,7 +5,7 @@ import type { Graph } from '@/graphSchema'
 
 describe('TagPill', () => {
   it('renders text', () => {
-    render(<TagPill text="math" vector={[0.1, 0.2, 0.3]} />)
+    render(<TagPill text="math" vector={[0.1, 0.2, 0.3]} score={0.5} />)
     expect(screen.getByText('math')).toBeInTheDocument()
   })
 
@@ -17,8 +17,14 @@ describe('TagPill', () => {
       ],
       edges: [['a', 'b']],
     }
-    render(<TagPill text="math" vector={[0, 0, 0]} graph={graph} />)
+    render(<TagPill text="math" vector={[0, 0, 0]} score={0.9} graph={graph} />)
     await userEvent.hover(screen.getByText('math'))
     expect((await screen.findAllByText('A')).length).toBeGreaterThan(0)
+  })
+
+  it('scales font size for high score', () => {
+    render(<TagPill text="big" vector={[0, 0, 0]} score={0.9} />)
+    const el = screen.getByText('big')
+    expect(window.getComputedStyle(el).fontSize).not.toBe('0.875rem')
   })
 })

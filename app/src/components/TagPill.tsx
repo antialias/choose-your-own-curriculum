@@ -6,6 +6,7 @@ import { Tooltip } from './Tooltip'
 export type TagPillProps = {
   text: string
   vector: number[]
+  score?: number
   graph?: Graph | null
 }
 
@@ -17,7 +18,14 @@ function vectorToColor(v: number[]): string {
   return `hsl(${Math.floor(hue) % 360}, ${Math.floor(sat)}%, ${Math.floor(light)}%)`
 }
 
-export function TagPill({ text, vector, graph }: TagPillProps) {
+function scoreToFontSize(score?: number) {
+  if (score == null) return 'sm'
+  if (score > 0.8) return 'lg'
+  if (score > 0.6) return 'md'
+  return 'sm'
+}
+
+export function TagPill({ text, vector, score, graph }: TagPillProps) {
   const color = vectorToColor(vector)
   const info = useMemo(() => {
     if (!graph) return null
@@ -42,7 +50,7 @@ export function TagPill({ text, vector, graph }: TagPillProps) {
         paddingY: '1',
         borderRadius: 'full',
         color: 'white',
-        fontSize: 'sm',
+        fontSize: scoreToFontSize(score),
         marginRight: '1',
         marginTop: '3',
       })}
