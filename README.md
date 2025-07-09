@@ -18,7 +18,7 @@ The home page includes a math skill selector that generates prerequisite graphs 
 - **NextAuth** for authentication
 - **Casbin** for access control
 - **LLM Client** uses OpenAI-compatible API with Zod schema validation ([docs](app/src/llm/README.md))
-- **GitHub Actions** verify formatting, linting and tests before building Docker images for GCR
+- **GitHub Actions** run formatting, linting, type checking, unit tests and e2e tests before building Docker images. The workflow lives in `.github/workflows/ci.yml`.
 
 ## Quick Start
 
