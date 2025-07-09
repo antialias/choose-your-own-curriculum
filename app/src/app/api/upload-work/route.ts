@@ -15,6 +15,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import { createCanvas } from 'canvas';
+import * as pdfjsLib from 'pdfjs-dist';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file instanceof File && file.type.startsWith('image/');
+  const isPdf = file instanceof File && file.type === 'application/pdf';
   if (file instanceof File) {
     buffer = Buffer.from(await file.arrayBuffer());
   }
@@ -63,6 +66,28 @@ export async function POST(req: NextRequest) {
         .toBuffer();
     } catch (err) {
       console.error('thumbnail error', err);
+    }
+  } else if (isPdf && buffer) {
+    try {
+      const doc = await pdfjsLib.getDocument({ data: buffer }).promise;
+      const page = await doc.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+      const canvas = createCanvas(144, 144);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const context = canvas.getContext('2d') as any;
+      const scale = Math.min(144 / viewport.width, 144 / viewport.height);
+      const scaled = page.getViewport({ scale });
+      await page.render({ canvasContext: context, viewport: scaled }).promise;
+      context.fillStyle = 'rgba(255,255,255,0.7)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#000';
+      context.font = 'bold 48px sans-serif';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText('PDF', canvas.width / 2, canvas.height / 2);
+      thumbnail = canvas.toBuffer('image/png');
+    } catch (err) {
+      console.error('thumbnail pdf error', err);
     }
   }
 
@@ -83,7 +108,18 @@ export async function POST(req: NextRequest) {
         console.error('summary error', err);
       }
     } else if (buffer) {
-      const text = buffer.toString('utf-8');
+      let text = buffer.toString('utf-8');
+      if (isPdf) {
+        try {
+          const doc = await pdfjsLib.getDocument({ data: buffer }).promise;
+          const page = await doc.getPage(1);
+          const content = await page.getTextContent();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          text = (content.items as any[]).map((i) => (i as { str: string }).str).join(' ');
+        } catch (err) {
+          console.error('pdf text error', err);
+        }
+      }
       try {
         const chat = await openai.chat.completions.create({
           model: 'gpt-4o',
