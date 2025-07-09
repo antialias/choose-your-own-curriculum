@@ -57,7 +57,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
       className={css({ display: 'flex', flexDir: 'column', gap: '2', padding: '4' })}
     >
       <input type="file" data-testid="file" {...register('file')} />
-      {errors.file && <span>{errors.file.message}</span>}
+      {errors.file && <span>{t(errors.file.message || '')}</span>}
       <input type="date" {...register('dateCompleted')} />
       <select {...register('studentId')} defaultValue="">
         <option value="" disabled>
@@ -69,7 +69,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
           </option>
         ))}
       </select>
-      {errors.studentId && <span>{errors.studentId.message}</span>}
+      {errors.studentId && <span>{t(errors.studentId.message || '')}</span>}
       <button type="submit" disabled={isSubmitting}>{t('upload')}</button>
     </form>
   )
