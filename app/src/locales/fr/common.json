@@ -60,4 +60,7 @@
   "coverageThreshold": "Seuil de couverture",
   "coverageThresholdInfo": "Seul le travail dépassant ce pourcentage de maîtrise est pris en compte dans la couverture.",
   "currentTopics": "Sujets actuels"
+  ,"actions": "Actions"
+  ,"delete": "Supprimer"
+  ,"reEvaluate": "Réévaluer"
 }

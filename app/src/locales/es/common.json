@@ -60,4 +60,7 @@
   "coverageThreshold": "Umbral de cobertura",
   "coverageThresholdInfo": "Solo el trabajo por encima de este porcentaje de dominio cuenta para la cobertura.",
   "currentTopics": "Temas actuales"
+  ,"actions": "Acciones"
+  ,"delete": "Eliminar"
+  ,"reEvaluate": "Reevaluar"
 }

@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     grade: z.string().optional().nullable(),
     studentName: z.string().optional().nullable(),
     dateOfWork: z.string().optional().nullable(),
-    masteryPercent: z.number().min(0).max(100).optional().nullable(),
+    masteryPercent: z.number().min(0).max(100),
     feedback: z.string().optional().nullable(),
   });
 
@@ -141,7 +141,8 @@ export async function POST(req: NextRequest) {
       const res = await llm.chatMessages(
         [{ role: 'user', content: parts }],
         {
-          systemPrompt: 'You are an expert teacher analyzing student work.',
+          systemPrompt:
+            'You are an expert teacher analyzing student work. Provide a summary, optional grade, student name, date of work, REQUIRED mastery percent between 0 and 100, and optional feedback.',
           schema: summarySchema,
           params: { model: 'gpt-4o' },
         }

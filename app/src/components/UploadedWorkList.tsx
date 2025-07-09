@@ -100,6 +100,16 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
     setError('uploadFailed')
   }
 
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/upload-work/${id}`, { method: 'DELETE' })
+    loadWorks()
+  }
+
+  const handleReevaluate = async (id: string) => {
+    await fetch(`/api/upload-work/${id}/re-evaluate`, { method: 'POST' })
+    loadWorks()
+  }
+
   return (
     <div>
       <UploadForm
@@ -216,6 +226,22 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                     </div>
                   )}
                 </div>
+                <select
+                  data-testid={`action-${w.id}`}
+                  defaultValue=""
+                  onChange={(e) => {
+                    const val = e.target.value
+                    e.target.value = ''
+                    if (val === 'delete') handleDelete(w.id)
+                    if (val === 're-evaluate') handleReevaluate(w.id)
+                  }}
+                >
+                  <option value="" disabled>
+                    {t('actions')}
+                  </option>
+                  <option value="re-evaluate">{t('reEvaluate')}</option>
+                  <option value="delete">{t('delete')}</option>
+                </select>
               </li>
             ))}
           </ul>
