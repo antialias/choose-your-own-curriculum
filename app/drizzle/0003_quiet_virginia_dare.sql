@@ -4,3 +4,5 @@ CREATE TABLE `tag` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `tag_text_unique` ON `tag` (`text`);
+
+--> statement-breakpoint
