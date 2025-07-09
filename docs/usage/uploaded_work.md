@@ -5,6 +5,7 @@ Authenticated users can upload documents from the **Uploaded Work** page. The se
 Each upload appears in the list with its summary for easy review. New uploads show a temporary `Processing...` placeholder while the summary is generated. Any errors are shown next to the list.
 
 Image uploads also generate a thumbnail shown to the left of the summary. Thumbnails are sized to at most 1.5 inches on each side while preserving aspect ratio.
+The server reads the image's orientation metadata so thumbnails are rotated correctly.
 
 If no thumbnail is available or a file type isn't supported, a placeholder icon displays the file's extension instead.
 
