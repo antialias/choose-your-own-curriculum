@@ -15,6 +15,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import { execFile } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { promises as fs } from 'node:fs';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -50,9 +54,33 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
+  const isPdf = file.type === 'application/pdf';
   if (isImage) {
     try {
       thumbnail = await sharp(buffer)
+        .resize({ width: 144, height: 144, fit: 'inside' })
+        .png()
+        .toBuffer();
+    } catch (err) {
+      console.error('thumbnail error', err);
+    }
+  } else if (isPdf) {
+    try {
+      const base = join(tmpdir(), `thumb-${crypto.randomUUID()}`);
+      const pdfPath = `${base}.pdf`;
+      const pngPath = `${base}.png`;
+      await fs.writeFile(pdfPath, buffer);
+      await new Promise((res, rej) => {
+        execFile(
+          'pdftoppm',
+          ['-png', '-singlefile', '-f', '1', '-l', '1', pdfPath, base],
+          (err) => (err ? rej(err) : res(null))
+        );
+      });
+      const png = await fs.readFile(pngPath);
+      await fs.unlink(pdfPath);
+      await fs.unlink(pngPath);
+      thumbnail = await sharp(png)
         .resize({ width: 144, height: 144, fit: 'inside' })
         .png()
         .toBuffer();
@@ -80,6 +108,19 @@ export async function POST(req: NextRequest) {
             ],
           },
         ],
+      });
+      summary = chat.choices[0].message.content || '';
+    } catch (err) {
+      console.error('summary error', err);
+    }
+  } else if (isPdf) {
+    try {
+      const { default: pdfParse } = await import('pdf-parse');
+      const data = await pdfParse(buffer);
+      const text = data.text;
+      const chat = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
       });
       summary = chat.choices[0].message.content || '';
     } catch (err) {
