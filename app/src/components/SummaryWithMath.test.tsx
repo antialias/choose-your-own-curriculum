@@ -16,4 +16,11 @@ describe('SummaryWithMath', () => {
     )
     expect(getByText(/a\+b\+c/)).toBeInTheDocument()
   })
+
+  it('renders markdown lists', () => {
+    const { container } = render(
+      <SummaryWithMath text={'- item1\n- item2'} />
+    )
+    expect(container.querySelector('ul')).toBeInTheDocument()
+  })
 })
