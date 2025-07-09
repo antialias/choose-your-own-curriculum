@@ -1,33 +1,20 @@
 
-import { InlineMath, BlockMath } from 'react-katex'
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 export function SummaryWithMath({ text }: { text: string }) {
-  const parts = text.split(
-    /(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g
-  )
+  const normalized = text
+    .replace(/\\\\/g, "\\")
+    .replace(/\\\(([^]*?)\\\)/g, (_match, math) => `$${math}$`)
+    .replace(/\\\[([^]*?)\\\]/g, (_match, math) => `$$${math}$$`);
   return (
-    <span>
-      {parts.map((part, i) => {
-        if (part.startsWith('$$') && part.endsWith('$$')) {
-          return <BlockMath key={i}>{part.slice(2, -2)}</BlockMath>
-        }
-        if (part.startsWith('\\[') && part.endsWith('\\]')) {
-          return <BlockMath key={i}>{part.slice(2, -2)}</BlockMath>
-        }
-        if (part.startsWith('$') && part.endsWith('$')) {
-          return <InlineMath key={i}>{part.slice(1, -1)}</InlineMath>
-        }
-        if (part.startsWith('\\(') && part.endsWith('\\)')) {
-          return <InlineMath key={i}>{part.slice(2, -2)}</InlineMath>
-        }
-        const lines = part.split('\n')
-        return lines.map((line, j) => (
-          <span key={`${i}-${j}`}> 
-            {line}
-            {j < lines.length - 1 && <br />} 
-          </span>
-        ))
-      })}
-    </span>
-  )
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+    >
+      {normalized}
+    </ReactMarkdown>
+  );
 }
