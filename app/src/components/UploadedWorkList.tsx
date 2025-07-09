@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import { Tooltip } from './Tooltip'
+import { TagDagTooltip } from './TagDagTooltip'
+import type { Graph } from '@/graphSchema'
 import { useTranslation } from 'react-i18next'
 
 interface Tag {
@@ -29,6 +32,11 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
+  const { data: studentData } = useQuery({
+    queryKey: [`/students/${studentId}`],
+    enabled: Boolean(studentId),
+  })
+  const graph = (studentData as { student: { graph: Graph | null } } | undefined)?.student.graph ?? null
   const [error, setError] = useState<string | null>(null)
   const { t } = useTranslation()
 
@@ -147,9 +155,18 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                   <SummaryWithMath text={w.summary ?? ''} />
                   {w.tags.length > 0 && (
                     <div>
-                      {w.tags.map((t) => (
-                        <TagPill key={t.text} text={t.text} vector={t.vector} />
-                      ))}
+                      {w.tags.map((t) => {
+                        const content = graph ? (
+                          <TagDagTooltip tag={t.text} graph={graph} />
+                        ) : null
+                        return content ? (
+                          <Tooltip key={t.text} content={content}>
+                            <TagPill text={t.text} vector={t.vector} />
+                          </Tooltip>
+                        ) : (
+                          <TagPill key={t.text} text={t.text} vector={t.vector} />
+                        )
+                      })}
                     </div>
                   )}
                 </div>
