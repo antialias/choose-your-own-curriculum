@@ -31,9 +31,11 @@ export function GraphWithTooltips({ graph }: { graph: Graph }) {
     }
   }, [graph])
 
+  const chart = graphToMermaid(graph, { htmlLabels: true })
+
   return (
     <div ref={ref}>
-      <Mermaid chart={graphToMermaid(graph, { htmlLabels: true })} config={{ securityLevel: 'loose' }} />
+      <Mermaid key={chart} chart={chart} config={{ securityLevel: 'loose' }} />
     </div>
   )
 }

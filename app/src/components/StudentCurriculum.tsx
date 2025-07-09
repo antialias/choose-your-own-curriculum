@@ -21,6 +21,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
   const [editing, setEditing] = useState(false)
+  const [coverage, setCoverage] = useState<Record<string, number> | null>(null)
   const { t } = useTranslation()
 
   const load = async () => {
@@ -51,6 +52,15 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     }
   }
 
+  const loadCoverage = async () => {
+    if (!data?.topicDagId) return
+    const res = await fetch(`/api/students/${studentId}/curriculum-coverage`)
+    if (res.ok) {
+      const json = (await res.json()) as { coverage: Record<string, number> }
+      setCoverage(json.coverage)
+    }
+  }
+
   const save = async () => {
     await fetch(`/api/students/${studentId}`, {
       method: 'PUT',
@@ -66,6 +76,11 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     loadDags()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId])
+
+  useEffect(() => {
+    loadCoverage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.topicDagId, studentId])
 
   if (!data) return null
 
@@ -110,7 +125,18 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
         <div style={{ marginTop: '1rem' }}>
-          <GraphWithTooltips graph={data.graph} />
+          <GraphWithTooltips
+            graph={{
+              ...data.graph,
+              nodes: data.graph.nodes.map((n) => ({
+                ...n,
+                label:
+                  coverage && n.id in coverage
+                    ? `${n.label} (${coverage[n.id]}%)`
+                    : n.label,
+              })),
+            }}
+          />
         </div>
       )}
       <div style={{ marginTop: '0.5rem' }}>
