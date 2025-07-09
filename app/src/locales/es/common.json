@@ -56,5 +56,8 @@
   "saveGraph": "Guardar gráfico",
   "saved": "Guardado",
   "cancel": "Cancelar",
-  "change": "Cambiar currículo"
+  "change": "Cambiar currículo",
+  "coverageThreshold": "Umbral de cobertura",
+  "coverageThresholdInfo": "Solo el trabajo por encima de este porcentaje de dominio cuenta para la cobertura.",
+  "currentTopics": "Temas actuales"
 }

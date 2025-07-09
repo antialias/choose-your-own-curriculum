@@ -6,7 +6,13 @@ import type { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
 import { Tooltip } from './Tooltip'
 
-export function GraphWithTooltips({ graph }: { graph: Graph }) {
+export function GraphWithTooltips({
+  graph,
+  styles = {},
+}: {
+  graph: Graph
+  styles?: Record<string, string>
+}) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -31,7 +37,10 @@ export function GraphWithTooltips({ graph }: { graph: Graph }) {
     }
   }, [graph])
 
-  const chart = graphToMermaid(graph, { htmlLabels: true })
+  const styleLines = Object.entries(styles)
+    .map(([id, style]) => `style ${id} ${style}`)
+    .join('\n')
+  const chart = `${graphToMermaid(graph, { htmlLabels: true })}\n${styleLines}`
 
   return (
     <div ref={ref}>

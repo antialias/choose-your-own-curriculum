@@ -13,3 +13,7 @@ the chosen percentage is ignored when computing coverage.
 
 When viewing a student's curriculum the graph displays these percentages after
 each node label so teachers can quickly spot areas that need more practice.
+Nodes with coverage above the threshold appear in gold while their immediate
+successors are highlighted in green as *current* topics. Topics following those
+current nodes show up in red as *future* topics. The current topics are also
+listed below the graph.

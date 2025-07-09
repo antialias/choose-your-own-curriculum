@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from '@/styled-system/css'
 import { Tooltip } from './Tooltip'
@@ -8,17 +8,26 @@ import { InfoIcon } from './InfoIcon'
 export function CoverageThresholdInput({ studentId, initial }: { studentId: string; initial: number }) {
   const { t } = useTranslation()
   const [value, setValue] = useState(String(initial))
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const first = useRef(true)
 
-  const save = async (val: string) => {
-    const num = Number(val) || 0
-    setValue(val)
-    await fetch(`/api/students/${studentId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ coverageMasteryThreshold: num }),
-    })
-    window.dispatchEvent(new Event('coverageThresholdChanged'))
-  }
+  useEffect(() => {
+    if (first.current) {
+      first.current = false
+      return
+    }
+    if (debounce.current) clearTimeout(debounce.current)
+    const val = value
+    debounce.current = setTimeout(async () => {
+      const num = Number(val) || 0
+      await fetch(`/api/students/${studentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverageMasteryThreshold: num }),
+      })
+      window.dispatchEvent(new Event('coverageThresholdChanged'))
+    }, 500)
+  }, [value, studentId])
 
   return (
     <label className={css({ display: 'flex', alignItems: 'center', gap: '1', marginBottom: '1rem' })}>
@@ -34,7 +43,6 @@ export function CoverageThresholdInput({ studentId, initial }: { studentId: stri
         max="100"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onBlur={(e) => save(e.target.value)}
         className={css({ width: '12' })}
       />
     </label>
