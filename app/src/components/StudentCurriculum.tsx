@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Graph } from '@/graphSchema'
 import { GraphWithTooltips } from './GraphWithTooltips'
+import { css } from '@/styled-system/css'
 
 interface Dag {
   id: string
@@ -131,7 +132,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
 
   if (!data.topicDagId || editing) {
     return (
-      <div style={{ marginBottom: '1rem' }}>
+      <div className={css({ marginBottom: '1rem' })}>
         <label>
           {t('curriculum')}
           <select
@@ -146,7 +147,11 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
             ))}
           </select>
         </label>
-        <button onClick={save} disabled={!selected} style={{ marginLeft: '0.5rem' }}>
+        <button
+          onClick={save}
+          disabled={!selected}
+          className={css({ marginLeft: '0.5rem' })}
+        >
           {t('save')}
         </button>
         {data.topicDagId && (
@@ -155,7 +160,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
               setEditing(false)
               setSelected(data.topicDagId || '')
             }}
-            style={{ marginLeft: '0.5rem' }}
+            className={css({ marginLeft: '0.5rem' })}
           >
             {t('cancel')}
           </button>
@@ -165,11 +170,11 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
+    <div className={css({ marginBottom: '1rem' })}>
       <h2>{t('curriculum')}</h2>
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
-        <div style={{ marginTop: '1rem' }}>
+        <div className={css({ marginTop: '1rem' })}>
           <GraphWithTooltips
             graph={{
               ...data.graph,
@@ -186,11 +191,11 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         </div>
       )}
       {currentTopics.length > 0 && (
-        <div style={{ marginTop: '0.5rem' }}>
+        <div className={css({ marginTop: '0.5rem' })}>
           <strong>{t('currentTopics')}:</strong> {currentTopics.join(', ')}
         </div>
       )}
-      <div style={{ marginTop: '0.5rem' }}>
+      <div className={css({ marginTop: '0.5rem' })}>
         <button
           onClick={() => {
             setSelected('')
