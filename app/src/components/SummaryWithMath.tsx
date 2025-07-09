@@ -1,33 +1,24 @@
 
-import { InlineMath, BlockMath } from 'react-katex'
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { InlineMath, BlockMath } from "react-katex";
 
 export function SummaryWithMath({ text }: { text: string }) {
-  const parts = text.split(
-    /(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g
-  )
   return (
-    <span>
-      {parts.map((part, i) => {
-        if (part.startsWith('$$') && part.endsWith('$$')) {
-          return <BlockMath key={i}>{part.slice(2, -2)}</BlockMath>
-        }
-        if (part.startsWith('\\[') && part.endsWith('\\]')) {
-          return <BlockMath key={i}>{part.slice(2, -2)}</BlockMath>
-        }
-        if (part.startsWith('$') && part.endsWith('$')) {
-          return <InlineMath key={i}>{part.slice(1, -1)}</InlineMath>
-        }
-        if (part.startsWith('\\(') && part.endsWith('\\)')) {
-          return <InlineMath key={i}>{part.slice(2, -2)}</InlineMath>
-        }
-        const lines = part.split('\n')
-        return lines.map((line, j) => (
-          <span key={`${i}-${j}`}> 
-            {line}
-            {j < lines.length - 1 && <br />} 
-          </span>
-        ))
-      })}
-    </span>
-  )
+    <ReactMarkdown
+      remarkPlugins={[remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+      components={{
+        math: ({ value }: { value: string }) => (
+          <BlockMath>{value}</BlockMath>
+        ),
+        inlineMath: ({ value }: { value: string }) => (
+          <InlineMath>{value}</InlineMath>
+        ),
+      } as never}
+    >
+      {text}
+    </ReactMarkdown>
+  );
 }

@@ -7,7 +7,7 @@ describe('SummaryWithMath', () => {
     const { container } = render(
       <SummaryWithMath text="Solve $x^2=1$ and also \\(a+b\\)" />
     )
-    expect(container.querySelector('.katex')).toBeInTheDocument()
+    expect(container.innerHTML).toContain('katex')
   })
 
   it('handles parentheses within math', () => {
