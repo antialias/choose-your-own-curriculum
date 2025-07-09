@@ -151,9 +151,11 @@ export async function GET(req: NextRequest) {
         const textRow = tagStmt.get(r.id) as { text: string } | undefined;
         const vector = getTagVector(r.id) || [];
         if (!textRow) return undefined;
-        return { text: textRow.text, vector };
+        return { text: textRow.text, vector, score: r.score };
       })
-      .filter((t): t is { text: string; vector: number[] } => Boolean(t));
+      .filter(
+        (t): t is { text: string; vector: number[]; score: number } => Boolean(t)
+      );
     return { ...w, tags, hasThumbnail: !!w.thumbnail };
   });
   if (studentId) {

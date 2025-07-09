@@ -100,8 +100,11 @@ export function getWorkVector(workId: string): number[] | null {
 
 export function searchTagsForWork(workId: string, k: number) {
   const vector = getWorkVector(workId);
-  if (!vector) return [] as { id: string; distance: number }[];
-  return searchTagEmbeddings(vector, k);
+  if (!vector) return [] as { id: string; distance: number; score: number }[];
+  return searchTagEmbeddings(vector, k).map((r) => ({
+    ...r,
+    score: 1 / (1 + r.distance),
+  }));
 }
 
 export function getTagVector(tagId: string): number[] | null {
