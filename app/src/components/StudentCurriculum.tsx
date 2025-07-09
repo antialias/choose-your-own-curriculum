@@ -21,6 +21,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [data, setData] = useState<StudentData | null>(null)
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
+  const [editing, setEditing] = useState(false)
   const { t } = useTranslation()
 
   const load = async () => {
@@ -57,6 +58,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topicDagId: selected }),
     })
+    setEditing(false)
     load()
   }
 
@@ -68,7 +70,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
 
   if (!data) return null
 
-  if (!data.topicDagId) {
+  if (!data.topicDagId || editing) {
     return (
       <div style={{ marginBottom: '1rem' }}>
         <label>
@@ -88,6 +90,17 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         <button onClick={save} disabled={!selected} style={{ marginLeft: '0.5rem' }}>
           {t('save')}
         </button>
+        {data.topicDagId && (
+          <button
+            onClick={() => {
+              setEditing(false)
+              setSelected(data.topicDagId || '')
+            }}
+            style={{ marginLeft: '0.5rem' }}
+          >
+            {t('cancel')}
+          </button>
+        )}
       </div>
     )
   }
@@ -101,6 +114,16 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
           <Mermaid chart={graphToMermaid(data.graph)} />
         </div>
       )}
+      <div style={{ marginTop: '0.5rem' }}>
+        <button
+          onClick={() => {
+            setSelected('')
+            setEditing(true)
+          }}
+        >
+          {t('change')}
+        </button>
+      </div>
     </div>
   )
 }

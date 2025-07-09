@@ -50,5 +50,7 @@
   "generatingGraph": "Generating graph...",
   "failedGenerateGraph": "Failed to generate graph: {{error}}. Please try again later.",
   "saveGraph": "Save Graph",
-  "saved": "Saved"
+  "saved": "Saved",
+  "cancel": "Cancel",
+  "change": "Change curriculum"
 }

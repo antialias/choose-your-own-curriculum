@@ -50,5 +50,7 @@
   "generatingGraph": "Generando gráfico...",
   "failedGenerateGraph": "Error al generar el gráfico: {{error}}. Inténtalo de nuevo más tarde.",
   "saveGraph": "Guardar gráfico",
-  "saved": "Guardado"
+  "saved": "Guardado",
+  "cancel": "Cancelar",
+  "change": "Cambiar currículo"
 }
