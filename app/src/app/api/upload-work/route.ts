@@ -14,6 +14,8 @@ import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import { LLMClient } from '@/llm/client';
+import { z } from 'zod';
 import sharp from 'sharp';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
@@ -51,6 +53,7 @@ export async function POST(req: NextRequest) {
   let buffer: Buffer | null = null;
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
+  const llm = new LLMClient(process.env.OPENAI_API_KEY || '');
   const isImage = file instanceof File && file.type.startsWith('image/');
   if (file instanceof File) {
     buffer = Buffer.from(await file.arrayBuffer());
@@ -67,36 +70,46 @@ export async function POST(req: NextRequest) {
   }
 
   let summary = '';
+  const summarySchema = z.object({
+    summary: z.string(),
+    grade: z.string().optional().nullable(),
+    studentName: z.string().optional().nullable(),
+    dateOfWork: z.string().optional().nullable(),
+    masteryPercent: z.number().min(0).max(100).optional().nullable(),
+    feedback: z.string().optional().nullable(),
+  });
 
-  if (file instanceof File) {
-    if (isImage && buffer) {
+  const parts: OpenAI.Chat.ChatCompletionContentPart[] = [];
+  if (fields.note) {
+    parts.push({ type: 'text', text: fields.note });
+  }
+  if (file instanceof File && buffer) {
+    if (isImage) {
       const base64 = buffer.toString('base64');
-      try {
-        const chat = await openai.chat.completions.create({
-          model: 'gpt-4o',
-          messages: [
-            { role: 'user', content: [{ type: 'text', text: 'Summarize this work' }, { type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } }] },
-          ],
-        });
-        summary = chat.choices[0].message.content || '';
-      } catch (err) {
-        console.error('summary error', err);
-      }
-    } else if (buffer) {
+      parts.push({ type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } });
+    } else {
       const text = buffer.toString('utf-8');
-      try {
-        const chat = await openai.chat.completions.create({
-          model: 'gpt-4o',
-          messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
-        });
-        summary = chat.choices[0].message.content || '';
-      } catch (err) {
-        console.error('summary error', err);
+      parts.push({ type: 'text', text });
+    }
+  }
+  try {
+    if (parts.length) {
+      const res = await llm.chatMessages(
+        [{ role: 'user', content: parts }],
+        {
+          systemPrompt: 'You are an expert teacher analyzing student work.',
+          schema: summarySchema,
+          params: { model: 'gpt-4o' },
+        }
+      );
+      if (!res.error && res.response) {
+        summary = res.response.summary;
       }
     }
-  } else if (fields.note) {
-    summary = fields.note;
+  } catch (err) {
+    console.error('summary error', err);
   }
+  if (!summary && fields.note) summary = fields.note;
   const workId = crypto.randomUUID();
   let vector: number[] = [];
   try {

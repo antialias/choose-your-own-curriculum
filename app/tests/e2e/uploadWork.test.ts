@@ -6,8 +6,15 @@ import { getServerSession } from 'next-auth';
 vi.mock('next-auth', () => ({ getServerSession: vi.fn() }));
 vi.mock('openai', () => ({
   default: vi.fn().mockImplementation(() => ({
-    chat: { completions: { create: vi.fn().mockResolvedValue({ choices: [{ message: { content: 'sum' } }] }) } },
     embeddings: { create: vi.fn().mockResolvedValue({ data: [] }) }
+  }))
+}));
+vi.mock('@/llm/client', () => ({
+  LLMClient: vi.fn().mockImplementation(() => ({
+    chatMessages: vi.fn(async () => ({
+      error: null,
+      response: { summary: 'sum' }
+    }))
   }))
 }));
 vi.mock('@/authOptions', () => ({ authOptions: {} }));
