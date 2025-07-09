@@ -67,20 +67,31 @@ export async function PUT(
   if (link.length === 0) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
-  const updateSchema = studentFieldsSchema.extend({
-    topicDagId: z.string().nullable().optional(),
-  })
+  const updateSchema = studentFieldsSchema
+    .partial()
+    .extend({ topicDagId: z.string().nullable().optional() })
   const data = updateSchema.parse(await req.json())
   const { name, email, topicDagId } = data
-  let accountUserId: string | null = null
-  if (email) {
-    const [u] = await db.select().from(users).where(eq(users.email, email))
-    if (u) accountUserId = u.id
+  const studentValues: {
+    name?: string
+    email?: string | null
+    accountUserId?: string | null
+  } = {}
+  if (name !== undefined) {
+    studentValues.name = name
   }
-  await db
-    .update(students)
-    .set({ name, email: email || null, accountUserId })
-    .where(eq(students.id, id))
+  if (email !== undefined) {
+    studentValues.email = email || null
+    const [u] = await db.select().from(users).where(eq(users.email, email))
+    if (u) {
+      studentValues.accountUserId = u.id
+    } else {
+      studentValues.accountUserId = null
+    }
+  }
+  if (Object.keys(studentValues).length > 0) {
+    await db.update(students).set(studentValues).where(eq(students.id, id))
+  }
   if (topicDagId !== undefined) {
     await db
       .update(teacherStudents)
