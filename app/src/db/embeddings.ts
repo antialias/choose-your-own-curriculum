@@ -28,6 +28,10 @@ const insertStmt = safePrepare(
   'INSERT INTO uploaded_work_index(work_id, vector) VALUES (?, json(?))'
 );
 
+export function deleteWorkEmbeddings(id: string) {
+  deleteStmt.run(id);
+}
+
 const tx = sqlite.transaction((batch: WorkEmbedding[]) => {
   for (const row of batch) {
     deleteStmt.run(row.workId);

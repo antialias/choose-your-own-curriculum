@@ -65,4 +65,7 @@
   "coverageThreshold": "Coverage Threshold",
   "coverageThresholdInfo": "Only work above this mastery percentage counts toward coverage.",
   "currentTopics": "Current Topics"
+  ,"actions": "Actions"
+  ,"delete": "Delete"
+  ,"reEvaluate": "Re-evaluate"
 }

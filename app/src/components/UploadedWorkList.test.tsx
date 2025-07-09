@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { UploadedWorkList } from './UploadedWorkList'
 import QueryProvider from './QueryProvider'
 import type { Mock } from 'vitest'
@@ -87,6 +87,31 @@ describe('UploadedWorkList', () => {
     )
     const placeholder = await screen.findByTestId('thumbnail-placeholder')
     expect(placeholder).toHaveTextContent('PDF')
+  })
+
+  it('handles actions', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ students: [] }) })
+    mockGet([
+      {
+        id: '3',
+        studentId: 's1',
+        summary: 'sum3',
+        dateUploaded: new Date().toISOString(),
+        dateCompleted: null,
+        tags: [],
+        hasThumbnail: false,
+        originalMimeType: null,
+      },
+    ])
+    render(
+      <QueryProvider>
+        <UploadedWorkList />
+      </QueryProvider>
+    )
+    const select = await screen.findByTestId('action-3')
+    await fireEvent.change(select, { target: { value: 'delete' } })
+    expect(mockFetch).toHaveBeenCalledWith('/api/upload-work/3', { method: 'DELETE' })
   })
 
 })
