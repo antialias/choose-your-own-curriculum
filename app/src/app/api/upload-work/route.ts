@@ -57,6 +57,8 @@ export async function POST(req: NextRequest) {
   uploadWorkServerSchema.parse({ ...fields, file: file instanceof File ? file : undefined });
   let buffer: Buffer | null = null;
   let thumbnail: Buffer | null = null;
+  let pdfImage: Buffer | null = null;
+  let pdfText = '';
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const llm = new LLMClient(process.env.OPENAI_API_KEY || '');
   const isImage = file instanceof File && file.type.startsWith('image/');
@@ -81,7 +83,10 @@ export async function POST(req: NextRequest) {
     try {
       await fs.writeFile(pdfPath, buffer);
       await execFileP('pdftoppm', ['-png', '-singlefile', '-f', '1', '-l', '1', pdfPath, tmpBase]);
-      const png = await fs.readFile(imgPath);
+      pdfImage = await fs.readFile(imgPath);
+      const { stdout } = await execFileP('pdftotext', ['-q', pdfPath, '-']);
+      pdfText = stdout;
+      const png = pdfImage;
       const svg = `<svg width="144" height="144"><rect width="100%" height="100%" fill="rgba(0,0,0,0.3)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="bold" fill="white">PDF</text></svg>`;
       thumbnail = await sharp(png)
         .resize({ width: 144, height: 144, fit: 'contain', background: 'white' })
@@ -116,9 +121,16 @@ export async function POST(req: NextRequest) {
     parts.push({ type: 'text', text: fields.note });
   }
   if (file instanceof File && buffer) {
-    if (isImage || isPdf) {
+    if (isImage) {
       const base64 = buffer.toString('base64');
       parts.push({ type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } });
+    } else if (isPdf) {
+      if (pdfImage) {
+        parts.push({ type: 'image_url', image_url: { url: `data:image/png;base64,${pdfImage.toString('base64')}` } });
+      }
+      if (pdfText) {
+        parts.push({ type: 'text', text: pdfText });
+      }
     } else {
       const text = buffer.toString('utf-8');
       parts.push({ type: 'text', text });
