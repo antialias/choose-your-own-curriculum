@@ -15,7 +15,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import { promises as fs } from 'node:fs';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
+
+const execFileP = promisify(execFile);
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -52,6 +57,7 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file instanceof File && file.type.startsWith('image/');
+  const isPdf = file instanceof File && file.type === 'application/pdf';
   if (file instanceof File) {
     buffer = Buffer.from(await file.arrayBuffer());
   }
@@ -63,6 +69,26 @@ export async function POST(req: NextRequest) {
         .toBuffer();
     } catch (err) {
       console.error('thumbnail error', err);
+    }
+  } else if (isPdf && buffer) {
+    const tmpBase = `/tmp/${crypto.randomUUID()}`;
+    const pdfPath = `${tmpBase}.pdf`;
+    const imgPath = `${tmpBase}.png`;
+    try {
+      await fs.writeFile(pdfPath, buffer);
+      await execFileP('pdftoppm', ['-png', '-singlefile', '-f', '1', '-l', '1', pdfPath, tmpBase]);
+      const png = await fs.readFile(imgPath);
+      const svg = `<svg width="144" height="144"><rect width="100%" height="100%" fill="rgba(0,0,0,0.3)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="bold" fill="white">PDF</text></svg>`;
+      thumbnail = await sharp(png)
+        .resize({ width: 144, height: 144, fit: 'inside' })
+        .composite([{ input: Buffer.from(svg) }])
+        .png()
+        .toBuffer();
+    } catch (err) {
+      console.error('pdf thumbnail error', err);
+    } finally {
+      try { await fs.unlink(pdfPath); } catch {}
+      try { await fs.unlink(imgPath); } catch {}
     }
   }
 
@@ -81,6 +107,21 @@ export async function POST(req: NextRequest) {
         summary = chat.choices[0].message.content || '';
       } catch (err) {
         console.error('summary error', err);
+      }
+    } else if (isPdf && buffer) {
+      const tmpPdf = `/tmp/${crypto.randomUUID()}.pdf`;
+      try {
+        await fs.writeFile(tmpPdf, buffer);
+        const { stdout } = await execFileP('pdftotext', ['-q', tmpPdf, '-']);
+        const chat = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: `Summarize this work: ${stdout}` }],
+        });
+        summary = chat.choices[0].message.content || '';
+      } catch (err) {
+        console.error('summary error', err);
+      } finally {
+        try { await fs.unlink(tmpPdf); } catch {}
       }
     } else if (buffer) {
       const text = buffer.toString('utf-8');
