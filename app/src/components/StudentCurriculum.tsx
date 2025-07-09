@@ -66,6 +66,20 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId])
 
+  useEffect(() => {
+    if (!data?.graph) return
+    for (const node of data.graph.nodes) {
+      const el =
+        document.getElementById(node.id) ||
+        document.getElementById(`flowchart-${node.id}`)
+      if (el && !el.querySelector('title')) {
+        const title = document.createElement('title')
+        title.textContent = node.tags.join(', ')
+        el.appendChild(title)
+      }
+    }
+  }, [data?.graph])
+
   if (!data) return null
 
   if (!data.topicDagId) {

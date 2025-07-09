@@ -44,6 +44,21 @@ export function TopicDAGList() {
     }
   }, [])
 
+  useEffect(() => {
+    const dag = dags.find((d) => d.id === expanded)
+    if (!dag) return
+    for (const node of dag.graph.nodes) {
+      const el =
+        document.getElementById(node.id) ||
+        document.getElementById(`flowchart-${node.id}`)
+      if (el && !el.querySelector('title')) {
+        const title = document.createElement('title')
+        title.textContent = node.tags.join(', ')
+        el.appendChild(title)
+      }
+    }
+  }, [expanded, dags])
+
   return (
     <ul>
       {dags.map((d) => (
