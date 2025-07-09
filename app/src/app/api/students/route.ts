@@ -43,6 +43,6 @@ export async function POST(req: NextRequest) {
     .returning({ id: students.id })
   await db
     .insert(teacherStudents)
-    .values({ teacherId, studentId: id })
+    .values({ teacherId, studentId: id, coverageMasteryThreshold: 0 })
   return NextResponse.json({ id })
 }

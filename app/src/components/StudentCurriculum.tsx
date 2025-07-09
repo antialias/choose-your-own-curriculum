@@ -14,6 +14,7 @@ interface StudentData {
   topicDagId: string | null
   topics: string[]
   graph: Graph | null
+  threshold: number
 }
 
 export function StudentCurriculum({ studentId }: { studentId: string }) {
@@ -22,6 +23,8 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [selected, setSelected] = useState('')
   const [editing, setEditing] = useState(false)
   const [coverage, setCoverage] = useState<Record<string, number> | null>(null)
+  const [styles, setStyles] = useState<Record<string, string>>({})
+  const [currentTopics, setCurrentTopics] = useState<string[]>([])
   const { t } = useTranslation()
 
   const load = async () => {
@@ -32,6 +35,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
           topicDagId: string | null
           topics: string[] | null
           graph: Graph | null
+          coverageMasteryThreshold: number
         }
       }
       const s = json.student
@@ -39,6 +43,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         topicDagId: s.topicDagId,
         topics: s.topics || [],
         graph: s.graph,
+        threshold: s.coverageMasteryThreshold ?? 0,
       })
       setSelected(s.topicDagId || '')
     }
@@ -61,6 +66,16 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     }
   }
 
+  useEffect(() => {
+    const handler = () => {
+      loadCoverage()
+      load()
+    }
+    window.addEventListener('coverageThresholdChanged', handler)
+    return () => window.removeEventListener('coverageThresholdChanged', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const save = async () => {
     await fetch(`/api/students/${studentId}`, {
       method: 'PUT',
@@ -76,6 +91,36 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     loadDags()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId])
+
+  useEffect(() => {
+    if (!data?.graph || !coverage) return
+    const threshold = data.threshold
+    const mastered = new Set(
+      data.graph.nodes
+        .filter((n) => (coverage[n.id] ?? 0) >= threshold)
+        .map((n) => n.id),
+    )
+    const current = new Set<string>()
+    for (const [from, to] of data.graph.edges) {
+      if (mastered.has(from) && !mastered.has(to)) current.add(to)
+    }
+    const future = new Set<string>()
+    for (const [from, to] of data.graph.edges) {
+      if (current.has(from) && !mastered.has(to) && !current.has(to)) {
+        future.add(to)
+      }
+    }
+    const styleMap: Record<string, string> = {}
+    mastered.forEach((id) => (styleMap[id] = 'fill:#ffd700,color:#000'))
+    current.forEach((id) => (styleMap[id] = 'fill:#38a169,color:#fff'))
+    future.forEach((id) => (styleMap[id] = 'fill:#e53e3e,color:#fff'))
+    setStyles(styleMap)
+    setCurrentTopics(
+      Array.from(current).map(
+        (id) => data.graph!.nodes.find((n) => n.id === id)?.label || id,
+      ),
+    )
+  }, [coverage, data?.graph, data?.threshold])
 
   useEffect(() => {
     loadCoverage()
@@ -136,7 +181,13 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
                     : n.label,
               })),
             }}
+            styles={styles}
           />
+        </div>
+      )}
+      {currentTopics.length > 0 && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <strong>{t('currentTopics')}:</strong> {currentTopics.join(', ')}
         </div>
       )}
       <div style={{ marginTop: '0.5rem' }}>

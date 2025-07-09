@@ -16,5 +16,6 @@ export const Default = {
       ],
       edges: [['a', 'b']],
     },
+    styles: { a: 'fill:#ffd700,color:#000' },
   },
 }

@@ -61,5 +61,8 @@
   "masteryPercent": "Mastery",
   "studentName": "Student Name",
   "dateOfWork": "Date of Work",
-  "feedback": "Feedback"
+  "feedback": "Feedback",
+  "coverageThreshold": "Coverage Threshold",
+  "coverageThresholdInfo": "Only work above this mastery percentage counts toward coverage.",
+  "currentTopics": "Current Topics"
 }

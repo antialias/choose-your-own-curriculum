@@ -56,5 +56,8 @@
   "saveGraph": "Enregistrer le graphique",
   "saved": "Enregistré",
   "cancel": "Annuler",
-  "change": "Modifier le curriculum"
+  "change": "Modifier le curriculum",
+  "coverageThreshold": "Seuil de couverture",
+  "coverageThresholdInfo": "Seul le travail dépassant ce pourcentage de maîtrise est pris en compte dans la couverture.",
+  "currentTopics": "Sujets actuels"
 }

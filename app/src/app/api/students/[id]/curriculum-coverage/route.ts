@@ -19,7 +19,11 @@ export async function GET(
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const [row] = await db
-    .select({ topicDagId: teacherStudents.topicDagId, graph: topicDags.graph })
+    .select({
+      topicDagId: teacherStudents.topicDagId,
+      graph: topicDags.graph,
+      threshold: teacherStudents.coverageMasteryThreshold,
+    })
     .from(teacherStudents)
     .leftJoin(topicDags, eq(topicDags.id, teacherStudents.topicDagId))
     .where(and(eq(teacherStudents.teacherId, teacherId), eq(teacherStudents.studentId, id)));
@@ -29,6 +33,6 @@ export async function GET(
   }
 
   const graph = JSON.parse(row.graph);
-  const coverage = await calculateCoverage(id, graph);
+  const coverage = await calculateCoverage(id, graph, row.threshold);
   return NextResponse.json({ coverage });
 }
