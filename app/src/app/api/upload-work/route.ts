@@ -25,9 +25,11 @@ export async function POST(req: NextRequest) {
   }
   const form = await req.formData();
   const file = form.get('file');
+  const note = form.get('note');
   const fields = uploadWorkFieldsSchema.parse({
     studentId: form.get('studentId'),
     dateCompleted: form.get('dateCompleted'),
+    note: typeof note === 'string' ? note : undefined,
   });
   const { studentId, dateCompleted } = fields;
   const link = await db
@@ -42,15 +44,18 @@ export async function POST(req: NextRequest) {
   if (link.length === 0) {
     return NextResponse.json({ error: 'invalid student' }, { status: 400 });
   }
-  if (!(file instanceof File)) {
+  if (!(file instanceof File) && !fields.note) {
     return NextResponse.json({ error: 'file required' }, { status: 400 });
   }
-  uploadWorkServerSchema.parse({ ...fields, file });
-  const buffer = Buffer.from(await file.arrayBuffer());
+  uploadWorkServerSchema.parse({ ...fields, file: file instanceof File ? file : undefined });
+  let buffer: Buffer | null = null;
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
-  const isImage = file.type.startsWith('image/');
-  if (isImage) {
+  const isImage = file instanceof File && file.type.startsWith('image/');
+  if (file instanceof File) {
+    buffer = Buffer.from(await file.arrayBuffer());
+  }
+  if (isImage && buffer) {
     try {
       thumbnail = await sharp(buffer)
         .resize({ width: 144, height: 144, fit: 'inside' })
@@ -63,39 +68,34 @@ export async function POST(req: NextRequest) {
 
   let summary = '';
 
-  if (isImage) {
-    const base64 = buffer.toString('base64');
-    try {
-      const chat = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: 'Summarize this work' },
-              {
-                type: 'image_url',
-                image_url: { url: `data:${file.type};base64,${base64}` },
-              },
-            ],
-          },
-        ],
-      });
-      summary = chat.choices[0].message.content || '';
-    } catch (err) {
-      console.error('summary error', err);
+  if (file instanceof File) {
+    if (isImage && buffer) {
+      const base64 = buffer.toString('base64');
+      try {
+        const chat = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            { role: 'user', content: [{ type: 'text', text: 'Summarize this work' }, { type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } }] },
+          ],
+        });
+        summary = chat.choices[0].message.content || '';
+      } catch (err) {
+        console.error('summary error', err);
+      }
+    } else if (buffer) {
+      const text = buffer.toString('utf-8');
+      try {
+        const chat = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
+        });
+        summary = chat.choices[0].message.content || '';
+      } catch (err) {
+        console.error('summary error', err);
+      }
     }
-  } else {
-    const text = buffer.toString('utf-8');
-    try {
-      const chat = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
-      });
-      summary = chat.choices[0].message.content || '';
-    } catch (err) {
-      console.error('summary error', err);
-    }
+  } else if (fields.note) {
+    summary = fields.note;
   }
   const workId = crypto.randomUUID();
   let vector: number[] = [];
@@ -115,9 +115,10 @@ export async function POST(req: NextRequest) {
     dateUploaded: new Date(),
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
+    note: fields.note || null,
     originalDocument: buffer,
-    originalFilename: file.name,
-    originalMimeType: file.type,
+    originalFilename: file instanceof File ? file.name : null,
+    originalMimeType: file instanceof File ? file.type : null,
     thumbnail,
     thumbnailMimeType: thumbnail ? 'image/png' : null,
   } as typeof uploadedWork.$inferInsert);

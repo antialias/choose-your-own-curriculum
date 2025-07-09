@@ -15,6 +15,7 @@ vi.mock('@/db', () => {
   const where = vi
     .fn()
     .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
+    .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
     .mockResolvedValue([]);
   const from = vi.fn(() => ({ where }));
   const select = vi.fn(() => ({ from }));
@@ -44,6 +45,16 @@ describe('upload-work API', () => {
     form.set('file', new File(['hello'], 'hello.txt'));
     form.set('studentId', '1');
     form.set('dateCompleted', '2024-01-01');
+    const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
+    const res = await uploadWork(req);
+    expect(res.status).toBe(200);
+  });
+
+  it('accepts note without file', async () => {
+    (getServerSession as unknown as Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const form = new FormData();
+    form.set('note', 'hello note');
+    form.set('studentId', '1');
     const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
     const res = await uploadWork(req);
     expect(res.status).toBe(200);
