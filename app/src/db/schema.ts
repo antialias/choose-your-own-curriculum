@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey, blob } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, primaryKey, blob, real } from 'drizzle-orm/sqlite-core';
 import crypto from 'node:crypto';
 
 export const users = sqliteTable('user', {
@@ -108,6 +108,11 @@ export const uploadedWork = sqliteTable('uploaded_work', {
     .$defaultFn(() => new Date()),
   dateCompleted: integer('dateCompleted', { mode: 'timestamp_ms' }),
   summary: text('summary'),
+  grade: text('grade'),
+  extractedStudentName: text('extractedStudentName'),
+  extractedDateOfWork: text('extractedDateOfWork'),
+  masteryPercent: real('masteryPercent'),
+  feedback: text('feedback'),
   note: text('note'),
   embeddings: text('embeddings'),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),

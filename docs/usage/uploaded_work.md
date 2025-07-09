@@ -1,8 +1,9 @@
 # Uploaded Work
 
-Authenticated users can upload documents or write free text notes from the **Uploaded Work** page. The server stores the original file when provided, an LLM-generated summary (or the note text) and timestamps for when the work was completed and uploaded. Embedding vectors are generated with the `multimodal-embedding-3-small` model and indexed using **sqlite-vec** for fast similarity search.
+Authenticated users can upload documents or write free text notes from the **Uploaded Work** page. The server stores the original file when provided and asks the LLM to summarize the work. The response may also include an optional grade, extracted student name and date, an estimated percentage of topic mastery and short feedback. Embedding vectors are generated with the `multimodal-embedding-3-small` model and indexed using **sqlite-vec** for fast similarity search.
 
 Each upload appears in the list with its summary for easy review. New uploads show a temporary `Processing...` placeholder while the summary is generated. Any errors are shown next to the list.
+If available, the grade, extracted student name and date, mastery percentage and feedback also display under each summary.
 
 Image uploads generate a thumbnail shown to the left of the summary. PDF uploads are treated the same way—the first page is rasterized and "PDF" is overlaid on top. Thumbnails are sized to at most 1.5 inches on each side while preserving aspect ratio.
 

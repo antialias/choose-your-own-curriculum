@@ -160,4 +160,94 @@ export class LLMClient {
     }
     return { error: lastError, response: null };
   }
+
+  /**
+   * Send pre-built chat messages and validate the model's response.
+   *
+   * @param messages - The chat messages to send, excluding the system prompt.
+   * @param options - Options describing the schema and prompt details.
+   * @returns The parsed response or an error.
+   */
+  async chatMessages<T>(
+    messages: OpenAI.Chat.ChatCompletionMessageParam[],
+    options: LLMOptions<T>
+  ): Promise<LLMResponse<T>> {
+    const { schema, systemPrompt, templateVars = {}, maxRetries = 3, params } = options;
+    const jsonSchema = JSON.stringify(zodToJsonSchema(schema), null, 2);
+    const interpolatedSystem = this.interpolate(systemPrompt, templateVars);
+    const systemTemplate = `${interpolatedSystem}\nRespond ONLY with JSON that matches this schema:\n${jsonSchema}`;
+
+    let lastError: LLMError | null = null;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      console.log(`Sending chat prompt (attempt ${attempt + 1})`);
+      const allMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+        { role: 'system', content: systemTemplate },
+        ...messages,
+      ];
+      if (lastError && lastError.type === 'validation_error') {
+        allMessages.push({
+          role: 'system',
+          content: `Retry #${attempt + 1} because previous response failed validation: ${lastError.message}`,
+        });
+      }
+      try {
+        const paramsWithModel = {
+          ...(params ?? {}),
+          model: params?.model ?? DEFAULT_MODEL,
+        } as Omit<OpenAI.Chat.ChatCompletionCreateParams, 'messages'>;
+        const result = await this.openai.chat.completions.create({
+          ...paramsWithModel,
+          stream: false,
+          messages: allMessages,
+        });
+        const completion = result as OpenAI.Chat.ChatCompletion;
+        const raw = completion.choices[0]?.message?.content ?? '';
+        const content = raw.trim();
+        try {
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(content);
+          } catch (err) {
+            const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            if (match) {
+              parsed = JSON.parse(match[1]);
+            } else {
+              throw err;
+            }
+          }
+          const data = schema.parse(parsed);
+          return { error: null, response: data };
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            console.error('Invalid JSON returned from LLM', e);
+            lastError = {
+              type: 'validation_error',
+              message: `Invalid JSON: ${e.message}`,
+            };
+          } else if (e instanceof ZodError) {
+            console.error('LLM response failed schema validation', e);
+            lastError = {
+              type: 'validation_error',
+              message: e.errors.map(err => err.message).join(', '),
+            };
+          } else {
+            lastError = { type: 'validation_error', message: 'Unknown validation error' };
+          }
+        }
+      } catch (err: unknown) {
+        const message =
+          typeof err === 'object' && err && 'message' in err
+            ? String((err as { message?: unknown }).message)
+            : 'Unknown OpenAI error';
+        console.error('OpenAI request failed', err);
+        lastError = {
+          type: 'openai_error',
+          message,
+        };
+        break;
+      }
+    }
+    return { error: lastError, response: null };
+  }
 }

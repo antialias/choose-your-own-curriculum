@@ -56,4 +56,14 @@ describe('LLMClient', () => {
     expect(result.response).toBeNull();
     expect(mockCreate).toHaveBeenCalledTimes(1);
   });
+
+  test('chatMessages uses provided messages', async () => {
+    const schema = z.object({ msg: z.string() });
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: '{"msg":"ok"}' } }] });
+    const client = new LLMClient('key');
+    const result = await client.chatMessages([{ role: 'user', content: 'hi' }], { schema, systemPrompt: 'sys' });
+    expect(result.error).toBeNull();
+    expect(result.response).toEqual({ msg: 'ok' });
+    expect(mockCreate).toHaveBeenCalled();
+  });
 });
