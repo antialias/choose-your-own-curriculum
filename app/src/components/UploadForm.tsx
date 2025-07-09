@@ -36,7 +36,10 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
   const onSubmit = async (data: UploadWorkClient) => {
     onUploadStart?.()
     const formData = new FormData()
-    formData.append('file', data.file[0])
+    if (data.file && data.file.length > 0) {
+      formData.append('file', data.file[0])
+    }
+    if (data.note) formData.append('note', data.note)
     if (data.dateCompleted) {
       formData.append('dateCompleted', data.dateCompleted.toISOString())
     }
@@ -57,6 +60,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
       className={css({ display: 'flex', flexDir: 'column', gap: '2', padding: '4' })}
     >
       <input type="file" data-testid="file" {...register('file')} />
+      <textarea placeholder={t('note')} {...register('note')} />
       {errors.file && <span>{errors.file.message}</span>}
       <input type="date" {...register('dateCompleted')} />
       <select {...register('studentId')} defaultValue="">

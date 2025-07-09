@@ -24,6 +24,7 @@
   "save": "Guardar",
   "name": "Nombre",
   "email": "Correo electrónico",
+  "note": "Nota",
   "add": "Agregar",
   "student": "Estudiante",
   "groupBy": "Agrupar por",
