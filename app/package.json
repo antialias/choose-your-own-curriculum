@@ -36,18 +36,18 @@
     "next-auth": "^4.24.11",
     "nodemailer": "^7.0.4",
     "openai": "^5.8.2",
+    "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.50.0",
     "react-i18next": "^15.6.0",
     "react-katex": "^3.1.0",
     "react-mermaid2": "^0.1.4",
+    "sharp": "^0.34.2",
     "sqlite-vec": "0.1.7-alpha.2",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",
     "zod-to-json-schema": "^3.24.6"
-    ,
-    "sharp": "^0.34.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",
@@ -66,6 +66,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-katex": "^3.0.4",

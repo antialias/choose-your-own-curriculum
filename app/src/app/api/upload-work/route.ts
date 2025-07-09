@@ -15,6 +15,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -50,6 +51,7 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
+  const isPdf = file.type === 'application/pdf';
   if (isImage) {
     try {
       thumbnail = await sharp(buffer)
@@ -86,7 +88,16 @@ export async function POST(req: NextRequest) {
       console.error('summary error', err);
     }
   } else {
-    const text = buffer.toString('utf-8');
+    let text = '';
+    if (isPdf) {
+      try {
+        text = (await pdfParse(buffer)).text;
+      } catch (err) {
+        console.error('pdf parse error', err);
+      }
+    } else {
+      text = buffer.toString('utf-8');
+    }
     try {
       const chat = await openai.chat.completions.create({
         model: 'gpt-4o',

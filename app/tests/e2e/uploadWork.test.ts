@@ -10,12 +10,10 @@ vi.mock('openai', () => ({
     embeddings: { create: vi.fn().mockResolvedValue({ data: [] }) }
   }))
 }));
+vi.mock('pdf-parse', () => ({ default: vi.fn().mockResolvedValue({ text: 'pdf' }) }));
 vi.mock('@/authOptions', () => ({ authOptions: {} }));
 vi.mock('@/db', () => {
-  const where = vi
-    .fn()
-    .mockResolvedValueOnce([{ teacherId: 'u1', studentId: '1' }])
-    .mockResolvedValue([]);
+  const where = vi.fn().mockResolvedValue([{ teacherId: 'u1', studentId: '1' }]);
   const from = vi.fn(() => ({ where }));
   const select = vi.fn(() => ({ from }));
   const insert = vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) }));
@@ -44,6 +42,16 @@ describe('upload-work API', () => {
     form.set('file', new File(['hello'], 'hello.txt'));
     form.set('studentId', '1');
     form.set('dateCompleted', '2024-01-01');
+    const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
+    const res = await uploadWork(req);
+    expect(res.status).toBe(200);
+  });
+
+  it('accepts pdf files', async () => {
+    (getServerSession as unknown as Mock).mockResolvedValue({ user: { id: 'u1' } });
+    const form = new FormData();
+    form.set('file', new File(['%PDF-1.4'], 'work.pdf', { type: 'application/pdf' }));
+    form.set('studentId', '1');
     const req = new NextRequest(new Request('http://localhost/api/upload-work', { method: 'POST', body: form }));
     const res = await uploadWork(req);
     expect(res.status).toBe(200);
