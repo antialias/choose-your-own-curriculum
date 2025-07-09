@@ -7,6 +7,7 @@ import { getDb } from '@/db'
 import { teacherStudents } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { initI18n } from '@/i18n'
+import { css } from '@/styled-system/css'
 
 export default async function StudentProgressPage({
   params,
@@ -18,7 +19,7 @@ export default async function StudentProgressPage({
   const userId = (session?.user as { id?: string } | undefined)?.id
   if (!userId) {
     return (
-      <div style={{ padding: '2rem' }}>
+      <div className={css({ padding: '2rem' })}>
         <h1>{i18n.t('studentProgress')}</h1>
         <p>{i18n.t('signInProgress')}</p>
       </div>
@@ -32,7 +33,7 @@ export default async function StudentProgressPage({
     .where(and(eq(teacherStudents.teacherId, userId), eq(teacherStudents.studentId, id)))
   const threshold = row?.threshold ?? 0
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className={css({ padding: '2rem' })}>
       <h1>{i18n.t('studentProgress')}</h1>
       <CoverageThresholdInput studentId={id} initial={threshold} />
       <StudentCurriculum studentId={id} />
