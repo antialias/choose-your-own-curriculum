@@ -37,4 +37,15 @@ describe('calculateCoverage', () => {
     expect(coverage.n1).toBe(100);
     expect(coverage.n2).toBe(50);
   });
+
+  it('ignores work below mastery threshold', async () => {
+    const graph: Graph = {
+      nodes: [
+        { id: 'n1', label: 'N1', desc: '', tags: ['b'], prereq: [] },
+      ],
+      edges: [],
+    };
+    const coverage = await calculateCoverage('s1', graph, 75);
+    expect(coverage.n1).toBe(41);
+  });
 });

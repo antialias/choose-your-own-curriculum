@@ -15,7 +15,11 @@ function similarity(a: number[], b: number[]): number {
   return 1 / (1 + dist);
 }
 
-export async function calculateCoverage(studentId: string, dag: Graph): Promise<Record<string, number>> {
+export async function calculateCoverage(
+  studentId: string,
+  dag: Graph,
+  threshold = Number(process.env.COVERAGE_MASTERY_THRESHOLD ?? '0'),
+): Promise<Record<string, number>> {
   const db = getDb();
   const sqlite = getSqlite();
   const rows = await db
@@ -24,7 +28,9 @@ export async function calculateCoverage(studentId: string, dag: Graph): Promise<
     .where(eq(uploadedWork.studentId, studentId));
 
   const works = rows
-    .filter((r) => r.masteryPercent !== null)
+    .filter(
+      (r) => r.masteryPercent !== null && (r.masteryPercent as number) > threshold
+    )
     .map((r) => {
       const vec = getWorkVector(r.id) || [];
       return { vector: vec, weight: (r.masteryPercent as number) / 100 };

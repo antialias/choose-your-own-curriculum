@@ -26,6 +26,7 @@ export async function GET(
       name: students.name,
       email: students.email,
       topicDagId: teacherStudents.topicDagId,
+      coverageMasteryThreshold: teacherStudents.coverageMasteryThreshold,
       topics: topicDags.topics,
       graph: topicDags.graph,
     })
@@ -43,6 +44,7 @@ export async function GET(
       name: row.name,
       email: row.email,
       topicDagId: row.topicDagId,
+      coverageMasteryThreshold: row.coverageMasteryThreshold,
       topics: row.topics ? JSON.parse(row.topics) : null,
       graph: row.graph ? JSON.parse(row.graph) : null,
     },
@@ -69,9 +71,12 @@ export async function PUT(
   }
   const updateSchema = studentFieldsSchema
     .partial()
-    .extend({ topicDagId: z.string().nullable().optional() })
+    .extend({
+      topicDagId: z.string().nullable().optional(),
+      coverageMasteryThreshold: z.number().optional(),
+    })
   const data = updateSchema.parse(await req.json())
-  const { name, email, topicDagId } = data
+  const { name, email, topicDagId, coverageMasteryThreshold } = data
   const studentValues: {
     name?: string
     email?: string | null
@@ -96,6 +101,12 @@ export async function PUT(
     await db
       .update(teacherStudents)
       .set({ topicDagId: topicDagId || null })
+      .where(and(eq(teacherStudents.teacherId, teacherId), eq(teacherStudents.studentId, id)))
+  }
+  if (coverageMasteryThreshold !== undefined) {
+    await db
+      .update(teacherStudents)
+      .set({ coverageMasteryThreshold })
       .where(and(eq(teacherStudents.teacherId, teacherId), eq(teacherStudents.studentId, id)))
   }
   return NextResponse.json({ ok: true })

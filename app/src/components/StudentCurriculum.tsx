@@ -61,6 +61,13 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     }
   }
 
+  useEffect(() => {
+    const handler = () => loadCoverage()
+    window.addEventListener('coverageThresholdChanged', handler)
+    return () => window.removeEventListener('coverageThresholdChanged', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const save = async () => {
     await fetch(`/api/students/${studentId}`, {
       method: 'PUT',

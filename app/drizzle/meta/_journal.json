@@ -71,5 +71,12 @@
       "when": 1752028889696,
       "tag": "0009_eminent_marvel_apes",
       "breakpoints": true
-    }
-  ]}
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1752069881007,
+      "tag": "0010_friendly_joystick",
+      "breakpoints": true
+    }  ]
+}
