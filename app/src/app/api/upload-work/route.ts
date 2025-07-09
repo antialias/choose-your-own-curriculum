@@ -15,6 +15,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file instanceof File && file.type.startsWith('image/');
+  const isPdf = file instanceof File && file.type === 'application/pdf';
   if (file instanceof File) {
     buffer = Buffer.from(await file.arrayBuffer());
   }
@@ -61,6 +63,32 @@ export async function POST(req: NextRequest) {
         .resize({ width: 144, height: 144, fit: 'inside' })
         .png()
         .toBuffer();
+    } catch (err) {
+      console.error('thumbnail error', err);
+    }
+  } else if (isPdf && buffer) {
+    try {
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      const { createCanvas } = await import(/* webpackIgnore: true */ '@napi-rs/canvas');
+      const doc = await pdfjs.getDocument({ data: buffer }).promise;
+      const page = await doc.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+      const scale = 144 / Math.max(viewport.width, viewport.height);
+      const vp = page.getViewport({ scale });
+      const canvas = createCanvas(vp.width, vp.height);
+      const ctx = canvas.getContext('2d');
+      await page.render({
+        canvasContext: ctx as unknown as CanvasRenderingContext2D,
+        viewport: vp,
+      }).promise;
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(0, 0, vp.width, vp.height);
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${vp.height / 2}px sans-serif`;
+      ctx.fillText('PDF', vp.width / 2, vp.height / 2);
+      thumbnail = canvas.toBuffer('image/png');
     } catch (err) {
       console.error('thumbnail error', err);
     }
@@ -77,6 +105,17 @@ export async function POST(req: NextRequest) {
           messages: [
             { role: 'user', content: [{ type: 'text', text: 'Summarize this work' }, { type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } }] },
           ],
+        });
+        summary = chat.choices[0].message.content || '';
+      } catch (err) {
+        console.error('summary error', err);
+      }
+    } else if (isPdf && buffer) {
+      try {
+        const { text } = await pdfParse(buffer);
+        const chat = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: `Summarize this work: ${text}` }],
         });
         summary = chat.choices[0].message.content || '';
       } catch (err) {
