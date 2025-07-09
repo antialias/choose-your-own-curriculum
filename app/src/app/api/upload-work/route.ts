@@ -14,6 +14,7 @@ import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
+import sharp from 'sharp';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -46,8 +47,19 @@ export async function POST(req: NextRequest) {
   }
   uploadWorkServerSchema.parse({ ...fields, file });
   const buffer = Buffer.from(await file.arrayBuffer());
+  let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file.type.startsWith('image/');
+  if (isImage) {
+    try {
+      thumbnail = await sharp(buffer)
+        .resize({ width: 144, height: 144, fit: 'inside' })
+        .png()
+        .toBuffer();
+    } catch (err) {
+      console.error('thumbnail error', err);
+    }
+  }
 
   let summary = '';
 
@@ -104,6 +116,10 @@ export async function POST(req: NextRequest) {
     dateCompleted: dateCompleted ? new Date(dateCompleted) : null,
     summary,
     originalDocument: buffer,
+    originalFilename: file.name,
+    originalMimeType: file.type,
+    thumbnail,
+    thumbnailMimeType: thumbnail ? 'image/png' : null,
   } as typeof uploadedWork.$inferInsert);
   if (vector.length) {
     upsertWorkEmbeddings([{ workId, vector }]);
@@ -137,7 +153,7 @@ export async function GET(req: NextRequest) {
         return { text: textRow.text, vector };
       })
       .filter((t): t is { text: string; vector: number[] } => Boolean(t));
-    return { ...w, tags };
+    return { ...w, tags, hasThumbnail: !!w.thumbnail };
   });
   if (studentId) {
     workWithTags = workWithTags.filter((w) => w.studentId === studentId);

@@ -18,6 +18,7 @@ interface Work {
   dateUploaded: string
   dateCompleted: string | null
   tags: Tag[]
+  hasThumbnail: boolean
 }
 
 export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}) {
@@ -128,18 +129,30 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
           }</h3>}
           <ul>
             {works.map((w) => (
-              <li key={w.id} style={{ marginBottom: '1rem' }}>
-                <strong>
-                  {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
-                </strong>
-                <SummaryWithMath text={w.summary ?? ''} />
-                {w.tags.length > 0 && (
-                  <div>
-                    {w.tags.map((t) => (
-                      <TagPill key={t.text} text={t.text} vector={t.vector} />
-                    ))}
-                  </div>
+              <li
+                key={w.id}
+                style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}
+              >
+                {w.hasThumbnail && (
+                  <img
+                    src={`/api/upload-work/${w.id}?type=thumbnail`}
+                    alt="thumbnail"
+                    style={{ maxWidth: '1.5in', maxHeight: '1.5in' }}
+                  />
                 )}
+                <div>
+                  <strong>
+                    {new Date(w.dateCompleted || w.dateUploaded).toDateString()}
+                  </strong>
+                  <SummaryWithMath text={w.summary ?? ''} />
+                  {w.tags.length > 0 && (
+                    <div>
+                      {w.tags.map((t) => (
+                        <TagPill key={t.text} text={t.text} vector={t.vector} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
