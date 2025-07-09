@@ -14,8 +14,12 @@ describe('graphToMermaid', () => {
   it('converts graph to mermaid syntax', () => {
     const mermaid = graphToMermaid(graph);
     expect(mermaid).toContain('graph LR');
-    expect(mermaid).toContain('a["Node A"]');
-    expect(mermaid).toContain('b["Node \\\"B\\\""]');
+    expect(mermaid).toContain(
+      'a["<span class=\'node-label\' data-node-id=\'a\'>Node A</span>"]'
+    );
+    expect(mermaid).toContain(
+      'b["<span class=\'node-label\' data-node-id=\'b\'>Node &quot;B&quot;</span>"]'
+    );
     expect(mermaid).toContain('a --> b');
   });
 });
