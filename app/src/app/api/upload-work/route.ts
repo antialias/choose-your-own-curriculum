@@ -15,6 +15,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/authOptions';
 import OpenAI from 'openai';
 import sharp from 'sharp';
+import { createCanvas } from 'canvas';
 import { uploadWorkFieldsSchema, uploadWorkServerSchema } from '@/forms/uploadWork';
 
 export async function POST(req: NextRequest) {
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
   let thumbnail: Buffer | null = null;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
   const isImage = file instanceof File && file.type.startsWith('image/');
+  const isPdf = file instanceof File && file.type === 'application/pdf';
   if (file instanceof File) {
     buffer = Buffer.from(await file.arrayBuffer());
   }
@@ -59,6 +61,31 @@ export async function POST(req: NextRequest) {
     try {
       thumbnail = await sharp(buffer)
         .resize({ width: 144, height: 144, fit: 'inside' })
+        .png()
+        .toBuffer();
+    } catch (err) {
+      console.error('thumbnail error', err);
+    }
+  } else if (isPdf && buffer) {
+    try {
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      const pdfDoc = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
+      const page = await pdfDoc.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+      const canvas = createCanvas(viewport.width, viewport.height);
+      const context = canvas.getContext('2d');
+      await page.render({ canvasContext: context as unknown as CanvasRenderingContext2D, viewport }).promise;
+      const pagePng = canvas.toBuffer('image/png');
+      const overlay = Buffer.from(
+        `<svg width="${viewport.width}" height="${viewport.height}">
+          <rect width="100%" height="100%" fill="rgba(0,0,0,0.4)" />
+          <text x="50%" y="50%" font-size="${viewport.width / 3}"
+            fill="white" dy=".35em" text-anchor="middle" font-family="sans-serif">PDF</text>
+        </svg>`
+      );
+      thumbnail = await sharp(pagePng)
+        .resize({ width: 144, height: 144, fit: 'inside' })
+        .composite([{ input: overlay }])
         .png()
         .toBuffer();
     } catch (err) {

@@ -39,7 +39,7 @@
   "selectStudent": "Select student",
   "invalidEmail": "Invalid email",
   "studentIdRequired": "Student ID is required",
-  "fileRequired": "File is required",
+  "fileRequired": "File or note is required",
   "nameRequired": "Name is required",
   "studentCount_one": "{{count}} student",
   "studentCount_other": "{{count}} students",
