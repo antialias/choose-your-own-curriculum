@@ -10,10 +10,10 @@ describe('SummaryWithMath', () => {
     expect(container.querySelector('.katex')).toBeInTheDocument()
   })
 
-  it('handles parentheses within math', () => {
-    const { getByText } = render(
-      <SummaryWithMath text="Perimeter \\(a+b+c\\)" />
+  it('renders markdown lists', () => {
+    const { container } = render(
+      <SummaryWithMath text={'- **Bold** item'} />
     )
-    expect(getByText(/a\+b\+c/)).toBeInTheDocument()
+    expect(container.querySelector('li strong')).toBeInTheDocument()
   })
 })

@@ -6,4 +6,5 @@ Each upload appears in the list with its summary for easy review. New uploads sh
 
 Image uploads also generate a thumbnail shown to the left of the summary. Thumbnails are sized to at most 1.5 inches on each side while preserving aspect ratio.
 
+Summaries support Markdown formatting such as lists and bold text.
 Math expressions wrapped in `$...$`, `$$...$$`, `\(...\)` or `\[...\]` in summaries are rendered with KaTeX.
