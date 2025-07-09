@@ -139,7 +139,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                 {w.hasThumbnail && !thumbError[w.id] ? (
                   <img
                     src={`/api/upload-work/${w.id}?type=thumbnail`}
-                    alt="thumbnail"
+                    alt={t('thumbnailAlt')}
                     style={{ maxWidth: '1.5in', maxHeight: '1.5in' }}
                     onError={() => setThumbError((e) => ({ ...e, [w.id]: true }))}
                   />

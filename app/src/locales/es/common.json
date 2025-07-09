@@ -41,4 +41,14 @@
   "studentCount_other": "{{count}} estudiantes",
   "curriculumCount_one": "{{count}} currículo",
   "curriculumCount_other": "{{count}} currículos"
+  ,
+  "greeting": "Hola {{name}}",
+  "userName": "Usuario {{id}}",
+  "defaultBio": "Esta es la biografía.",
+  "thumbnailAlt": "miniatura",
+  "generateGraph": "Generar gráfico",
+  "generatingGraph": "Generando gráfico...",
+  "failedGenerateGraph": "Error al generar el gráfico: {{error}}. Inténtalo de nuevo más tarde.",
+  "saveGraph": "Guardar gráfico",
+  "saved": "Guardado"
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 type Props = { name: string };
 
 const styles = {
@@ -7,5 +9,6 @@ const styles = {
 };
 
 export function Greeting({ name }: Props) {
-  return <span style={styles.root}>Hello {name}</span>;
+  const { t } = useTranslation();
+  return <span style={styles.root}>{t('greeting', { name })}</span>;
 }

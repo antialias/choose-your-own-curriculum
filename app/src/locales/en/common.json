@@ -41,4 +41,14 @@
   "studentCount_other": "{{count}} students",
   "curriculumCount_one": "{{count}} curriculum",
   "curriculumCount_other": "{{count}} curriculums"
+  ,
+  "greeting": "Hello {{name}}",
+  "userName": "User {{id}}",
+  "defaultBio": "This is the bio.",
+  "thumbnailAlt": "thumbnail",
+  "generateGraph": "Generate Graph",
+  "generatingGraph": "Generating graph...",
+  "failedGenerateGraph": "Failed to generate graph: {{error}}. Please try again later.",
+  "saveGraph": "Save Graph",
+  "saved": "Saved"
 }

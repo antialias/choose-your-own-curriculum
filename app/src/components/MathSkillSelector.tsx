@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { css } from '@/styled-system/css';
 import Mermaid from 'react-mermaid2';
 import { Graph } from '@/graphSchema';
@@ -34,6 +35,7 @@ export function MathSkillSelector() {
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const toggle = (skill: string) => {
     setSelected((prev) =>
@@ -93,19 +95,19 @@ export function MathSkillSelector() {
         ))}
       </div>
       <button style={styles.button} onClick={generate}>
-        Generate Graph
+        {t('generateGraph')}
       </button>
       {status === 'loading' && (
-        <p className={css({ color: 'blue.600', mt: '2' })}>Generating graph...</p>
+        <p className={css({ color: 'blue.600', mt: '2' })}>{t('generatingGraph')}</p>
       )}
       {status === 'error' && (
         <p className={css({ color: 'red.600', mt: '2' })}>
-          Failed to generate graph: {error}. Please try again later.
+          {t('failedGenerateGraph', { error })}
         </p>
       )}
       {graph && (
         <button style={styles.button} onClick={save} disabled={saved}>
-          {saved ? 'Saved' : 'Save Graph'}
+          {saved ? t('saved') : t('saveGraph')}
         </button>
       )}
       {graph && (
