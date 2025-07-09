@@ -1,9 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
-import { graphToMermaid } from '@/graphToMermaid'
+import { CurriculumGraph } from './CurriculumGraph'
 
 interface Dag {
   id: string
@@ -98,7 +97,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
         <div style={{ marginTop: '1rem' }}>
-          <Mermaid chart={graphToMermaid(data.graph)} />
+          <CurriculumGraph graph={data.graph} />
         </div>
       )}
     </div>
