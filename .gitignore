@@ -3,6 +3,7 @@ node_modules/
 **/.next
 **/build
 **/coverage
+!app/src/coverage
 app/prisma/dev.db
 app/node-compile-cache
 

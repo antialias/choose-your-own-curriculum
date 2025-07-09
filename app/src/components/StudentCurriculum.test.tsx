@@ -25,6 +25,10 @@ function mockStudent(topicDagId: string | null) {
   })
 }
 
+function mockCoverage() {
+  mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ coverage: {} }) })
+}
+
 function mockDags() {
   mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ dags: [] }) })
 }
@@ -37,6 +41,7 @@ describe('StudentCurriculum', () => {
   it('shows selector when no curriculum', async () => {
     mockStudent(null)
     mockDags()
+    mockCoverage()
     render(
       <I18nProvider lng="en">
         <StudentCurriculum studentId="s1" />
@@ -49,6 +54,7 @@ describe('StudentCurriculum', () => {
   it('shows graph when curriculum set', async () => {
     mockStudent('d1')
     mockDags()
+    mockCoverage()
     render(
       <I18nProvider lng="en">
         <StudentCurriculum studentId="s1" />
@@ -60,6 +66,7 @@ describe('StudentCurriculum', () => {
   it('allows changing curriculum', async () => {
     mockStudent('d1')
     mockDags()
+    mockCoverage()
     render(
       <I18nProvider lng="en">
         <StudentCurriculum studentId="s1" />
