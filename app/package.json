@@ -41,13 +41,16 @@
     "react-hook-form": "^7.50.0",
     "react-i18next": "^15.6.0",
     "react-katex": "^3.1.0",
+    "react-markdown": "^10.1.0",
     "react-mermaid2": "^0.1.4",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "sharp": "^0.34.2",
     "sqlite-vec": "0.1.7-alpha.2",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.74",
     "zod-to-json-schema": "^3.24.6"
-    ,
-    "sharp": "^0.34.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",
