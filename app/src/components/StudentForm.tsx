@@ -51,9 +51,9 @@ export function StudentForm({ student, onSuccess }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
       <input placeholder={t('name')} {...register('name')} />
-      {errors.name && <span>{errors.name.message}</span>}
+      {errors.name && <span>{t(errors.name.message || '')}</span>}
       <input placeholder={t('email')} {...register('email')} />
-      {errors.email && <span>{errors.email.message}</span>}
+      {errors.email && <span>{t(errors.email.message || '')}</span>}
       <button type="submit" disabled={isSubmitting || mutation.isPending}>
         {student ? t('save') : t('add')}
       </button>

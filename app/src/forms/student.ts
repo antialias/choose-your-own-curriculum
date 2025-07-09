@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
 export const studentFieldsSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'nameRequired'),
   email: z
     .string()
-    .email('Invalid email')
+    .email('invalidEmail')
     .optional()
     .or(z.literal('')),
 })

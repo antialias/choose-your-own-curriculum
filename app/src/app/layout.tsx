@@ -9,11 +9,15 @@ import { NavBar } from "@/components/NavBar";
 import I18nProvider from "@/components/I18nProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
+import { initI18n } from "@/i18n";
 
-export const metadata: Metadata = {
-  title: "Choose Your Own Curriculum",
-  description: "Track and plan your learning journey",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const i18n = await initI18n("en");
+  return {
+    title: i18n.t("chooseCurriculum"),
+    description: i18n.t("siteDescription"),
+  };
+}
 
 export default async function RootLayout({
   children,

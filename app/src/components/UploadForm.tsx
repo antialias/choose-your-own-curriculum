@@ -61,7 +61,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
     >
       <input type="file" data-testid="file" {...register('file')} />
       <textarea placeholder={t('note')} {...register('note')} />
-      {errors.file && <span>{errors.file.message}</span>}
+      {errors.file && <span>{t(errors.file.message || '')}</span>}
       <input type="date" {...register('dateCompleted')} />
       <select {...register('studentId')} defaultValue="">
         <option value="" disabled>
@@ -73,7 +73,7 @@ export function UploadForm({ onUploadStart, onSuccess, onError }: Props) {
           </option>
         ))}
       </select>
-      {errors.studentId && <span>{errors.studentId.message}</span>}
+      {errors.studentId && <span>{t(errors.studentId.message || '')}</span>}
       <button type="submit" disabled={isSubmitting}>{t('upload')}</button>
     </form>
   )
