@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
   if (isImage) {
     try {
       thumbnail = await sharp(buffer)
+        .rotate()
         .resize({ width: 144, height: 144, fit: 'inside' })
         .png()
         .toBuffer();
