@@ -4,7 +4,7 @@ Authenticated users can upload documents or write free text notes from the **Upl
 
 Each upload appears in the list with its summary for easy review. New uploads show a temporary `Processing...` placeholder while the summary is generated. Any errors are shown next to the list.
 
-Image uploads also generate a thumbnail shown to the left of the summary. Thumbnails are sized to at most 1.5 inches on each side while preserving aspect ratio.
+Image uploads generate a thumbnail shown to the left of the summary. PDF uploads render the first page and overlay **PDF** across the image. Thumbnails are sized to at most 1.5 inches on each side while preserving aspect ratio.
 
 If no thumbnail is available or a file type isn't supported, a placeholder icon displays the file's extension instead.
 
