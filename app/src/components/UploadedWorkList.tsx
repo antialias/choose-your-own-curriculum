@@ -136,7 +136,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                 {w.hasThumbnail && (
                   <img
                     src={`/api/upload-work/${w.id}?type=thumbnail`}
-                    alt="thumbnail"
+                    alt={t('thumbnailAlt')}
                     style={{ maxWidth: '1.5in', maxHeight: '1.5in' }}
                   />
                 )}

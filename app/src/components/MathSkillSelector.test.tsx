@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 vi.mock('react-mermaid2', () => ({ default: () => <div data-testid="mermaid" /> }));
 import { MathSkillSelector } from './MathSkillSelector';
+import I18nProvider from './I18nProvider';
 
 vi.stubGlobal('fetch', vi.fn());
 const mockFetch = fetch as unknown as Mock;
@@ -16,9 +17,13 @@ test('calls API with selected topics and saves', async () => {
     })
   );
   mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ ok: true }) });
-  render(<MathSkillSelector />);
-  await user.click(screen.getByLabelText('Algebra'));
-  await user.click(screen.getByText('Generate Graph'));
+  render(
+    <I18nProvider lng="en">
+      <MathSkillSelector />
+    </I18nProvider>
+  );
+  await user.click(await screen.findByLabelText('Algebra'));
+  await user.click(await screen.findByText('Generate Graph'));
   expect(await screen.findByText('Generating graph...')).toBeInTheDocument();
   resolveFetch!({ ok: true, json: () => Promise.resolve({ graph: { nodes: [{ id: 'a', label: 'A', desc: '', tags: ['t1','t2','t3'] }], edges: [] } }) });
   expect(mockFetch).toHaveBeenCalledWith('/api/generate-graph', expect.objectContaining({ method: 'POST' }));
@@ -37,7 +42,11 @@ test('shows error message on failure', async () => {
     ok: false,
     json: () => Promise.resolve({ error: 'bad' }),
   });
-  render(<MathSkillSelector />);
-  await user.click(screen.getByText('Generate Graph'));
+  render(
+    <I18nProvider lng="en">
+      <MathSkillSelector />
+    </I18nProvider>
+  );
+  await user.click(await screen.findByText('Generate Graph'));
   expect(await screen.findByText('Failed to generate graph: bad. Please try again later.')).toBeInTheDocument();
 });
