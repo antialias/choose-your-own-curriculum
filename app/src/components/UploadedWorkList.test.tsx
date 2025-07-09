@@ -10,6 +10,7 @@ const mockFetch = fetch as unknown as Mock
 interface Tag {
   text: string
   vector: number[]
+  score: number
 }
 
 interface Work {
@@ -43,7 +44,7 @@ describe('UploadedWorkList', () => {
       summary: 'sum',
       dateUploaded: new Date().toISOString(),
       dateCompleted: null,
-      tags: [{ text: 't1', vector: [0, 0, 0] }],
+      tags: [{ text: 't1', vector: [0, 0, 0], score: 0.9 }],
       hasThumbnail: true,
       originalMimeType: 'image/png',
     },

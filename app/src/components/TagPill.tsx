@@ -2,10 +2,12 @@ import { css } from '@/styled-system/css'
 import { useMemo } from 'react'
 import type { Graph } from '@/graphSchema'
 import { Tooltip } from './Tooltip'
+import type { FontSizeToken } from '@/styled-system/tokens'
 
 export type TagPillProps = {
   text: string
   vector: number[]
+  score?: number
   graph?: Graph | null
 }
 
@@ -17,8 +19,11 @@ function vectorToColor(v: number[]): string {
   return `hsl(${Math.floor(hue) % 360}, ${Math.floor(sat)}%, ${Math.floor(light)}%)`
 }
 
-export function TagPill({ text, vector, graph }: TagPillProps) {
+export function TagPill({ text, vector, score = 0, graph }: TagPillProps) {
   const color = vectorToColor(vector)
+  const sizes: FontSizeToken[] = ['sm', 'md', 'lg', 'xl']
+  const idx = Math.round(Math.max(0, Math.min(1, score)) * (sizes.length - 1))
+  const fontSize = sizes[idx]
   const info = useMemo(() => {
     if (!graph) return null
     const matches = graph.nodes.filter((n) => n.tags.includes(text))
@@ -42,7 +47,7 @@ export function TagPill({ text, vector, graph }: TagPillProps) {
         paddingY: '1',
         borderRadius: 'full',
         color: 'white',
-        fontSize: 'sm',
+        fontSize,
         marginRight: '1',
         marginTop: '3',
       })}
