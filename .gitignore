@@ -5,3 +5,5 @@ node_modules/
 **/coverage
 app/prisma/dev.db
 app/node-compile-cache
+
+app/drizzle/meta/
