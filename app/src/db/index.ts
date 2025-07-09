@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import Database from 'better-sqlite3';
 import type { Database as SqliteDatabase } from 'better-sqlite3';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';

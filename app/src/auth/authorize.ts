@@ -1,5 +1,5 @@
 import { newEnforcer } from 'casbin';
-import path from 'path';
+import path from 'node:path';
 
 let enforcerPromise: ReturnType<typeof newEnforcer> | null = null;
 
