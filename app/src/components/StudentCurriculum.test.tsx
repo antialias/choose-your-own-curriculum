@@ -1,6 +1,7 @@
 vi.mock('react-mermaid2', () => ({ default: () => <div data-testid="mermaid" /> }))
 import { render, screen } from '@testing-library/react'
 import { StudentCurriculum } from './StudentCurriculum'
+import { CurriculumGraphProvider } from './CurriculumGraphContext'
 import I18nProvider from './I18nProvider'
 import type { Mock } from 'vitest'
 
@@ -37,7 +38,9 @@ describe('StudentCurriculum', () => {
     mockDags()
     render(
       <I18nProvider lng="en">
-        <StudentCurriculum studentId="s1" />
+        <CurriculumGraphProvider>
+          <StudentCurriculum studentId="s1" />
+        </CurriculumGraphProvider>
       </I18nProvider>
     )
     expect(await screen.findByText('Curriculum')).toBeInTheDocument()
@@ -49,7 +52,9 @@ describe('StudentCurriculum', () => {
     mockDags()
     render(
       <I18nProvider lng="en">
-        <StudentCurriculum studentId="s1" />
+        <CurriculumGraphProvider>
+          <StudentCurriculum studentId="s1" />
+        </CurriculumGraphProvider>
       </I18nProvider>
     )
     expect(await screen.findByText('A, B')).toBeInTheDocument()

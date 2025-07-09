@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
+import { useCurriculumGraph } from './CurriculumGraphContext'
 
 interface Dag {
   id: string
@@ -22,6 +23,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
   const { t } = useTranslation()
+  const { setGraph } = useCurriculumGraph()
 
   const load = async () => {
     const res = await fetch(`/api/students/${studentId}`)
@@ -40,6 +42,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
         graph: s.graph,
       })
       setSelected(s.topicDagId || '')
+      setGraph(s.graph)
     }
   }
 

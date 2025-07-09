@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/authOptions'
-import { StudentCurriculum } from '@/components/StudentCurriculum'
-import { UploadedWorkList } from '@/components/UploadedWorkList'
+import { StudentProgressClient } from '@/components/StudentProgressClient'
 import { initI18n } from '@/i18n'
 
 export default async function StudentProgressPage({
@@ -24,8 +23,7 @@ export default async function StudentProgressPage({
   return (
     <div style={{ padding: '2rem' }}>
       <h1>{i18n.t('studentProgress')}</h1>
-      <StudentCurriculum studentId={id} />
-      <UploadedWorkList studentId={id} />
+      <StudentProgressClient studentId={id} />
     </div>
   )
 }
