@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 interface Tag {
   text: string
   vector: number[]
+  score: number
 }
 
 interface Work {
@@ -177,6 +178,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                           key={t.text}
                           text={t.text}
                           vector={t.vector}
+                          score={t.score}
                           graph={graph}
                         />
                       ))}
