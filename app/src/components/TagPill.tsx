@@ -1,8 +1,12 @@
 import { css } from '@/styled-system/css'
+import { useMemo } from 'react'
+import type { Graph } from '@/graphSchema'
+import { Tooltip } from './Tooltip'
 
 export type TagPillProps = {
   text: string
   vector: number[]
+  graph?: Graph | null
 }
 
 function vectorToColor(v: number[]): string {
@@ -13,9 +17,24 @@ function vectorToColor(v: number[]): string {
   return `hsl(${Math.floor(hue) % 360}, ${Math.floor(sat)}%, ${Math.floor(light)}%)`
 }
 
-export function TagPill({ text, vector }: TagPillProps) {
+export function TagPill({ text, vector, graph }: TagPillProps) {
   const color = vectorToColor(vector)
-  return (
+  const info = useMemo(() => {
+    if (!graph) return null
+    const matches = graph.nodes.filter((n) => n.tags.includes(text))
+    if (matches.length === 0) return null
+    return matches.map((node) => {
+      const fromIds = graph.edges.filter((e) => e[1] === node.id).map((e) => e[0])
+      const toIds = graph.edges.filter((e) => e[0] === node.id).map((e) => e[1])
+      return {
+        node,
+        from: graph.nodes.filter((n) => fromIds.includes(n.id)),
+        to: graph.nodes.filter((n) => toIds.includes(n.id)),
+      }
+    })
+  }, [graph, text])
+
+  const pill = (
     <span
       className={css({
         display: 'inline-block',
@@ -31,5 +50,33 @@ export function TagPill({ text, vector }: TagPillProps) {
     >
       {text}
     </span>
+  )
+
+  if (!info) return pill
+
+  return (
+    <Tooltip
+      content={
+        <div>
+          {info.map(({ node, from, to }) => (
+            <div key={node.id} className={css({ mb: '2' })}>
+              <div className={css({ fontWeight: 'bold' })}>{node.label}</div>
+              {from.length > 0 && (
+                <div>
+                  from: {from.map((f) => f.label).join(', ')}
+                </div>
+              )}
+              {to.length > 0 && (
+                <div>
+                  to: {to.map((t) => t.label).join(', ')}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      }
+    >
+      {pill}
+    </Tooltip>
   )
 }

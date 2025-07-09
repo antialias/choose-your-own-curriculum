@@ -13,3 +13,17 @@ export const Default = {
     vector: [0.1, 0.2, 0.3],
   },
 }
+
+export const WithTooltip = {
+  args: {
+    text: 'math',
+    vector: [0, 0, 0],
+    graph: {
+      nodes: [
+        { id: 'a', label: 'A', desc: '', tags: ['math'], grade: undefined },
+        { id: 'b', label: 'B', desc: '', tags: [], grade: undefined },
+      ],
+      edges: [['a', 'b']],
+    },
+  },
+}

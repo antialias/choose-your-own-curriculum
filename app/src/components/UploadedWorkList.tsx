@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UploadForm } from './UploadForm'
 import { TagPill } from './TagPill'
+import type { Graph } from '@/graphSchema'
 import { ThumbnailPlaceholder } from './ThumbnailPlaceholder'
 import { useTranslation } from 'react-i18next'
 
@@ -31,6 +32,7 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   const [filterStudent, setFilterStudent] = useState(studentId)
   const [filterDay, setFilterDay] = useState('')
   const [filterTag, setFilterTag] = useState('')
+  const [graph, setGraph] = useState<Graph | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [thumbError, setThumbError] = useState<Record<string, boolean>>({})
   const { t } = useTranslation()
@@ -38,6 +40,23 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
   useEffect(() => {
     setFilterStudent(studentId)
   }, [studentId])
+
+  useEffect(() => {
+    if (!filterStudent) {
+      setGraph(null)
+      return
+    }
+    const load = async () => {
+      const res = await fetch(`/api/students/${filterStudent}`)
+      if (res.ok) {
+        const data = (await res.json()) as { student: { graph: Graph | null } }
+        setGraph(data.student.graph)
+      } else {
+        setGraph(null)
+      }
+    }
+    load()
+  }, [filterStudent])
 
 
   const loadWorks = async () => {
@@ -154,7 +173,12 @@ export function UploadedWorkList({ studentId = '' }: { studentId?: string } = {}
                   {w.tags.length > 0 && (
                     <div>
                       {w.tags.map((t) => (
-                        <TagPill key={t.text} text={t.text} vector={t.vector} />
+                        <TagPill
+                          key={t.text}
+                          text={t.text}
+                          vector={t.vector}
+                          graph={graph}
+                        />
                       ))}
                     </div>
                   )}
