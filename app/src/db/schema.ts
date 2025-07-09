@@ -110,6 +110,10 @@ export const uploadedWork = sqliteTable('uploaded_work', {
   summary: text('summary'),
   embeddings: text('embeddings'),
   originalDocument: blob('originalDocument', { mode: 'buffer' }),
+  originalFilename: text('originalFilename'),
+  originalMimeType: text('originalMimeType'),
+  thumbnail: blob('thumbnail', { mode: 'buffer' }),
+  thumbnailMimeType: text('thumbnailMimeType'),
 });
 
 export const tags = sqliteTable('tag', {
