@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
+import { addMermaidTags } from '@/lib/mermaidTags'
 
 interface Dag {
   id: string
@@ -62,7 +63,10 @@ export function TopicDAGList() {
               : `Tag processing: ${d.tagEmbeddingsComplete}/${d.tagEmbeddingsTotal}`}
           </div>
           {expanded === d.id && (
-            <div style={{ marginTop: '1rem' }}>
+            <div
+              style={{ marginTop: '1rem' }}
+              ref={(el) => addMermaidTags(el, d.graph)}
+            >
               <Mermaid chart={graphToMermaid(d.graph)} />
             </div>
           )}

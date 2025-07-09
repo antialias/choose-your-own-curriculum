@@ -1,9 +1,10 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import Mermaid from 'react-mermaid2'
 import { Graph } from '@/graphSchema'
 import { graphToMermaid } from '@/graphToMermaid'
+import { addMermaidTags } from '@/lib/mermaidTags'
 
 interface Dag {
   id: string
@@ -22,6 +23,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
   const [dags, setDags] = useState<Dag[]>([])
   const [selected, setSelected] = useState('')
   const { t } = useTranslation()
+  const graphRef = useRef<HTMLDivElement | null>(null)
 
   const load = async () => {
     const res = await fetch(`/api/students/${studentId}`)
@@ -66,6 +68,12 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId])
 
+  useEffect(() => {
+    if (data?.graph) {
+      addMermaidTags(graphRef.current, data.graph)
+    }
+  }, [data?.graph])
+
   if (!data) return null
 
   if (!data.topicDagId) {
@@ -97,7 +105,7 @@ export function StudentCurriculum({ studentId }: { studentId: string }) {
       <h2>{t('curriculum')}</h2>
       <div>{data.topics.join(', ')}</div>
       {data.graph && (
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: '1rem' }} ref={graphRef}>
           <Mermaid chart={graphToMermaid(data.graph)} />
         </div>
       )}
