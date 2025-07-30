@@ -11,3 +11,8 @@ export async function getEnforcer() {
   }
   return enforcerPromise;
 }
+
+export async function authorize(role: string, obj: string, act: string) {
+  const enforcer = await getEnforcer();
+  return enforcer.enforce(role, obj, act);
+}
