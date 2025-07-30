@@ -4,6 +4,8 @@ Choose Your Own Curriculum is a web application for planning and tracking long t
 
 Users can authenticate via email. Use the navigation bar's **Sign in** link to open the `/login` page. Once signed in, the link changes to **Sign out**. The navigation bar links to **Upload Work** (the Uploaded Work page), **Curriculums** (My Curriculums) and **Students**.
 
+User accounts have roles for access control. The very first account created on a new database is automatically assigned the `superadmin` role. All subsequent accounts default to the `user` role.
+
 The home page includes a math skill selector that generates prerequisite graphs as JSON using the built-in LLM client. The graphs are converted to Mermaid diagrams only when rendered. The Curriculum Generator moved to `/curriculum-generator`; start there from the **Curriculums** page to generate prerequisite graphs.
 
 ## Tech Stack
